@@ -36,3 +36,10 @@ prototype is pretty close to being done, we should figure out how to:
 If we're going to be creating a common library used by multiple animations, do 
 we want some way of tracking which animations depend on which tools so we can check
 the output still works when we make changes to the tools?
+
+## Website
+### Build
+In order to build the website, you will need to (install sphinx)[https://www.sphinx-doc.org/en/master/usage/installation.html]. This can be done on linux using the command `apt-get install python3-sphinx`.
+
+Once you've installed sphinx, you can build the website by running `make html`.
+You can view the result by opening `build/html/index.html` in your web browser (using a command like `firefox build/html/index.html`).
