@@ -40,9 +40,9 @@ the output still works when we make changes to the tools?
 
 ### Build
 This respository uses vs-code dev containers. To open the repository in a dev container:
-1. Install (docker desktop)[https://www.docker.com/products/docker-desktop/]
-2. Install (vs-code)["https://code.visualstudio.com/download"]
+1. Install [docker desktop](https://www.docker.com/products/docker-desktop/).
+2. Install [vs-code](https://code.visualstudio.com/download).
 3. Add the **Dev Containers** extension to vs-code.
 4. Open the command pallette using *Ctrl + Shift + P*, then search for *Dev Containers: Open Folder in Container* and select the folder containing a local copy of this repository. 
 
-In the dev container, build the website using `make html` or running the vs-code *Build* task. Open the website by running `python -m http.server` or running the vs-code *Open* task and then opening `localhost:8000` in your web browser.
+In the dev container, build the website using `make html` or running the vs-code *Build* task. Open the website by running `python -m http.server` or running the vs-code *Open* task and then opening [localhost:8000](localhost:8000/) in your web browser.
