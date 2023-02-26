@@ -11,7 +11,6 @@ Welcome to Robot Documentation's documentation!
    :caption: Contents:
 
 
-
 Indices and tables
 ==================
 
