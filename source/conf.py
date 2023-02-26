@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Robot Docs'
+project = 'Robot Documentation'
 copyright = '2023, Alex Kempen, Egan Johnson'
 author = 'Alex Kempen, Egan Johnson'
 
