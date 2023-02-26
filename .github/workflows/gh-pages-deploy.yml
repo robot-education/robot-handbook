@@ -1,25 +1,24 @@
 name: Build and Deploy
- 
-# execute this workflow automatically when a we push to master
-on:
+on: 
   push:
+    branches: 
+      - main
+  workflow_dispatch:
     branches:
       - main
- 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-    uses: actions/checkout@v2.3.1
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
 
-    - name: Install and Build
-      run: |
-      pip install -r requirements.txt
-      make html
- 
-    - name: Deploy
-      uses:  JamesIves/github-pages-deply-action@4.1.4
-      with:
-        branch: gh-pages
-        folder: build/html
+      - name: Install and Build 
+        run: |
+          pip install -r requirements.txt
+          make html
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: build/html # The folder the action should deploy.
