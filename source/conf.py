@@ -32,7 +32,6 @@ release = '1.0.0'
 # ones.
 extensions = [
     'sphinx_rtd_theme',
-    'myst_parser',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.githubpages',
     'sphinx_copybutton'
