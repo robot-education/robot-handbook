@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "build",
-            "detail": "Build website",
+            "detail": "Build the website.",
             "type": "shell",
             "command": "make html",
             "group": {
@@ -23,7 +23,7 @@
         },
         {
             "label": "open",
-            "detail": "Open website",
+            "detail": "Open the website.",
             "type": "shell",
             "command": "python -m http.server",
             "isBackground": true,
