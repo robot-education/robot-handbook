@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        // {
+        //     "name": "Launch Website",
+        //     "request": "launch",
+        //     "program": "${workspaceFolder}/",
+        //     "args": [],
+        //     "preLaunchTask": "make html",
+        //     "cwd": "${workspaceFolder}",
+        //     "internalConsoleOptions": "neverOpen",
+        // },
+    ]
+}
