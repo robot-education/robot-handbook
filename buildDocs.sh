@@ -8,8 +8,8 @@ set -x
 #
 # Authors: Michael Altfield <michael@michaelaltfield.net>
 # Created: 2020-07-17
-# Updated: 2020-07-17
-# Version: 0.1
+# Updated: 2020-07-20
+# Version: 0.2
 ################################################################################
  
 ###################
@@ -17,7 +17,9 @@ set -x
 ###################
  
 apt-get update
-apt-get -y install git rsync python3-sphinx python3-sphinx-rtd-theme
+apt-get -y install git rsync python3-sphinx python3-sphinx-rtd-theme python3-stemmer python3-git python3-pip python3-virtualenv python3-setuptools
+ 
+python3 -m pip install --upgrade rinohtype pygments
  
 #####################
 # DECLARE VARIABLES #
@@ -27,14 +29,67 @@ pwd
 ls -lah
 export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
  
+# make a new temp dir which will be our GitHub Pages docroot
+docroot=`mktemp -d`
+
+export REPO_NAME="${GITHUB_REPOSITORY##*/}"
+ 
 ##############
 # BUILD DOCS #
 ##############
  
-# build our documentation with sphinx (see website/conf.py)
-# * https://www.sphinx-doc.org/en/master/usage/quickstart.html#running-the-build
+# first, cleanup any old builds' static assets
 make -C docs clean
-make -C docs html
+ 
+# get a list of branches, excluding 'HEAD' and 'gh-pages'
+versions="`git for-each-ref '--format=%(refname:lstrip=-1)' refs/remotes/origin/ | grep -viE '^(HEAD|gh-pages)$'`"
+for current_version in ${versions}; do
+ 
+   # make the current language available to conf.py
+   export current_version
+   git checkout ${current_version}
+ 
+   echo "INFO: Building sites for ${current_version}"
+ 
+   # skip this branch if it doesn't have our docs dir & sphinx config
+   if [ ! -e 'docs/conf.py' ]; then
+      echo -e "\tINFO: Couldn't find 'docs/conf.py' (skipped)"
+      continue
+   fi
+ 
+   languages="en `find docs/locales/ -mindepth 1 -maxdepth 1 -type d -exec basename '{}' \;`"
+   for current_language in ${languages}; do
+ 
+      # make the current language available to conf.py
+      export current_language
+ 
+      ##########
+      # BUILDS #
+      ##########
+      echo "INFO: Building for ${current_language}"
+ 
+      # HTML #
+      sphinx-build -b html docs/ docs/_build/html/${current_language}/${current_version} -D language="${current_language}"
+ 
+      # PDF #
+      sphinx-build -b rinoh docs/ docs/_build/rinoh -D language="${current_language}"
+      mkdir -p "${docroot}/${current_language}/${current_version}"
+      cp "docs/_build/rinoh/target.pdf" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.pdf"
+ 
+      # EPUB #
+      sphinx-build -b epub docs/ docs/_build/epub -D language="${current_language}"
+      mkdir -p "${docroot}/${current_language}/${current_version}"
+      cp "docs/_build/epub/target.epub" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.epub"
+ 
+      # copy the static assets produced by the above build into our docroot
+      rsync -av "docs/_build/html/" "${docroot}/"
+ 
+   done
+ 
+done
+ 
+# return to master branch
+git checkout master
  
 #######################
 # Update GitHub Pages #
@@ -42,9 +97,6 @@ make -C docs html
  
 git config --global user.name "${GITHUB_ACTOR}"
 git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
- 
-docroot=`mktemp -d`
-rsync -av "build/html/" "${docroot}/"
  
 pushd "${docroot}"
  
@@ -56,6 +108,20 @@ git checkout -b gh-pages
 # add .nojekyll to the root so that github won't 404 on content added to dirs
 # that start with an underscore (_), such as our "_content" dir..
 touch .nojekyll
+ 
+# add redirect from the docroot to our default docs language/version
+cat > index.html <<EOF
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>helloWorld Docs</title>
+      <meta http-equiv = "refresh" content="0; url='/${REPO_NAME}/en/master/'" />
+   </head>
+   <body>
+      <p>Please wait while you're redirected to our <a href="/${REPO_NAME}/en/master/">documentation</a>.</p>
+   </body>
+</html>
+EOF
  
 # Add README
 cat > README.md <<EOF
