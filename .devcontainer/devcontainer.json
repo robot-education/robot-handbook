@@ -2,23 +2,38 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
 	"name": "Debian",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"dockerFile" : "Dockerfile",
-	"features": {
-		"ghcr.io/devcontainers/features/python:1": {}
-	}
-	// We'll see if we need this
-	// "postCreateCommand": "pip install -r requirements.txt"
-
+	"dockerFile": "Dockerfile",
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
+	"features": {
+		"ghcr.io/devcontainers/features/python:1": {
+			"installJupyterlab": true
+		}
+	},
+	"build": {
+		"args": {
+			"WORKSPACE": "${containerWorkspaceFolder}"
+		}
+	},
+	// We'll see if we need this
+	"postCreateCommand": "pip install -r requirements.txt",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-
 	// Configure tool-specific properties.
-	// "customizations": {},
-
+	"customizations": {
+		"settings": {
+			"terminal.integrated.profiles.linux": {
+				"bash": {
+					"path": "bash"
+				}
+			},
+			"terminal.integrated.defaultProfile.linux": "bash"
+		},
+		"extensions": [
+			"streetsidesoftware.code-spell-checker",
+			"redhat.vscode-yaml",
+			"yzhang.markdown-all-in-one"
+		]
+	}
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
