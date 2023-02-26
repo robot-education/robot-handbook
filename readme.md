@@ -39,7 +39,9 @@ the output still works when we make changes to the tools?
 
 ## Website
 ### Build
-In order to build the website, you will need to (install sphinx)[https://www.sphinx-doc.org/en/master/usage/installation.html]. This can be done on linux using the command `apt-get install python3-sphinx`.
+In order to build the website, you will need:
+1. The build tool (Sphinx)[https://www.sphinx-doc.org/en/master/usage/installation.html]. On linux, run `sudo apt-get install -y python3-sphinx`.
+2. The Read the Docs theme (sphinx-rtd-theme)[https://pypi.org/project/sphinx-rtd-theme/]. On linux, run `sudo apt-get install -y python3-sphinx-rtd-theme` (or `pip install sphinx-rtd-theme`?).
 
 Once you've installed sphinx, you can build the website by running `make html`.
 You can view the result by opening `build/html/index.html` in your web browser (using a command like `firefox build/html/index.html`).
