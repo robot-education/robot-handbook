@@ -52,12 +52,12 @@ for current_version in ${versions}; do
    echo "INFO: Building sites for ${current_version}"
  
    # skip this branch if it doesn't have our docs dir & sphinx config
-   if [ ! -e 'docs/conf.py' ]; then
-      echo -e "\tINFO: Couldn't find 'docs/conf.py' (skipped)"
+   if [ ! -e 'conf.py' ]; then
+      echo -e "\tINFO: Couldn't find 'conf.py' (skipped)"
       continue
    fi
  
-   languages="en `find docs/locales/ -mindepth 1 -maxdepth 1 -type d -exec basename '{}' \;`"
+   languages="en `find locales/ -mindepth 1 -maxdepth 1 -type d -exec basename '{}' \;`"
    for current_language in ${languages}; do
  
       # make the current language available to conf.py
@@ -69,20 +69,20 @@ for current_version in ${versions}; do
       echo "INFO: Building for ${current_language}"
  
       # HTML #
-      sphinx-build -b html docs/ docs/_build/html/${current_language}/${current_version} -D language="${current_language}"
+      sphinx-build -b html build/ build/html/${current_language}/${current_version} -D language="${current_language}"
  
       # PDF #
-      sphinx-build -b rinoh docs/ docs/_build/rinoh -D language="${current_language}"
+      sphinx-build -b rinoh build/ build/rinoh -D language="${current_language}"
       mkdir -p "${docroot}/${current_language}/${current_version}"
-      cp "docs/_build/rinoh/target.pdf" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.pdf"
+      cp "build/rinoh/target.pdf" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.pdf"
  
       # EPUB #
-      sphinx-build -b epub docs/ docs/_build/epub -D language="${current_language}"
+      sphinx-build -b epub build/ build/epub -D language="${current_language}"
       mkdir -p "${docroot}/${current_language}/${current_version}"
-      cp "docs/_build/epub/target.epub" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.epub"
+      cp "build/epub/target.epub" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.epub"
  
       # copy the static assets produced by the above build into our docroot
-      rsync -av "docs/_build/html/" "${docroot}/"
+      rsync -av "build/html/" "${docroot}/"
  
    done
  
@@ -114,7 +114,7 @@ cat > index.html <<EOF
 <!DOCTYPE html>
 <html>
    <head>
-      <title>helloWorld Docs</title>
+      <title>Robot Concepts</title>
       <meta http-equiv = "refresh" content="0; url='/${REPO_NAME}/en/master/'" />
    </head>
    <body>
@@ -127,10 +127,10 @@ EOF
 cat > README.md <<EOF
 # GitHub Pages Cache
  
-Nothing to see here. The contents of this branch are essentially a cache that's not intended to be viewed on github.com.
+Nothing to see here. The contents of this branch is essentially a cache that's not intended to be viewed on github.com.
  
  
-If you're looking to update our documentation, check the relevant development branch's 'docs/' dir.
+If you're looking to update our documentation, check the relevant development branch's dir.
  
 For more information on how this documentation is built using Sphinx, Read the Docs, and GitHub Actions/Pages, see:
  
