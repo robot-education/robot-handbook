@@ -9,5 +9,5 @@ jobs:
 
       - name: Install and Build 
         run: |
-          ./install.sh
+          bash install.sh
           make html
