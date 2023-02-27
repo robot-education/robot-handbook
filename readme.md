@@ -1,12 +1,13 @@
-# FRC Animations
+# Robot Concepts
 
 A collection of animations intended to be a visual aid when explaining robotics
 concepts, primarily for an FRC audience. Animations created using 
-[manim community](https://www.manim.community/)- check them out!
+[manim community](https://www.manim.community/).
+
+<!-- View the live website here: (TODO: add github pages link). -->
 
 ## Workflows
-
-## Task Management
+### Task Management
 Create issues for tasks that need to be done. Tasks can be anything from substantive
 code retooling to requests for new animations to small visual tweaks. 
 
@@ -37,11 +38,11 @@ If we're going to be creating a common library used by multiple animations, do
 we want some way of tracking which animations depend on which tools so we can check
 the output still works when we make changes to the tools?
 
-## Website
 ### Build
-In order to build the website, you will need:
-1. The build tool (Sphinx)[https://www.sphinx-doc.org/en/master/usage/installation.html]. On linux, run `sudo apt-get install -y python3-sphinx`.
-2. The Read the Docs theme (sphinx-rtd-theme)[https://pypi.org/project/sphinx-rtd-theme/]. On linux, run `sudo apt-get install -y python3-sphinx-rtd-theme` (or `pip install sphinx-rtd-theme`?).
+This respository uses vs-code dev containers. To open the repository in a dev container:
+1. Install [docker desktop](https://www.docker.com/products/docker-desktop/).
+2. Install [vs-code](https://code.visualstudio.com/download).
+3. Add the **Dev Containers** extension to vs-code.
+4. Open the command pallette using *Ctrl + Shift + P*, then search for *Dev Containers: Open Folder in Container* and select the folder containing a local copy of this repository. 
 
-Once you've installed sphinx, you can build the website by running `make html`.
-You can view the result by opening `build/html/index.html` in your web browser (using a command like `firefox build/html/index.html`).
+In the dev container, build the website using `make html` or running the vs-code *Build* task. Open the website by running `python -m http.server` or running the vs-code *Open* task and then opening [localhost:8000](localhost:8000/) in your web browser.
