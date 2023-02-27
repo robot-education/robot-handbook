@@ -19,5 +19,6 @@
     "cSpell.words": [
         "Egan",
         "Kempen"
-    ]
+    ],
+    "esbonio.sphinx.confDir": "source"
 }

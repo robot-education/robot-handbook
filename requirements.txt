@@ -1,5 +1,8 @@
 Sphinx==6.1.3
 sphinx-copybutton==0.5.1
 sphinx-rtd-theme==1.2.0
+# Animation library
 manim>=0.17.2
 numpy>=1.24
+# rst language server
+esbonio
