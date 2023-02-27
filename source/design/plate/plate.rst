@@ -1,4 +1,6 @@
 Plate
 =====
+Introduction
+------------
+This tutorial will introduce a technique for modeling plates in a robust and flexible way.
 
-This tutorial will introduce one technique for modeling plates in a light and flexible way.
