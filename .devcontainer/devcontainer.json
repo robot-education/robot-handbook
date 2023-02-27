@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
-	"name": "Debian",
+	"name": "Linux",
 	"dockerFile": "Dockerfile",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
@@ -18,11 +18,14 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// Configure tool-specific properties.
 	"customizations": {
-		"extensions": [
-			"streetsidesoftware.code-spell-checker",
-			"redhat.vscode-yaml",
-			"yzhang.markdown-all-in-one"
-		]
+		"vscode": {
+			"extensions": [
+				"streetsidesoftware.code-spell-checker",
+				"redhat.vscode-yaml",
+				"yzhang.markdown-all-in-one",
+				"lextudio.restructuredtext"
+			]
+		}
 	},
 	"forwardPorts": [
 		8000
