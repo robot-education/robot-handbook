@@ -14,7 +14,7 @@
 			"WORKSPACE": "${containerWorkspaceFolder}"
 		}
 	},
-	"postCreateCommand": "./install.sh",
+	"postCreateCommand": "bash setup.sh",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// Configure tool-specific properties.
 	"customizations": {
