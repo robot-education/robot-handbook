@@ -14,10 +14,8 @@
 			"WORKSPACE": "${containerWorkspaceFolder}"
 		}
 	},
-	// We'll see if we need this
-	"postCreateCommand": "pip install -r requirements.txt",
+	"postCreateCommand": "./install.sh",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
 	// Configure tool-specific properties.
 	"customizations": {
 		"extensions": [

@@ -15,7 +15,7 @@ jobs:
 
       - name: Install and Build 
         run: |
-          pip install -r requirements.txt
+          ./install.sh
           make html
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
