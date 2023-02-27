@@ -8,7 +8,7 @@
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
-    "cSpell.allowCompoundWords": false,
+    "cSpell.allowCompoundWords": true,
     "cSpell.ignorePaths": [
         "build",
         ".git",

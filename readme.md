@@ -1,10 +1,12 @@
 # Robot Concepts
+[![Build and Deploy](https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml/badh.sv?branch=main)]
+(https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml)
+
+View this website by visiting [eganj.github.io/robot-concepts/](https://eganj.github.io/robot-concepts/).
 
 A collection of animations intended to be a visual aid when explaining robotics
 concepts, primarily for an FRC audience. Animations created using 
 [manim community](https://www.manim.community/).
-
-<!-- View the live website here: (TODO: add github pages link). -->
 
 ## Workflows
 ### Task Management
@@ -39,10 +41,11 @@ we want some way of tracking which animations depend on which tools so we can ch
 the output still works when we make changes to the tools?
 
 ### Build
-This respository uses vs-code dev containers. To open the repository in a dev container:
+This repository uses vs-code dev containers. To open the repository in a dev container:
 1. Install [docker desktop](https://www.docker.com/products/docker-desktop/).
 2. Install [vs-code](https://code.visualstudio.com/download).
 3. Add the **Dev Containers** extension to vs-code.
-4. Open the command pallette using *Ctrl + Shift + P*, then search for *Dev Containers: Open Folder in Container* and select the folder containing a local copy of this repository. 
+4. Open the command pallette (*Ctrl + Shift + P*), and run the *Dev Containers: Open Folder in Container* task. Select a folder containing a local copy of this repository.
 
-In the dev container, build the website using `make html` or running the vs-code *Build* task. Open the website by running `python -m http.server` or running the vs-code *Open* task and then opening [localhost:8000](localhost:8000/) in your web browser.
+Build the website by running either `make html` or the vs-code **build** task. 
+Open the website by by running either `python -m http.server` or the vs-code **open** task and then opening [localhost:8000](localhost:8000/) in your web browser.
