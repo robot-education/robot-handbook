@@ -1,5 +1,25 @@
 import numpy as np
 
+__all__ = [
+    'pauli_x', 'paily_y', 'pauli_z',
+    # 'levi_civita',
+    # 'rotate_coords_right', 'rotate_coords_left',
+    'rotation_2d',
+    'rotation_z', 'rotation_x', 'rotation_y', 'rotation_3d'
+]
+
+
+class T:
+    """Type hints aliases for the linear algebra module."""
+    Vector = np.ndarray
+    Vector2d = np.ndarray
+    Vector3d = np.ndarray
+    Matrix = np.ndarray
+    Matrix2d = np.ndarray
+    Matrix3d = np.ndarray
+    radians = float
+    index = int
+
 
 # Useful constants
 # Pauli matrices
@@ -10,7 +30,7 @@ pauli_z = np.array([[1, 0], [0, -1]])
 # Levi-Civita symbol (for cross products and similar operations)
 
 
-def levi_civita(i, j, k):
+def levi_civita(i: T.index, j: T.index, k: T.index) -> int:
     """Return the Levi-Civita symbol for the given indices."""
     if max(i, j, k) > 2 or min(i, j, k) < 0:
         raise ValueError('Indices must be between 0 and 2 inclusive.')
@@ -33,33 +53,33 @@ rotate_coords_left = np.array([[0, 1, 0], [0, 0, 1], [1, 0, 0]])
 
 
 # Rotation matrices
-def rotation_matrix_2d(angle):
+def rotation_2d(angle: T.radians) -> T.Matrix2d:
     """Return the rotation matrix for a 2D rotation by angle."""
     return np.cos(angle) * np.eye(2) + np.sin(angle) * np.array([[0, -1], [1, 0]])
 
 
-def rotation_z(angle):
+def rotation_z(angle: T.radians) -> T.Matrix3d:
     """Return the rotation matrix for a rotation around the z axis."""
-    r2d = rotation_matrix_2d(angle)
+    r2d = rotation_2d(angle)
     r3d = np.pad(r2d, ((0, 1), (0, 1)), 'constant', constant_values=0)
     r3d[2, 2] = 1
 
     return r3d
 
 
-def rotation_x(angle):
+def rotation_x(angle: T.radians) -> T.Matrix3d:
     """Return the rotation matrix for a rotation around the x axis."""
 
     return rotate_coords_right @ rotation_z(angle) @ rotate_coords_left
 
 
-def rotation_y(angle):
+def rotation_y(angle: T.radians) -> T.Matrix3d:
     """Return the rotation matrix for a rotation around the y axis."""
 
     return rotate_coords_left @ rotation_z(angle) @ rotate_coords_right
 
 
-def rotation_3d(axis, angle=None):
+def rotation_3d(axis: T.Vector3d, angle=None) -> T.Matrix3d:
     """Return the rotation matrix for a rotation around the axis by angle.
     If angle is None, the magnitude of the axis vector is used.
     """
