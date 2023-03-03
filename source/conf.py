@@ -13,11 +13,10 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'Robot Documentation'
+project = 'Robot Concepts'
 copyright = '2023, Alex Kempen, Egan Johnson'
 author = 'Alex Kempen, Egan Johnson'
 
@@ -32,7 +31,6 @@ release = '1.0.0'
 # ones.
 extensions = [
     'sphinx_rtd_theme',
-    'myst_parser',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.githubpages',
     'sphinx_copybutton'
