@@ -20,7 +20,8 @@
         "atleast",
         "Egan",
         "Kempen",
-        "manim"
+        "manim",
+        "Uncreate"
     ],
     "esbonio.sphinx.confDir": "source"
 }
