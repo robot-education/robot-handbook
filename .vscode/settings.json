@@ -21,7 +21,12 @@
         "Egan",
         "Kempen",
         "manim",
+        "Mobject",
+        "ndarray",
         "Uncreate"
     ],
-    "esbonio.sphinx.confDir": "source"
+    "esbonio.sphinx.confDir": "source",
+    "python.analysis.extraPaths": [
+        "common"
+    ]
 }
