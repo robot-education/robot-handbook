@@ -7,5 +7,6 @@
     "terminal.integrated.defaultProfile.linux": "bash",
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 1000
+    "files.autoSaveDelay": 1000,
+    "files.eol": "\n"
 }
