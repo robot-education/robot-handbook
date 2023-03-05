@@ -1,16 +1,13 @@
 from manim import *
+from rc_lib import type_hints as T
+
 
 __all__ = [
     "get_smooth_boundary_point",
-    ]
-
-class T():
-    """ Type hints for this module. """
-    Point3 = np.ndarray
-    Vector3 = np.ndarray
+]
 
 
-def get_smooth_boundary_point(mobject, direction):
+def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Point2D:
     """ Returns a point on the boundary of the mobject in the given direction.
 
         Manim has a number of methods for finding the boundary of a mobject, but
@@ -38,7 +35,8 @@ def get_smooth_boundary_point(mobject, direction):
     # Note: relys on symmetry that corner(dir) = -corner(-dir) when viewed from the
     # center of the mobject. If the corners no longer show rectangular symmetry
     # a new method will need to be found.
-    for project_direction in ((UP + RIGHT) / np.sqrt(2), (UP + LEFT) / np.sqrt(2)):
+    basis = [(UP + RIGHT) / np.sqrt(2), (UP + LEFT) / np.sqrt(2)]
+    for project_direction in basis:
         component = np.dot(direction, project_direction)
 
         corner = mobject.get_corner(project_direction) - mobject.get_center()
