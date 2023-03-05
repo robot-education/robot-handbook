@@ -6,3 +6,7 @@ sudo apt-get install -y build-essential python3-dev libcairo2-dev libpango1.0-de
 
 # install pip requirements
 pip install -r requirements.txt
+
+# add the robot concepts helper library so we can import it anywhere
+# this will install any packages specified in setup.py
+pip install -e .
