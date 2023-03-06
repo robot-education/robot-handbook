@@ -1,13 +1,15 @@
-from manim import normalize
 import numpy as np
-from math import acos, atan2, cos, sin
+
 from typing import List
+from rc_lib import type_hints as T
+
+from math import acos, atan2, cos, sin
 from common.calc import util
 
 __all__ = ["circle_to_circle_tangent", "circle_to_point_tangent"]
 
 
-def circle_to_circle_tangent(center1: np.ndarray, radius1: float, center2: np.ndarray, radius2: float) -> List[np.ndarray]:
+def circle_to_circle_tangent(center1: T.Point2d, radius1: float, center2: T.Point2d, radius2: float) -> List[T.Point2d]:
     """
     Returns the outer tangent line between two circles.
     The tangent is such that it is on the (left) outside of 1 and 2 when they are arranged in clockwise fashion.
@@ -25,7 +27,7 @@ def circle_to_circle_tangent(center1: np.ndarray, radius1: float, center2: np.nd
     ]
 
 
-def circle_to_point_tangent(center: np.ndarray, radius: float, point: np.ndarray) -> np.ndarray:
+def circle_to_point_tangent(center: T.Point2d, radius: float, point: T.Point2d) -> T.Point2d:
     """
     Returns the outer tangent line between a circle and a point. 
     The tangent is such that it is on the outside when point is clockwise to center.
@@ -41,5 +43,5 @@ def circle_to_point_tangent(center: np.ndarray, radius: float, point: np.ndarray
     ])
 
 
-def circle_to_point_tangent(point: np.ndarray, center: np.ndarray, radius: float) -> List[float]:
+def circle_to_point_tangent(point: T.Point2d, center: T.Point2d, radius: float) -> T.Point2d:
     return circle_to_circle_tangent(center, -radius, point)

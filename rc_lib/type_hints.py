@@ -11,12 +11,11 @@ import numpy as np
 __all__ = []  # no public names, access via module namespace
 
 Vector = np.ndarray
-# Means it has the semantic meaning of a 2d vector.
-# Even in 2d spaces manim prefers to use 3d vectors.
-Vector2D = np.ndarray
-Vector3D = np.ndarray
+# For compatability with manim, a 2d vector is defined as 3d vector with its third coordinate equal to zero.
+Vector2d = np.ndarray
+Vector3d = np.ndarray
 
 Point = np.ndarray
-# Means it has the semantic meaning of a 2d point, not that it has dimension 2.
-Point2D = np.ndarray
-Point3D = np.ndarray
+# For compatability with manim, a 2d point is defined as a 3d point with its third coordinate equal to zero.
+Point2d = np.ndarray
+Point3d = np.ndarray

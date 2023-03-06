@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from manim import *
 from typing import List, Optional
-from common.calc import tangent
+from rc_lib.math_utils import tangent
 
 __all__ = ["Plate", "PlateCircle"]
 
