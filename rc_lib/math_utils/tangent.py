@@ -1,7 +1,7 @@
 import numpy as np
 
 from typing import List
-from rc_lib import type_hints as T
+from rc_lib import types as T
 
 from math import acos, atan2, cos, sin
 from common.calc import util

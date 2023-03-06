@@ -1,5 +1,5 @@
 from manim import *
-from rc_lib import type_hints as T
+from rc_lib import types as T
 
 
 __all__ = [
@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Point2D:
+def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2d) -> T.Point2d:
     """ Returns a point on the boundary of the mobject in the given direction.
 
         Manim has a number of methods for finding the boundary of a mobject, but

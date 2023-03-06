@@ -50,7 +50,7 @@ class PlateCircle(VGroup):
         return GrowFromCenter(self.outer_circle())
 
 
-class Plate(VGroup):
+class PlateGroup(VGroup):
     def __init__(self, points: List[PlateCircle], boundary_order: List[int]) -> None:
         self._points = points
         self._boundary = [points[i] for i in boundary_order]

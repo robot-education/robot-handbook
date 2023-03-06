@@ -1,7 +1,6 @@
 from manim import *
-from common.design import plate
-from common.view import sequential_title
-from common.calc import util
+from design import plate_utils
+from rc_lib.view_utils import sequential_title
 
 # from common.view import style, sequential_title
 quality = "ql"
@@ -9,8 +8,8 @@ quality = "ql"
 
 class IntakePlateScene(Scene):
     def construct(self):
-        small_base = plate.PlateCircle.make(0.15, 0.2)
-        medium_base = plate.PlateCircle.make(0.4, 0.2)
+        small_base = plate_utils.PlateCircle.make(0.15, 0.2)
+        medium_base = plate_utils.PlateCircle.make(0.4, 0.2)
 
         front_hole = util.point(-4, -3)
         middle_hole = util.point(-1.5, 0.25)
@@ -29,7 +28,7 @@ class IntakePlateScene(Scene):
         ]
 
         boundary_order = [1, 3, 4, 0]
-        pl = plate.Plate(points, boundary_order)
+        pl = plate_utils.Plate(points, boundary_order)
         # titles = sequential_title.SequentialTitle(
         #     ["Draw plate holes", "Add larger circles", "Connect boundary"])
 

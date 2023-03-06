@@ -1,7 +1,7 @@
 from manim import *
 from typing import List
 
-from common.view import style
+from rc_lib import style
 
 __all__ = ["SequentialTitle"]
 
