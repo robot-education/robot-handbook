@@ -12,10 +12,11 @@ class TitleSequence(Text):
     """
 
     def __init__(self, titles: List[str]) -> None:
-        # titles = [(str(i + 1) + ": " + title) for i,
-        #           title in enumerate(titles)]
+        titles = [(str(i + 1) + ": " + title) for i,
+                  title in enumerate(titles)]
         self._titles = [Text(title, font_size=style.FontSize.LARGE) for title in titles]
-        # (title.to_corner(UP + LEFT) for title in self._titles)
+        (title.to_corner(UP + LEFT) for title in self._titles)
+
         self._index = -1
         super().__init__(self._titles[0])
 
