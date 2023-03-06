@@ -1,13 +1,15 @@
 from manim import *
-from rc_lib import types as T
+from rc_lib import type_hints as T
+
+from rc_lib.math_utils import geometry
 
 
 __all__ = [
-    "get_smooth_boundary_point",
+    "get_smooth_boundary_point"
 ]
 
 
-def get_smooth_boundary_point(mobject: VMobject, direction: T.Direction2d) -> T.Point2d:
+def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Point2D:
     """ Returns a point on the boundary of the mobject in the given direction.
 
         Manim has a number of methods for finding the boundary of a mobject, but
@@ -17,7 +19,7 @@ def get_smooth_boundary_point(mobject: VMobject, direction: T.Direction2d) -> T.
         This method instead fits a bounding ellipse to the mobject, and smoothly
         finds points on the boundary of that ellipse: continuity is guaranteed.
 
-        Only implemented and tested for 2D Mobject.
+        Only implemented and tested for 2D Mobjects.
 
         Args:
             mobject: The mobject to find the boundary point of.
@@ -37,7 +39,7 @@ def get_smooth_boundary_point(mobject: VMobject, direction: T.Direction2d) -> T.
     # a new method will need to be found.
     basis = [(UP + RIGHT) / np.sqrt(2), (UP + LEFT) / np.sqrt(2)]
     for project_direction in basis:
-        component = np.dot(direction, project_direction)
+        component = geometry.dot(direction, project_direction)
 
         corner = mobject.get_corner(project_direction) - mobject.get_center()
         border_point += component * corner

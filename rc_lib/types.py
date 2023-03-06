@@ -23,25 +23,3 @@ Point3d = np.ndarray
 
 Direction2d = np.ndarray
 Direction3d = np.ndarray
-
-def norm(point: Point2d | Point3d) -> float:
-    return np.linalg.norm(point)
-
-def normalize(vector: Vector2d) -> Direction2d:
-    return manim.normalize(vector)
-
-def normalize(vector: Vector3d) -> Direction3d:
-    return manim.normalize(vector)
-
-
-def point_2d(x: float, y: float) -> Point2d:
-    """
-    A constructor for a point2d.
-    """
-    return np.array([x, y, 0])
-
-def point_3d(x: float, y: float, z: float) -> Point3d:
-    """
-    A constructor for a point3d.
-    """
-    return np.array([x, y, z])

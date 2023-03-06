@@ -9,7 +9,7 @@ __all__ = ["Color", "FontSize", "Time", "center_and_scale"]
 # C_EMPHASIS = ORANGE
 
 
-class Color():
+class Color(enum.StrEnum):
     RED = Colors.red_c.value
     GREEN = Colors.green_d.value
     BLUE = Colors.blue_d.value
@@ -19,17 +19,21 @@ class Color():
 # SMALL_FONT = 24
 # MED_FONT = 32
 # LARGE_FONT = 48
+
+
 class FontSize(enum.IntEnum):
-    SMALL = 20,
-    MEDIUM = 24,
+    SMALL = 20
+    MEDIUM = 24
     LARGE = 32
 
 
-
 class Time():
-    SHORT = 0.5,
-    AVERAGE = 1,
-    LONG = 1.5
+    FAST = 0.5
+    STANDARD = 1
+    SLOW = 1.5
+    # The delay to display at the end of an animation.
+    END = 3
+
 
 def center_and_scale(object: Mobject) -> Mobject:
     """

@@ -1,7 +1,7 @@
-import numpy as np
-
 from typing import List
 from rc_lib import types as T
+
+from rc_lib.math_utils import geometry
 
 from math import acos, atan2, cos, sin
 
@@ -14,9 +14,9 @@ def circle_to_circle_tangent(center1: T.Point2d, radius1: float, center2: T.Poin
     The tangent is such that it is on the (left) outside of 1 and 2 when they are arranged in clockwise fashion.
     To flip the tangent, flip the order of the circles.
     """
-    dist = T.norm(center2 - center1)
+    dist = geometry.norm(center2 - center1)
     delta = (center2 - center1) / dist
-    cross = T.point_2d(-delta[1], delta[0])
+    cross = geometry.point_2d(-delta[1], delta[0])
     alpha = (radius1 - radius2) / dist
     beta = (1 - alpha ** 2) ** 0.5
     return [
@@ -31,10 +31,10 @@ def circle_to_point_tangent(center: T.Point2d, radius: float, point: T.Point2d) 
     The tangent is such that it is on the outside when point is clockwise to center.
     To flip the tangent, pass point before center.
     """
-    dist = T.norm(point - center)
+    dist = geometry.norm(point - center)
     angle = acos(radius / dist)
     angle_offset = atan2(point[1] - center[1], point[0] - center[0])
-    return T.point_2d(
+    return geometry.point_2d(
         center[0] + radius * cos(angle_offset - angle),
         center[1] + radius * sin(angle_offset - angle)
     )

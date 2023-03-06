@@ -4,11 +4,11 @@
 	"name": "Linux",
 	"dockerFile": "Dockerfile",
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-		"ghcr.io/devcontainers/features/python:1": {
-			"installJupyterlab": true
-		}
-	},
+	// "features": {
+	// 	"ghcr.io/devcontainers/features/python:1": {
+	// 		"installJupyterlab": true
+	// 	}
+	// },
 	// "build": {
 	// 	"args": {
 	// 		"WORKSPACE": "${containerWorkspaceFolder}"
@@ -22,7 +22,8 @@
 			"extensions": [
 				"streetsidesoftware.code-spell-checker",
 				"redhat.vscode-yaml",
-				"yzhang.markdown-all-in-one"
+				"yzhang.markdown-all-in-one",
+				"ms-toolsai.jupyter"
 			]
 		}
 	},

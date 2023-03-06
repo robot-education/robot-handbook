@@ -22,11 +22,13 @@
         "Kempen",
         "manim",
         "Mobject",
+        "Mobjects",
         "ndarray",
+        "unannotate",
         "Uncreate"
     ],
     "python.analysis.extraPaths": [
-        "common"
+        "rc_lib"
     ],
     "files.eol": "\n"
 }
