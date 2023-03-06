@@ -7,7 +7,7 @@ __all__ = [
 ]
 
 
-def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2d) -> T.Point2d:
+def get_smooth_boundary_point(mobject: VMobject, direction: T.Direction2d) -> T.Point2d:
     """ Returns a point on the boundary of the mobject in the given direction.
 
         Manim has a number of methods for finding the boundary of a mobject, but

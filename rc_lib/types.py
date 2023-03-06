@@ -6,6 +6,7 @@
     used in the library.
 """
 import numpy as np
+import manim
 
 __all__ = []  # no public names, access via module namespace
 
@@ -19,6 +20,19 @@ Point = np.ndarray
 # For compatability with manim, a 2d point is defined as a 3d point with its third coordinate equal to zero.
 Point2d = np.ndarray
 Point3d = np.ndarray
+
+Direction2d = np.ndarray
+Direction3d = np.ndarray
+
+def norm(point: Point2d | Point3d) -> float:
+    return np.linalg.norm(point)
+
+def normalize(vector: Vector2d) -> Direction2d:
+    return manim.normalize(vector)
+
+def normalize(vector: Vector3d) -> Direction3d:
+    return manim.normalize(vector)
+
 
 def point_2d(x: float, y: float) -> Point2d:
     """
