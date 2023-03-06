@@ -4,7 +4,6 @@ Robot Concepts
 This website contains various tutorials which introduce and explain a variety of engineering practices applicable to robotics programs like FRC and FTC.
 
 .. toctree::
-   .. :maxdepth: 2
    :caption: Contents
 
    design/design

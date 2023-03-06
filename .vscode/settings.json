@@ -25,8 +25,8 @@
         "ndarray",
         "Uncreate"
     ],
-    "esbonio.sphinx.confDir": "source",
     "python.analysis.extraPaths": [
         "common"
-    ]
+    ],
+    "files.eol": "\n"
 }
