@@ -9,6 +9,7 @@ from rc_lib.common_mobjects.containers import OrderedVGroup
 from rc_lib.math_utils.mobject_geometry import get_smooth_boundary_point
 
 __all__ = [
+    "Placeholder",
     "LinearLayout"
 ]
 
@@ -20,6 +21,108 @@ def edge_from_center(mobject, direction):
         Translational invariant version of get_smooth_boundary_point.
     """
     return get_smooth_boundary_point(mobject, direction) - mobject.get_center()
+
+
+class Placeholder(VMobject):
+    """
+        An invisible placeholder constructed to have an equivalent bounding box
+        to a given mobject, referred to as the reservee. Useful for reserving
+        space in a layout without yet joining it.
+
+        Placeholders may be constructed from dimensions using the static 
+        `Placeholder.of_dimensions(width, height)`. In this case, the placeholder 
+        does not have a reservee, which may be specified later using set_reservee()
+
+        Note that transformations to the placeholder do not effect the reservee
+        and vice versa. To update a placeholder to meet the new dimensions of the
+        reservee, call `self.fit()`
+
+        Placeholders are considered equal if they are for the same reservee, even
+        if their positions or dimensions are different. Placeholders with no 
+        reservee are not considered equal (unless they are the same object).
+    """
+
+    @staticmethod
+    def of_dimensions(width: float, height: float) -> "Placeholder":
+        """
+            Returns a placeholder with no reservee of the given dimensions
+        """
+        p = Placeholder(None)
+        p.set_dimensions(width, height)
+
+        return p
+
+    def __init__(self, reservee: VMobject):
+        """
+            Creates a placeholder for reservee with equivalent bounding rectangle.
+
+            If reservee is None, dimensions are defaulted to (1, 1). 
+        """
+        super().__init__()
+        # Initialize the invisible rectangle we will be using
+        self._bounding_box = Rectangle(
+            height=1, width=1, stroke_opacity=0.0, fill_opacity=0.0)
+        # If we register it as a submobject, we will take on its boundaries
+        self.add(self._bounding_box)
+
+        self.set_reservee(reservee)
+
+    def set_reservee(self, reservee: VMobject):
+        """
+            Sets a new reservee and updates the bounding box. Does not move the
+            placeholder.
+
+            If `reservee == None`, the reservee is cleared and no changes to the
+            box are made.
+
+            Returns self for chaining.
+        """
+
+        self.reservee = reservee
+
+        if not reservee == None:
+            diagonal = reservee.get_corner(
+                UP + RIGHT) - reservee.get_corner(DOWN + LEFT)
+            width = diagonal[0]
+            height = diagonal[1]
+            self.set_dimensions(width, height)
+
+        return self
+
+    def set_dimensions(self, width: float, height: float):
+        """
+            Sets the edge-to-edge dimensions of the placeholder. Does not move
+            the center.
+
+            Returns self for chaining.
+        """
+
+        self._bounding_box.stretch_to_fit_height(height)
+        self._bounding_box.stretch_to_fit_width(width)
+
+        return self
+
+    def reserved_for(self, mob: VMobject):
+        """
+            Returns true if this placeholder is reserved for `mob`.
+
+            A placeholder with no reservee is never considered to be reserved
+            for anything even if `mob` is `None`.
+        """
+        return not (self.reservee == None) and (mob is self.reservee)
+
+    def __eq__(self, other):
+        if self is other:
+            return True
+
+        if isinstance(other, Placeholder):
+            if (not self.reservee == None) and self.reservee == other.reservee:
+                return True
+
+        return False
+
+    def __hash__(self) -> int:
+        return self._bounding_box.__hash__()
 
 
 class LinearLayout(OrderedVGroup):
@@ -38,7 +141,7 @@ class LinearLayout(OrderedVGroup):
     """
 
     def __init__(self, *mobjects, direction=DOWN):
-        VGroup.__init__(self, *mobjects)
+        super().__init__(*mobjects)
         self.set_direction(direction)
 
     def set_direction(self, direction):
@@ -137,3 +240,19 @@ class LinearLayout(OrderedVGroup):
             anim_function = _move_mob_to_pos
 
         return [anim_function(self[i], positions[i]) for i in range(len(self))]
+
+    def replace_placeholder(self, reservee: VMobject):
+        """
+            Searches for a placeholder reserving reservee and replaces it with
+            the reservee.
+
+            Throws a value error if no placeholder found.
+        """
+
+        for i, sub_mob in enumerate(self):
+            if isinstance(sub_mob, Placeholder):
+                if sub_mob.reserved_for(reservee):
+                    self[i] = reservee
+                    return
+
+        raise ValueError("No placeholder found for reservee")
