@@ -1,11 +1,12 @@
 """
     Mobject groups with available layout methods.
 """
-from typing import List
+from typing import List, Any
 
 from manim import *
-from rc_lib.common_mobjects.containers import OrderedVGroup
 
+import rc_lib.type_hints as T
+from rc_lib.common_mobjects.containers import OrderedVGroup
 from rc_lib.math_utils.mobject_geometry import get_smooth_boundary_point
 
 __all__ = [
@@ -16,8 +17,8 @@ __all__ = [
 normalize_vector = normalize  # alias
 
 
-def edge_from_center(mobject, direction):
-    """ Returns a vector for the edge, rather than an apsolute position. 
+def edge_from_center(mobject: VMobject, direction: T.Vector2D) -> T.Vector2D:
+    """ Returns a vector for the edge, rather than an absolute position. 
         Translational invariant version of get_smooth_boundary_point.
     """
     return get_smooth_boundary_point(mobject, direction) - mobject.get_center()
@@ -62,12 +63,12 @@ class Placeholder(VMobject):
         # Initialize the invisible rectangle we will be using
         self._bounding_box = Rectangle(
             height=1, width=1, stroke_opacity=0.0, fill_opacity=0.0)
-        # If we register it as a submobject, we will take on its boundaries
+        # If we register it as a sub-mobject, we will take on its boundaries
         self.add(self._bounding_box)
 
         self.set_reservee(reservee)
 
-    def set_reservee(self, reservee: VMobject):
+    def set_reservee(self, reservee: VMobject) -> "Placeholder":
         """
             Sets a new reservee and updates the bounding box. Does not move the
             placeholder.
@@ -89,7 +90,7 @@ class Placeholder(VMobject):
 
         return self
 
-    def set_dimensions(self, width: float, height: float):
+    def set_dimensions(self, width: float, height: float) -> "Placeholder":
         """
             Sets the edge-to-edge dimensions of the placeholder. Does not move
             the center.
@@ -102,7 +103,7 @@ class Placeholder(VMobject):
 
         return self
 
-    def reserved_for(self, mob: VMobject):
+    def reserved_for(self, mob: VMobject) -> bool:
         """
             Returns true if this placeholder is reserved for `mob`.
 
@@ -111,7 +112,7 @@ class Placeholder(VMobject):
         """
         return not (self.reservee == None) and (mob is self.reservee)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any):
         if self is other:
             return True
 
@@ -140,11 +141,11 @@ class LinearLayout(OrderedVGroup):
             this can be changed by passing in a different animation class.
     """
 
-    def __init__(self, *mobjects, direction=DOWN):
+    def __init__(self, *mobjects: List[VMobject], direction=DOWN):
         super().__init__(*mobjects)
         self.set_direction(direction)
 
-    def set_direction(self, direction):
+    def set_direction(self, direction: T.Vector2D) -> "LinearLayout":
         """ Sets the default direction for the layout. 
 
         This may be overridden by specific calls to arrange, and does not
@@ -154,8 +155,8 @@ class LinearLayout(OrderedVGroup):
         self.direction = direction
         return self
 
-    def predict_arrangement(self, direction=None, root=None, normalize=True,
-                            padding=0.0):
+    def predict_arrangement(self, direction=None, root: T.Point2D = None,
+                            normalize=True, padding=0.0) -> List[T.Point2D]:
         """
         Returns a list of the predicted positions that the mobjects would be
         arranged at, in the order they have been placed in the layout.
@@ -198,7 +199,7 @@ class LinearLayout(OrderedVGroup):
 
         return positions
 
-    def arrange(self, positions=None):
+    def arrange(self, positions: List[T.Point2D] = None) -> "LinearLayout":
         """ Instantaneously updates the layout along the given direction, as
         according to predict_arrangement().
 
@@ -218,7 +219,7 @@ class LinearLayout(OrderedVGroup):
         return self
 
     def animate_arrange(self, anim_function=None,
-                        positions=None) -> List[Animation]:
+                        positions: List[T.Point2D] = None) -> List[Animation]:
         """
         Returns an animation of the layout being updated to its predicted 
         arrangement.
@@ -226,7 +227,7 @@ class LinearLayout(OrderedVGroup):
         Args:
             anim_function(mobject, position): returns an animation that moves
                 the mobject to the given position. By default, this moves 
-                the mobject linearly (manim.animation.transform.Transform).
+                the mobject linearly (mobject.animate.move_to).
             positions: The positions to move the mobjects to. If None, the
                 positions are predicted using predict_arrangement().
         """
@@ -241,7 +242,7 @@ class LinearLayout(OrderedVGroup):
 
         return [anim_function(self[i], positions[i]) for i in range(len(self))]
 
-    def replace_placeholder(self, reservee: VMobject):
+    def replace_placeholder(self, reservee: VMobject) -> "LinearLayout":
         """
             Searches for a placeholder reserving reservee and replaces it with
             the reservee.
@@ -253,6 +254,6 @@ class LinearLayout(OrderedVGroup):
             if isinstance(sub_mob, Placeholder):
                 if sub_mob.reserved_for(reservee):
                     self[i] = reservee
-                    return
+                    return self
 
         raise ValueError("No placeholder found for reservee")
