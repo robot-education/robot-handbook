@@ -1,1 +1,1 @@
-FROM mcr.microsoft.com/devcontainers/base:bullseye
+FROM python:3.11.2-bullseye
