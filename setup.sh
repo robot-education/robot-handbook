@@ -1,9 +1,13 @@
 #!/bin/bash
 
 # install dependencies
-sudo apt-get update
+apt-get update
 # manim system libraries
-sudo apt-get install -y build-essential libcairo2-dev ffmpeg libpango1.0-dev texlive-full 
+apt-get install -y build-essential libcairo2-dev libpango1.0-dev ffmpeg texlive texlive-latex-extra
+
+# Create python virtual enviornment named .venv
+# python -m venv .venv
+# source .venv/bin/activate
 
 # install pip requirements
 pip install -r requirements.txt
