@@ -14,6 +14,7 @@ class Color(enum.StrEnum):
     GREEN = Colors.green_d.value
     BLUE = Colors.blue_d.value
     YELLOW = Colors.yellow_e.value
+    WHITE = Colors.white.value
 
 # Default sizes:
 # SMALL_FONT = 24

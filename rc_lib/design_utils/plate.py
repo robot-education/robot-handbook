@@ -1,6 +1,8 @@
 from manim import *
 from typing import List, Optional, Self
 from rc_lib import math_types as T
+
+from rc_lib import style
 from rc_lib.math_utils import tangent
 
 __all__ = ["Plate", "PlateCircle"]
@@ -13,16 +15,12 @@ class PlateCircle(VGroup):
         self._outer_circle = outer_circle
 
     @staticmethod
-    def make(radius: float, offset: float) -> Self:
-        return PlateCircle(Circle(radius), Circle(radius + offset))
-
-    @staticmethod
     def tangent_points(start, end) -> List[T.Point2d]:
         return tangent.circle_to_circle_tangent(start.center(), start.outer_radius(), end.center(), end.outer_radius())
 
     @staticmethod
-    def tangent_line(start, end) -> Line:
-        return Line(*PlateCircle.tangent_points(start, end))
+    def tangent_line(start, end, color: Optional[style.Color] = style.Color.WHITE) -> Line:
+        return Line(*PlateCircle.tangent_points(start, end), color=color)
 
     def inner_circle(self) -> Self:
         return self._inner_circle
@@ -39,7 +37,7 @@ class PlateCircle(VGroup):
     def outer_radius(self) -> float:
         return self.outer_circle().width / 2
 
-    def copy(self, center: np.ndarray) -> Self:
+    def copy(self, center: T.Point2d) -> Self:
         return super().copy().move_to(center)
 
     def draw_inner_circle(self) -> Animation:
@@ -48,23 +46,48 @@ class PlateCircle(VGroup):
     def draw_outer_circle(self) -> Animation:
         return GrowFromCenter(self.outer_circle())
 
+class PlateCircleFactory():
+    def __init__(self, radius: float, offset: float) -> None:
+        self._radius = radius
+        self._offset = offset
+        self._inner_color = style.Color.WHITE
+        self._outer_color = style.Color.WHITE
+    
+    def set_inner_color(self, color: style.Color) -> Self:
+        self._inner_color = color
+        return self
+    
+    def set_outer_color(self, color: style.Color) -> Self:
+        self._outer_color = color
+        return self
+
+    def copy(self, radius: float, offset: Optional[float] = None) -> Self:
+        if (offset == None):
+            offset = self._offset
+
+        copy = PlateCircleFactory(radius, offset)
+        return copy.set_inner_color(self._inner_color).set_outer_color(self._outer_color)
+
+    def make(self, location: T.Point2d) -> PlateCircle:
+        return PlateCircle(Circle(self._radius, color=self._inner_color),
+            Circle(self._radius + self._offset, color=self._outer_color)).move_to(location)
 
 class PlateGroup(VGroup):
-    def __init__(self, points: List[PlateCircle], boundary_order: List[int]) -> None:
-        self._points = points
-        self._boundary = [points[i] for i in boundary_order]
-        # self._boundary = list(filter(lambda p: p not in self._inside, self._points))
-        self._boundary_segments = self._make_boundary_segments()
-        super().__init__(*[*self._points, *self._boundary_segments])
+    def __init__(self, entities: List[PlateCircle], 
+    boundary_order: List[int], boundary_color: Optional[style.Color] = style.Color.WHITE) -> None:
+        self._entities = entities
+        self._boundary = [self._entities[i] for i in boundary_order]
+        self._boundary_lines = self._make_boundary_lines(boundary_color)
+        super().__init__(*[*self._entities, *self._boundary_lines])
 
-    def _make_boundary_segments(self) -> List[Line]:
-        return [PlateCircle.tangent_line(self._boundary[i - 1], curr) for i, curr in enumerate(self._boundary)]
+    def _make_boundary_lines(self, color: style.Color) -> List[Line]:
+        return [PlateCircle.tangent_line(self._boundary[i - 1], curr, color=color) for i, curr in enumerate(self._boundary)]
 
     def draw_inner_circles(self, lag_ratio: Optional[float] = 1, **kwargs) -> Animation:
-        return AnimationGroup(*[x.draw_inner_circle() for x in self._points], lag_ratio=lag_ratio, **kwargs)
+        return AnimationGroup(*[x.draw_inner_circle() for x in self._entities], lag_ratio=lag_ratio, **kwargs)
 
     def draw_outer_circles(self, lag_ratio: Optional[float] = 1, **kwargs) -> Animation:
-        return AnimationGroup(*[x.draw_outer_circle() for x in self._points], lag_ratio=lag_ratio, **kwargs)
+        return AnimationGroup(*[x.draw_outer_circle() for x in self._entities], lag_ratio=lag_ratio, **kwargs)
 
     def draw_boundary(self, lag_ratio: Optional[float] = 1, **kwargs) -> Animation:
-        return AnimationGroup(*[Create(x) for x in self._boundary_segments], lag_ratio=lag_ratio, **kwargs)
+        return AnimationGroup(*[Create(x) for x in self._boundary_lines], lag_ratio=lag_ratio, **kwargs)
