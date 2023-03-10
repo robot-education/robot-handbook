@@ -8,7 +8,7 @@ __all__ = [
     "get_smooth_boundary_point"
 ]
 
-def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Point2D:
+def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2d) -> T.Point2d:
     """ Returns a point on the boundary of the mobject in the given direction.
 
         Manim has a number of methods for finding the boundary of a mobject, but
@@ -28,7 +28,7 @@ def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Poi
                 mobject.
     """
     # Start at center
-    border_point = mobject.get_center()
+    border_point = T.Point2d(mobject.get_center())
 
     # project direction onto the axes for two of the corners of the bounding box,
     # get their vectors, and add them to get the border point vector in the
@@ -39,7 +39,6 @@ def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Poi
     basis = [(UP + RIGHT) / np.sqrt(2), (UP + LEFT) / np.sqrt(2)]
     for project_direction in basis:
         component = geometry.dot(direction, project_direction)
-
         corner = mobject.get_corner(project_direction) - mobject.get_center()
         border_point += component * corner
 

@@ -20,8 +20,8 @@ def circle_to_circle_tangent(center1: T.Point2d, radius1: float, center2: T.Poin
     alpha = (radius1 - radius2) / dist
     beta = (1 - alpha ** 2) ** 0.5
     return [
-        center1 + (alpha * delta + beta * cross) * radius1,
-        center2 + (alpha * delta + beta * cross) * radius2
+        T.Point2d(center1 + (alpha * delta + beta * cross) * radius1),
+        T.Point2d(center2 + (alpha * delta + beta * cross) * radius2)
     ]
 
 

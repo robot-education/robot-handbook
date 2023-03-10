@@ -6,20 +6,20 @@
     used in the library.
 """
 import numpy as np
-import manim
+from typing import NewType
 
-__all__ = []  # no public names, access via module namespace
+# To avoid conflicts with manim, we do not have any public names
+__all__ = []
 
-# To avoid conflicts with manim's Vector, we do not have any public names
-Vector = np.ndarray
+Vector = NewType('Vector', np.ndarray)
 # For compatability with manim, a 2d vector is defined as 3d vector with its third coordinate equal to zero.
-Vector2d = np.ndarray
-Vector3d = np.ndarray
+Vector2d = NewType('Vector2d', np.ndarray)
+Vector3d = NewType('Vector3d', np.ndarray)
 
-Point = np.ndarray
+Point = NewType('Point', np.ndarray)
 # For compatability with manim, a 2d point is defined as a 3d point with its third coordinate equal to zero.
-Point2d = np.ndarray
-Point3d = np.ndarray
+Point2d = NewType('Point2d', np.ndarray)
+Point3d = NewType('Point3d', np.ndarray)
 
-Direction2d = np.ndarray
-Direction3d = np.ndarray
+Direction2d = NewType('Direction2d', np.ndarray)
+Direction3d = NewType('Direction3d', np.ndarray)

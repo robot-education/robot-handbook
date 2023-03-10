@@ -1,20 +1,21 @@
 from manim import *
+from typing import Optional, NewType
 from manim.utils.color import Colors
 import enum
 
 __all__ = ["Color", "FontSize", "Time", "center_and_scale"]
 
-# Colors
-# C_HIGHLIGHT = TEAL_C
-# C_EMPHASIS = ORANGE
-
+# This isn't a collision!
+Color = NewType('Color', str)
 
 class Color(enum.StrEnum):
-    RED = Colors.red_c.value
-    GREEN = Colors.green_d.value
-    BLUE = Colors.blue_d.value
-    YELLOW = Colors.yellow_e.value
-    WHITE = Colors.white.value
+    RED = Color(Colors.red_c.value)
+    GREEN = Color(Colors.green_d.value)
+    BLUE = Color(Colors.blue_d.value)
+    YELLOW = Color(Colors.yellow_e.value)
+    WHITE = Color(Colors.white.value)
+
+DEFAULT_COLOR = Color.WHITE
 
 # Default sizes:
 # SMALL_FONT = 24
