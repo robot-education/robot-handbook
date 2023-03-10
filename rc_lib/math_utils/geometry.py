@@ -1,8 +1,7 @@
 import manim
 import numpy as np
 
-import rc_lib.style as T
-
+from rc_lib import math_types as T
 
 def norm(point: T.Point2d | T.Point3d) -> float:
     return np.linalg.norm(point)

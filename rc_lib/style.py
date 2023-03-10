@@ -29,6 +29,7 @@ class FontSize(enum.IntEnum):
 
 class Time():
     FAST = 0.5
+    MEDIUM = 0.75
     STANDARD = 1
     SLOW = 1.5
     # The delay to display at the end of an animation.

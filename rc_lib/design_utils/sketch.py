@@ -1,10 +1,12 @@
 from manim import *
 
+from rc_lib import math_types as T
+
 __all__ = ["SketchLine"]
 
 
 class SketchLine(VGroup):
-    def __init__(self, start_point: np.ndarray, end_point: np.ndarray) -> None:
+    def __init__(self, start_point: T.Point2d, end_point: T.Point2d) -> None:
         self._line = Line(start_point, end_point)
         self._start = Dot(start_point)
         self._end = Dot(end_point)

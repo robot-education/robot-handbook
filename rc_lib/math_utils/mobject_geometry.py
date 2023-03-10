@@ -1,5 +1,5 @@
 from manim import *
-from rc_lib import type_hints as T
+from rc_lib import math_types as T
 
 from rc_lib.math_utils import geometry
 
@@ -7,7 +7,6 @@ from rc_lib.math_utils import geometry
 __all__ = [
     "get_smooth_boundary_point"
 ]
-
 
 def get_smooth_boundary_point(mobject: VMobject, direction: T.Vector2D) -> T.Point2D:
     """ Returns a point on the boundary of the mobject in the given direction.

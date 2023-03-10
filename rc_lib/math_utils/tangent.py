@@ -1,6 +1,6 @@
 from typing import List
-from rc_lib import types as T
 
+from rc_lib import math_types as T
 from rc_lib.math_utils import geometry
 
 from math import acos, atan2, cos, sin
