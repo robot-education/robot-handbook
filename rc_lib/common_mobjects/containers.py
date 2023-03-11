@@ -10,6 +10,8 @@ from manim import *
 # we will do the same here.
 from manim.mobject.opengl.opengl_vectorized_mobject import OpenGLVMobject
 
+from typing import List, Self
+
 __all__ = [
     "OrderedVGroup",
 ]
@@ -21,7 +23,7 @@ def is_valid_vmobject(item) -> bool:
     return isinstance(item, (VMobject, OpenGLVMobject))
 
 
-def all_are_valid_vmobjects(item_list) -> bool:
+def all_are_valid_vmobjects(item_list: list) -> bool:
     """ Returns True if all items in the given list are valid mobjects, as 
         accepted by VGroup. """
     return all(is_valid_vmobject(item) for item in item_list)
@@ -52,23 +54,23 @@ class OrderedVGroup(VGroup):
     interface, so this may break in future versions of manim.
     """
 
-    def _validate_mobjects(self, *mobjects):
-        """ Checks the valididty of all provided mobjects and raises a value
+    def _validate_mobjects(self, *mobjects: VMobject):
+        """ Checks the validity of all provided mobjects and raises a value
             error if any are invalid. """
         if not all_are_valid_vmobjects(mobjects):
             raise ValueError("Member mobjects must be of type VMobject")
 
     # Constructor is the same as VGroup
-    def __init__(self, *submobjects, **kwargs):
+    def __init__(self, *submobjects: VMobject, **kwargs):
         super().__init__(*submobjects, **kwargs)
 
     # a few aliases for methods called on members:
-    def contains(self, mobject):
+    def contains(self, mobject: VMobject) -> bool:
         """ Returns True if the given object is in the group. """
         # count method not needed since we are enforcing uniqueness
         return self.submobjects.count(mobject) > 0
 
-    def index(self, mobject):
+    def index(self, mobject: VMobject) -> int:
         """ Returns the index of the given mobject in the group. 
 
         Raises a ValueError if the mobject is not in the group: use 
@@ -76,7 +78,7 @@ class OrderedVGroup(VGroup):
         """
         return self.submobjects.index(mobject)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """ Returns the number of elements in the group. """
         return len(self.submobjects)
 
@@ -85,7 +87,7 @@ class OrderedVGroup(VGroup):
         return iter(self.submobjects)
 
     # Insertion
-    def insert(self, index, mobject):
+    def insert(self, index: int, mobject: VMobject) -> Self:
         """ Inserts the given mobject at the given index. 
 
         Raises a ValueError if not given a valid mobject. Inserting a duplicate
@@ -98,8 +100,9 @@ class OrderedVGroup(VGroup):
         return self
 
     # Removal
-    def remove(self, mobject_or_index):
-        """ Removes the given mobject or index from the group. 
+    def remove(self, mobject_or_index: VMobject) -> Self:
+        """
+        Removes the given mobject or index from the group. 
 
         Raises a ValueError if not given a valid mobject or index.
         """
@@ -110,6 +113,6 @@ class OrderedVGroup(VGroup):
             self -= mobject_or_index
         return self
 
-    def pop(self, index):
+    def pop(self, index: int) -> VMobject:
         """ Removes and returns the mobject at the given index. """
         return self.submobjects.pop(index)
