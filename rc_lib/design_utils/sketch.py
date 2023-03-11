@@ -1,3 +1,4 @@
+from typing import Self
 from manim import *
 
 from rc_lib import math_types as T
@@ -13,6 +14,9 @@ class SketchLine(VGroup):
         self._start = Dot(start_point, color=color)
         self._end = Dot(end_point, color=color)
         super().__init__(self._line, self._start, self._end)
+    
+    def copy(self) -> Self:
+        pass
 
     def line(self) -> Line:
         return self._line
@@ -43,6 +47,6 @@ class SketchLine(VGroup):
 
     def move_end(self, new_end_point: T.Point2d, **kwargs) -> Animation:
         """
-        Move the end point to a given start point using a Transform.
+        Move the end point to a given end point using a Transform.
         """
         return Transform(self, SketchLine(self.start_point(), new_end_point, color=self._color), **kwargs)

@@ -1,5 +1,5 @@
 from manim import *
-from typing import Optional, NewType
+from typing import NewType
 from manim.utils.color import Colors
 import enum
 
@@ -31,6 +31,11 @@ class Time():
     SLOW = 1.5
     # The delay to display at the end of an animation.
     END = 3
+
+"""
+The length of the delay at the end of each animation.
+"""
+END_DELAY = 3
 
 
 def center_and_scale(object: Mobject) -> Mobject:

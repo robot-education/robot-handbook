@@ -37,9 +37,6 @@ class PlateCircle(VGroup):
     def outer_radius(self) -> float:
         return self.outer_circle().width / 2
 
-    def copy(self, center: T.Point2d) -> Self:
-        return super().copy().move_to(center)
-
     def draw_inner_circle(self) -> Animation:
         return GrowFromCenter(self.inner_circle())
 
@@ -59,7 +56,7 @@ class PlateCircleFactory():
         self._outer_color = color
         return self
     
-    def get_generator(self, radius: float, offset: float):
+    def make_generator(self, radius: float, offset: float):
         """
         Returns a generator function which may be used to create points of the given size.
         The generator function takes a location as an argument.
