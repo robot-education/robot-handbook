@@ -17,12 +17,7 @@ class Color(enum.StrEnum):
 
 DEFAULT_COLOR = Color.WHITE
 
-# Default sizes:
-# SMALL_FONT = 24
-# MED_FONT = 32
-# LARGE_FONT = 48
-
-
+# Default sizes were 24, 32, 48
 class FontSize(enum.IntEnum):
     SMALL = 20
     MEDIUM = 24
