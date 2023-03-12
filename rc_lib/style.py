@@ -5,22 +5,25 @@ import enum
 
 __all__ = ["Color", "FontSize", "Time", "center_and_scale"]
 
-Color = NewType('Color', str)
+Color = NewType("Color", str)
 
-class Pallette(enum.StrEnum):
+
+class Palette(enum.StrEnum):
     RED = Colors.red_c.value
     GREEN = Colors.green_d.value
     BLUE = Colors.blue_d.value
     YELLOW = Colors.yellow_e.value
     WHITE = Colors.white.value
 
-DEFAULT_COLOR = Pallette.WHITE
+
+DEFAULT_COLOR = Palette.WHITE
 
 # Default sizes were 24, 32, 48
 class FontSize(enum.IntEnum):
     SMALL = 20
     MEDIUM = 24
     LARGE = 32
+
 
 """
 The length of the delay at the end of each animation.

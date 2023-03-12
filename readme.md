@@ -45,7 +45,7 @@ This repository uses vs-code dev containers. To open the repository in a dev con
 1. Install [docker desktop](https://www.docker.com/products/docker-desktop/).
 2. Install [vs-code](https://code.visualstudio.com/download).
 3. Add the **Dev Containers** extension to vs-code.
-4. Open the command pallette (*Ctrl + Shift + P*), and run the *Dev Containers: Open Folder in Container* task. Select a folder containing a local copy of this repository.
+4. Open the command Palette (*Ctrl + Shift + P*), and run the *Dev Containers: Open Folder in Container* task. Select a folder containing a local copy of this repository.
 
 Build the website by running either `make html` or the vs-code **build** task. 
 Open the website by by running either `python -m http.server` or the vs-code **open** task and then opening [localhost:8000](localhost:8000/) in your web browser.

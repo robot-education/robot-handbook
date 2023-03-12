@@ -75,7 +75,7 @@ class PlateCircleFactory:
 
     def make(self, radius: float, offset: float, location: T.Point2d) -> PlateCircle:
         # get a generator and immediately pass it location
-        return self.get_generator(radius, offset)(location)
+        return self.make_generator(radius, offset)(location)
 
 
 class PlateGroup(VGroup):
