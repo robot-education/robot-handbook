@@ -1,14 +1,16 @@
-Welcome to Robot Documentation's documentation!
-===============================================
+Robot Concepts
+==============
+
+This website contains various tutorials which introduce and explain a variety of engineering practices applicable to robotics programs like FRC and FTC.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
+   design/design
 
-Indices and tables
-==================
+.. Indices and tables
+.. ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`

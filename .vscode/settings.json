@@ -8,9 +8,34 @@
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
-    "files.eol": "\n",
+    "cSpell.allowCompoundWords": true,
+    "cSpell.ignorePaths": [
+        "build",
+        ".git",
+        ".vscode",
+        ".devcontainer",
+        "conf.py"
+    ],
     "cSpell.words": [
+        "atleast",
+        "Egan",
+        "Kempen",
+        "kwargs",
+        "manim",
+        "Mobject",
         "mobjects",
+        "Mobjects",
+        "ndarray",
+        "opengl",
+        "reservee",
+        "submobjects",
+        "unannotate",
+        "Uncreate",
+        "vmobject",
         "vmobjects"
-    ]
+    ],
+    "python.analysis.extraPaths": [
+        "rc_lib"
+    ],
+    "files.eol": "\n"
 }

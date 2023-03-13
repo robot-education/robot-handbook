@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
-	"name": "Debian",
+	"name": "Linux",
 	"dockerFile": "Dockerfile",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {
@@ -9,11 +9,11 @@
 	// 		"installJupyterlab": true
 	// 	}
 	// },
-	"build": {
-		"args": {
-			"WORKSPACE": "${containerWorkspaceFolder}"
-		}
-	},
+	// "build": {
+	// 	"args": {
+	// 		"WORKSPACE": "${containerWorkspaceFolder}"
+	// 	}
+	// },
 	"postCreateCommand": "bash setup.sh",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// Configure tool-specific properties.
@@ -24,7 +24,8 @@
 				"redhat.vscode-yaml",
 				"yzhang.markdown-all-in-one",
 				"ms-toolsai.jupyter",
-				"ms-python.python"
+				"ms-python.python",
+				"ms-python.black-formatter"
 			]
 		}
 	},
