@@ -19,6 +19,7 @@
     "cSpell.words": [
         "atleast",
         "Egan",
+        "ipynb",
         "Kempen",
         "kwargs",
         "manim",
@@ -32,7 +33,8 @@
         "unannotate",
         "Uncreate",
         "vmobject",
-        "vmobjects"
+        "vmobjects",
+        "webm"
     ],
     "python.analysis.extraPaths": [
         "rc_lib"
