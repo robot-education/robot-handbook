@@ -23,11 +23,15 @@
         "kwargs",
         "manim",
         "Mobject",
+        "mobjects",
         "Mobjects",
         "ndarray",
+        "opengl",
+        "reservee",
+        "submobjects",
         "unannotate",
         "Uncreate",
-        "mobjects",
+        "vmobject",
         "vmobjects"
     ],
     "python.analysis.extraPaths": [
