@@ -34,9 +34,6 @@ class SketchLine(VGroup):
         # self._line.add_tip(self._start, at_start=True)
         # self._line.add_tip(self._end, at_start=False)
 
-    # def copy(self) -> Self:
-    #     return super().copy()
-
     def set_position(self, new_point: T.Point2d, line_end: LineEnd) -> Self:
         if line_end == LineEnd.START:
             self._line.put_start_and_end_on(new_point, self.end_point())
@@ -69,15 +66,3 @@ class SketchLine(VGroup):
             Create(self._line),
             Create(self.end(), run_time=0),
         )
-
-    # def move_start(self, new_start_point: T.Point2d, **kwargs) -> Animation:
-    #     """
-    #     Move the start point to a given start point using a Transform.
-    #     """
-    #     return Transform(self, SketchLine(new_start_point, self.end_point(), color=self._color), **kwargs)
-
-    # def move_end(self, new_end_point: T.Point2d, **kwargs) -> Animation:
-    #     """
-    #     Move the end point to a given end point using a Transform.
-    #     """
-    #     return Transform(self, SketchLine(self.start_point(), new_end_point, color=self._color), **kwargs)
