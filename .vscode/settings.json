@@ -26,7 +26,9 @@
         "Mobjects",
         "ndarray",
         "unannotate",
-        "Uncreate"
+        "Uncreate",
+        "mobjects",
+        "vmobjects"
     ],
     "python.analysis.extraPaths": [
         "rc_lib"
