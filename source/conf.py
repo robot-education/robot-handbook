@@ -26,9 +26,6 @@ release = "1.0.0"
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
-# ones.
 extensions = [
     "sphinx_rtd_theme",
     "sphinx.ext.autosectionlabel",
@@ -38,16 +35,15 @@ extensions = [
 ]
 
 myst_enable_extensions = [
-    "strkethrough",  # Strikethrough: ~~strike~~
+    "strikethrough",  # Strikethrough: ~~strike~~
     "amsmath",  # Parse amsmath equations, e.g. \begin{align} 2 = 2 \end{align}
     "dollarmath",  # Parse $2 = 2$ and $$2 = 2$$
     "substitution",  # Enables substituions here and at the top of files
     "colon_fence",  # Enables directives using ::: and md-figure directive
 ]
 
-autosectionlabel_prefix_document = True
+# autosectionlabel_prefix_document = True
 
-# Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
@@ -55,12 +51,10 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
 html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
