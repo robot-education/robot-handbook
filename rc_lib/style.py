@@ -3,10 +3,7 @@ from typing import NewType
 from manim.utils.color import Colors
 import enum
 
-__all__ = ["Color", "FontSize", "Time", "center_and_scale"]
-
-Color = NewType("Color", str)
-
+Color = str
 
 class Palette(enum.StrEnum):
     RED = Colors.red_c.value

@@ -1,21 +1,13 @@
 """
     Mobject groups with available layout methods.
 """
-from typing import List, Any
+import manim as mn
 
-from manim import *
+from typing import Callable, List, Any, Self
 
-from typing import Self
+from rc_lib.math_utils import vector, mobject_geometry
 
-from rc_lib import math_types as T
-from rc_lib.common_mobjects import containers
-from rc_lib.math_utils import geometry
-from rc_lib.math_utils import mobject_geometry
-
-__all__ = ["Placeholder", "LinearLayout"]
-
-
-def edge_from_center(mobject: VMobject, direction: T.Vector2D) -> T.Vector2D:
+def edge_from_center(mobject: mn.VMobject, direction: vector.Vector2d) -> vector.Vector2d:
     """Returns a vector for the edge, rather than an absolute position.
     Translational invariant version of get_smooth_boundary_point.
     """
@@ -25,7 +17,7 @@ def edge_from_center(mobject: VMobject, direction: T.Vector2D) -> T.Vector2D:
     )
 
 
-class Placeholder(VMobject):
+class Placeholder(mn.VMobject):
     """
     An invisible placeholder constructed to have an equivalent bounding box
     to a given mobject, referred to as the reservee. Useful for reserving
@@ -45,16 +37,15 @@ class Placeholder(VMobject):
     """
 
     @staticmethod
-    def of_dimensions(width: float, height: float) -> "Placeholder":
+    def of_dimensions(width: float, height: float) -> Self:
         """
         Returns a placeholder with no reservee of the given dimensions
         """
         p = Placeholder(None)
         p.set_dimensions(width, height)
-
         return p
 
-    def __init__(self, reservee: VMobject):
+    def __init__(self, reservee: mn.VMobject):
         """
         Creates a placeholder for reservee with equivalent bounding rectangle.
 
@@ -62,7 +53,7 @@ class Placeholder(VMobject):
         """
         super().__init__()
         # Initialize the invisible rectangle we will be using
-        self._bounding_box = Rectangle(
+        self._bounding_box = mn.Rectangle(
             height=1, width=1, stroke_opacity=0.0, fill_opacity=0.0
         )
         # If we register it as a sub-mobject, we will take on its boundaries
@@ -70,7 +61,7 @@ class Placeholder(VMobject):
 
         self.set_reservee(reservee)
 
-    def set_reservee(self, reservee: VMobject) -> Self:
+    def set_reservee(self, reservee: mn.VMobject) -> Self:
         """
         Sets a new reservee and updates the bounding box. Does not move the
         placeholder.
@@ -84,8 +75,8 @@ class Placeholder(VMobject):
         self.reservee = reservee
 
         if not reservee == None:
-            diagonal = reservee.get_corner(UP + RIGHT) - reservee.get_corner(
-                DOWN + LEFT
+            diagonal = reservee.get_corner(mn.UP + mn.RIGHT) - reservee.get_corner(
+                mn.DOWN + mn.LEFT
             )
             width = diagonal[0]
             height = diagonal[1]
@@ -106,7 +97,7 @@ class Placeholder(VMobject):
 
         return self
 
-    def reserved_for(self, mob: VMobject) -> bool:
+    def reserved_for(self, mob: mn.VMobject) -> bool:
         """
         Returns true if this placeholder is reserved for `mob`.
 
@@ -130,7 +121,8 @@ class Placeholder(VMobject):
 
 
 class LinearLayout(object.OrderedVGroup):
-    """A VGroup that arranges its elements in order along a given direction.
+    """
+    A VGroup that arranges its elements in order along a given direction.
 
     Does not automatically update the layout. To use the layout, three primary
     methods are provided:
@@ -144,11 +136,11 @@ class LinearLayout(object.OrderedVGroup):
             this can be changed by passing in a different animation class.
     """
 
-    def __init__(self, *mobjects: List[VMobject], direction=DOWN):
+    def __init__(self, *mobjects: List[mn.VMobject], direction=mn.DOWN):
         super().__init__(*mobjects)
         self.set_direction(direction)
 
-    def set_direction(self, direction: T.Vector2D) -> Self:
+    def set_direction(self, direction: vector.Vector2d) -> Self:
         """Sets the default direction for the layout.
 
         This may be overridden by specific calls to arrange, and does not
@@ -160,11 +152,11 @@ class LinearLayout(object.OrderedVGroup):
 
     def predict_arrangement(
         self,
-        direction: T.Vector2D = None,
-        root: T.Point2D = None,
+        direction: vector.Vector2d | None = None,
+        root: vector.Point2d | None = None,
         normalize=True,
         padding: float = 0.0,
-    ) -> List[T.Point2D]:
+    ) -> List[vector.Point2d]:
         """
         Returns a list of the predicted positions that the mobjects would be
         arranged at, in the order they have been placed in the layout.
@@ -186,7 +178,7 @@ class LinearLayout(object.OrderedVGroup):
             direction = self.direction
 
         if normalize:
-            direction = geometry.normalize(direction)
+            direction = vector.normalize(direction)
 
         if root is None:
             root = self[0].get_center()
@@ -206,7 +198,7 @@ class LinearLayout(object.OrderedVGroup):
 
         return positions
 
-    def arrange(self, positions: List[T.Point2D] = None) -> Self:
+    def arrange(self, positions: List[vector.Point2d] = None) -> Self:
         """Instantaneously updates the layout along the given direction, as
         according to predict_arrangement().
 
@@ -227,9 +219,9 @@ class LinearLayout(object.OrderedVGroup):
 
     def animate_arrange(
         self,
-        anim_function: Callable[[VMobject, T.Point2D], Animation] = None,
-        positions: List[T.Point2D] = None,
-    ) -> List[Animation]:
+        anim_function: Callable[[mn.VMobject, vector.Point2d], mn.Animation] | None = None,
+        positions: List[vector.Point2d] | None = None,
+    ) -> List[mn.Animation]:
         """
         Returns an animation of the layout being updated to its predicted
         arrangement.
@@ -253,7 +245,7 @@ class LinearLayout(object.OrderedVGroup):
 
         return [anim_function(self[i], positions[i]) for i in range(len(self))]
 
-    def replace_placeholder(self, reservee: VMobject) -> Self:
+    def replace_placeholder(self, reservee: mn.VMobject) -> Self:
         """
         Searches for a placeholder reserving reservee and replaces it with
         the reservee.
