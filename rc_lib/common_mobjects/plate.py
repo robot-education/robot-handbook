@@ -1,8 +1,9 @@
 from manim import *
 from typing import List, Self
 from rc_lib import math_types as T
-
 from rc_lib import style
+from rc_lib.style import color
+
 from rc_lib.math_utils import tangent
 
 __all__ = ["Plate", "PlateCircle"]
@@ -21,7 +22,7 @@ class PlateCircle(VGroup):
         )
 
     @staticmethod
-    def tangent_line(start, end, color: style.Color = style.DEFAULT_COLOR) -> Line:
+    def tangent_line(start, end, color: color.Color = color.FOREGROUND) -> Line:
         return Line(*PlateCircle.tangent_points(start, end), color=color)
 
     def inner_circle(self) -> Self:
@@ -48,14 +49,14 @@ class PlateCircle(VGroup):
 
 class PlateCircleFactory:
     def __init__(self) -> None:
-        self._inner_color = style.DEFAULT_COLOR
-        self._outer_color = style.DEFAULT_COLOR
+        self._inner_color = color.FOREGROUND
+        self._outer_color = color.FOREGROUND
 
-    def set_inner_color(self, color: style.Color) -> Self:
+    def set_inner_color(self, color: color.Color) -> Self:
         self._inner_color = color
         return self
 
-    def set_outer_color(self, color: style.Color) -> Self:
+    def set_outer_color(self, color: color.Color) -> Self:
         self._outer_color = color
         return self
 
@@ -83,14 +84,14 @@ class PlateGroup(VGroup):
         self,
         entities: List[PlateCircle],
         boundary_order: List[int],
-        boundary_color: style.Color = style.DEFAULT_COLOR,
+        boundary_color: color.Color = color.FOREGROUND,
     ) -> None:
         self._entities = entities
         self._boundary = [self._entities[i] for i in boundary_order]
         self._boundary_lines = self._make_boundary_lines(boundary_color)
         super().__init__(*[*self._entities, *self._boundary_lines])
 
-    def _make_boundary_lines(self, color: style.Color) -> List[Line]:
+    def _make_boundary_lines(self, color: color.Color) -> List[Line]:
         return [
             PlateCircle.tangent_line(self._boundary[i - 1], curr, color=color)
             for i, curr in enumerate(self._boundary)
