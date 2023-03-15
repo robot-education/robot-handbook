@@ -1,0 +1,37 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+	"name": "Linux",
+	"dockerFile": "Dockerfile",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {
+	// 	"ghcr.io/devcontainers/features/python:1": {
+	// 		"installJupyterlab": true
+	// 	}
+	// },
+	// "build": {
+	// 	"args": {
+	// 		"WORKSPACE": "${containerWorkspaceFolder}"
+	// 	}
+	// },
+	"postCreateCommand": "bash setup.sh",
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"streetsidesoftware.code-spell-checker",
+				"redhat.vscode-yaml",
+				"yzhang.markdown-all-in-one",
+				"ms-toolsai.jupyter",
+				"ms-python.python",
+				"ms-python.black-formatter"
+			]
+		}
+	},
+	"forwardPorts": [
+		8000
+	]
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

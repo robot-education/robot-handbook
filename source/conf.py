@@ -12,48 +12,50 @@
 #
 # import os
 # import sys
-# sys.path.insert(0, os.path.abspath('.'))
-import sphinx_rtd_theme
+# sys.path.insert(0, os.path.abspath("."))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Robot Documentation'
-copyright = '2023, Alex Kempen, Egan Johnson'
-author = 'Alex Kempen, Egan Johnson'
+project = "Robot Concepts"
+copyright = "2023, Alex Kempen, Egan Johnson"
+author = "Alex Kempen, Egan Johnson"
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+release = "1.0.0"
 
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
-    'sphinx_rtd_theme',
-    'sphinx.ext.autosectionlabel',
-    'sphinx.ext.githubpages',
-    'sphinx_copybutton'
+    "sphinx_rtd_theme",
+    "sphinx.ext.autosectionlabel",
+    "sphinx.ext.githubpages",
+    "sphinx_copybutton",
+    "myst_parser",
 ]
 
-autosectionlabel_prefix_document = True
+myst_enable_extensions = [
+    "strikethrough",  # Strikethrough: ~~strike~~
+    "amsmath",  # Parse amsmath equations, e.g. \begin{align} 2 = 2 \end{align}
+    "dollarmath",  # Parse $2 = 2$ and $$2 = 2$$
+    "substitution",  # Enables substituions here and at the top of files
+    "colon_fence",  # Enables directives using ::: and md-figure directive
+]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+# autosectionlabel_prefix_document = True
+
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

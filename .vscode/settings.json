@@ -1,0 +1,44 @@
+{
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "bash"
+        }
+    },
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "cSpell.allowCompoundWords": true,
+    "cSpell.ignorePaths": [
+        "build",
+        ".git",
+        ".vscode",
+        ".devcontainer",
+        "conf.py"
+    ],
+    "cSpell.words": [
+        "atleast",
+        "Egan",
+        "eganj",
+        "ipynb",
+        "Kempen",
+        "kwargs",
+        "manim",
+        "Mobject",
+        "mobjects",
+        "Mobjects",
+        "ndarray",
+        "opengl",
+        "reservee",
+        "submobjects",
+        "unannotate",
+        "Uncreate",
+        "vmobject",
+        "vmobjects",
+        "webm"
+    ],
+    "python.analysis.extraPaths": [
+        "rc_lib"
+    ],
+    "files.eol": "\n"
+}
