@@ -6,6 +6,7 @@ import enum
 from rc_lib.math_utils import vector
 from rc_lib import style
 
+
 class LineEnd(enum.IntEnum):
     START = 0
     END = 1
@@ -23,7 +24,7 @@ class SketchLine(mn.VGroup):
         self.start = mn.Dot(start_point, color=color)
         self.end = mn.Dot(end_point, color=color)
         super().__init__(self.line, self.start, self.end)
-    
+
     def set_position(self, new_point: vector.Point2d, line_end: LineEnd) -> Self:
         if line_end == LineEnd.START:
             self.line.put_start_and_end_on(new_point, self.end_point())

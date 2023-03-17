@@ -19,6 +19,7 @@ Direction = np.ndarray
 Direction2d = np.ndarray
 Direction3d = np.ndarray
 
+
 def norm(point: Point | Vector) -> float:
     return np.linalg.norm(point)
 
@@ -26,18 +27,26 @@ def norm(point: Point | Vector) -> float:
 def normalize(vector: Vector) -> Direction:
     return mn.normalize(vector)
 
+
 def dot(vector1: Vector, vector2: Vector) -> Vector:
     return np.dot(vector1, vector2)
 
+
+def vector_2d(x: float, y: float) -> Vector2d:
+    """A constructor for a vector2d."""
+    return np.array([x, y, 0])
+
+
+def vector_3d(x: float, y: float, z: float) -> Vector3d:
+    """A constructor for a vector3d."""
+    return np.array([x, y, z])
+
+
 def point_2d(x: float, y: float) -> Point2d:
-    """
-    A constructor for a point2d.
-    """
+    """A constructor for a point2d."""
     return np.array([x, y, 0])
 
 
 def point_3d(x: float, y: float, z: float) -> Point3d:
-    """
-    A constructor for a point3d.
-    """
+    """A constructor for a point3d."""
     return np.array([x, y, z])

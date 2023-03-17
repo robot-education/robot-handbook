@@ -1,5 +1,5 @@
 import manim as mn
-from typing import List, Self
+from typing import Callable, List, Self, Tuple
 
 from rc_lib import style
 from rc_lib.math_utils import tangent, vector
@@ -8,8 +8,8 @@ from rc_lib.math_utils import tangent, vector
 class PlateCircle(mn.VGroup):
     def __init__(self, inner_circle: mn.Circle, outer_circle: mn.Circle) -> None:
         super().__init__(inner_circle, outer_circle)
-        self.inner_circle = inner_circle
-        self.outer_circle = outer_circle
+        self.inner_circle: mn.Circle = inner_circle
+        self.outer_circle: mn.Circle = outer_circle
 
     def center(self) -> vector.Point2d:
         return self.inner_circle.get_center()
@@ -20,28 +20,37 @@ class PlateCircle(mn.VGroup):
     def outer_radius(self) -> float:
         return self.outer_circle.width / 2
 
-def plate_circle_tangent_points(start: PlateCircle, end: PlateCircle) -> List[vector.Point2d]:
+
+def plate_circle_tangent_points(
+    start: PlateCircle, end: PlateCircle
+) -> Tuple[vector.Point2d, vector.Point2d]:
     return tangent.circle_to_circle_tangent(
         start.center(), start.outer_radius(), end.center(), end.outer_radius()
     )
 
-def plate_circle_tangent_line(start: PlateCircle, end: PlateCircle, color: style.Color = style.DEFAULT_COLOR) -> mn.Line:
+
+def plate_circle_tangent_line(
+    start: PlateCircle, end: PlateCircle, color: style.Color = style.DEFAULT_COLOR
+) -> mn.Line:
     return mn.Line(*plate_circle_tangent_points(start, end), color=color)
+
 
 class PlateCircleFactory:
     def __init__(self) -> None:
-        self._inner_color = style.DEFAULT_COLOR
-        self._outer_color = style.DEFAULT_COLOR
+        self._inner_color: style.Color = style.DEFAULT_COLOR
+        self._outer_color: style.Color = style.DEFAULT_COLOR
 
     def set_inner_color(self, color: style.Color) -> Self:
-        self._inner_color = color
+        self._inner_color: style.Color = color
         return self
 
     def set_outer_color(self, color: style.Color) -> Self:
-        self._outer_color = color
+        self._outer_color: style.Color = color
         return self
 
-    def make_generator(self, radius: float, offset: float):
+    def make_generator(
+        self, radius: float, offset: float
+    ) -> Callable[[vector.Point2d], PlateCircle]:
         """
         Returns a generator function which may be used to create points of the given size.
         The generator function takes a location as an argument.
@@ -55,7 +64,9 @@ class PlateCircleFactory:
 
         return generator
 
-    def make(self, radius: float, offset: float, location: vector.Point2d) -> PlateCircle:
+    def make(
+        self, radius: float, offset: float, location: vector.Point2d
+    ) -> PlateCircle:
         # get a generator and immediately pass it location
         return self.make_generator(radius, offset)(location)
 
@@ -67,9 +78,9 @@ class PlateGroup(mn.VGroup):
         boundary_order: List[int],
         boundary_color: style.Color = style.DEFAULT_COLOR,
     ) -> None:
-        self._entities = entities
-        self._boundary = [self._entities[i] for i in boundary_order]
-        self._boundary_lines = self._make_boundary_lines(boundary_color)
+        self._entities: List[PlateCircle] = entities
+        self._boundary: List[PlateCircle] = [self._entities[i] for i in boundary_order]
+        self._boundary_lines: List[mn.Line] = self._make_boundary_lines(boundary_color)
         super().__init__(*[*self._entities, *self._boundary_lines])
 
     def _make_boundary_lines(self, color: style.Color) -> List[mn.Line]:

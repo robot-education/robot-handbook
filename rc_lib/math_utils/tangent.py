@@ -1,10 +1,13 @@
-from typing import List
+from typing import List, Tuple
 
 from rc_lib.math_utils import vector
 
 from math import acos, atan2, cos, sin
 
-def circle_to_circle_tangent(center1: vector.Point2d, radius1: float, center2: vector.Point2d, radius2: float) -> List[vector.Point2d]:
+
+def circle_to_circle_tangent(
+    center1: vector.Point2d, radius1: float, center2: vector.Point2d, radius2: float
+) -> Tuple[vector.Point2d, vector.Point2d]:
     """
     Returns the outer tangent line between two circles.
     The tangent is such that it is on the (left) outside of 1 and 2 when they are arranged in clockwise fashion.
@@ -14,16 +17,18 @@ def circle_to_circle_tangent(center1: vector.Point2d, radius1: float, center2: v
     delta = (center2 - center1) / dist
     cross = vector.point_2d(-delta[1], delta[0])
     alpha = (radius1 - radius2) / dist
-    beta = (1 - alpha ** 2) ** 0.5
-    return [
+    beta = (1 - alpha**2) ** 0.5
+    return (
         center1 + (alpha * delta + beta * cross) * radius1,
-        center2 + (alpha * delta + beta * cross) * radius2
-    ]
+        center2 + (alpha * delta + beta * cross) * radius2,
+    )
 
 
-def circle_to_point_tangent(center: vector.Point2d, radius: float, point: vector.Point2d) -> vector.Point2d:
+def circle_to_point_tangent(
+    center: vector.Point2d, radius: float, point: vector.Point2d
+) -> vector.Point2d:
     """
-    Returns the outer tangent line between a circle and a point. 
+    Returns the tangent point between a circle and a point.
     The tangent is such that it is on the outside when point is clockwise to center.
     To flip the tangent, pass point before center.
     """
@@ -32,9 +37,11 @@ def circle_to_point_tangent(center: vector.Point2d, radius: float, point: vector
     angle_offset = atan2(point[1] - center[1], point[0] - center[0])
     return vector.point_2d(
         center[0] + radius * cos(angle_offset - angle),
-        center[1] + radius * sin(angle_offset - angle)
+        center[1] + radius * sin(angle_offset - angle),
     )
 
 
-def circle_to_point_tangent(point: vector.Point2d, center: vector.Point2d, radius: float) -> vector.Point2d:
+def circle_to_point_tangent(
+    point: vector.Point2d, center: vector.Point2d, radius: float
+) -> vector.Point2d:
     return circle_to_circle_tangent(center, -radius, point)
