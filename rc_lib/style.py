@@ -5,6 +5,7 @@ import enum
 
 Color = str
 
+
 class Palette(enum.StrEnum):
     RED = Colors.red_c.value
     GREEN = Colors.green_d.value
@@ -14,6 +15,7 @@ class Palette(enum.StrEnum):
 
 
 DEFAULT_COLOR = Palette.WHITE
+
 
 # Default sizes were 24, 32, 48
 class FontSize(enum.IntEnum):
@@ -26,10 +28,3 @@ class FontSize(enum.IntEnum):
 The length of the delay at the end of each animation.
 """
 END_DELAY = 3
-
-
-def center_and_scale(object: Mobject) -> Mobject:
-    """
-    Centers and scales an object so it lies in the center of the screen.
-    """
-    pass

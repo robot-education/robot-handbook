@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 import manim as mn
 from rc_lib import style
+=======
+from manim import *
+from typing import List
+
+from rc_lib.style import color
+>>>>>>> origin/development
 
 
 class TitleSequence:
@@ -8,7 +15,7 @@ class TitleSequence:
     """
 
     def __init__(
-        self, add_numbers: bool = True, default_color: style.Color = style.DEFAULT_COLOR
+        self, add_numbers: bool = True, default_color: color.Color = color.FOREGROUND
     ) -> None:
         self._add_numbers = add_numbers
         self._default_color = default_color
@@ -20,10 +27,14 @@ class TitleSequence:
         """
         self._number = 1
 
+<<<<<<< HEAD
     def next(self, title: str, color: style.Color | None = None) -> mn.Animation:
         """
         Returns an animation which displays the given title (or transitions from the previous title).
         """
+=======
+    def next(self, title: str, color: color.Color | None = None) -> Animation:
+>>>>>>> origin/development
         text = self._make_text(title, self._default_color if color is None else color)
         self._number += 1
         if self._number == 2:
@@ -32,6 +43,10 @@ class TitleSequence:
         else:
             return mn.Transform(self._first, text, run_time=0.75)
 
+<<<<<<< HEAD
     def _make_text(self, title: str, color: style.Color) -> mn.Text:
+=======
+    def _make_text(self, title: str, color: color.Color) -> Text:
+>>>>>>> origin/development
         prefix = str(self._number) + ": " if self._add_numbers else ""
         return mn.Text(prefix + title, color=color).to_corner(mn.UP + mn.LEFT)

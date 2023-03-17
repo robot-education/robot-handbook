@@ -2,6 +2,7 @@ import manim as mn
 from typing import Callable, List, Self, Tuple
 
 from rc_lib import style
+from rc_lib.style import color
 from rc_lib.math_utils import tangent, vector
 
 
@@ -76,7 +77,7 @@ class PlateGroup(mn.VGroup):
         self,
         entities: List[PlateCircle],
         boundary_order: List[int],
-        boundary_color: style.Color = style.DEFAULT_COLOR,
+        boundary_color: color.Color = color.FOREGROUND,
     ) -> None:
         self._entities: List[PlateCircle] = entities
         self._boundary: List[PlateCircle] = [self._entities[i] for i in boundary_order]

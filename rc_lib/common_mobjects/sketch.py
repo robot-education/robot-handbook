@@ -3,8 +3,13 @@ import manim as mn
 from typing import Self
 import enum
 
+<<<<<<< HEAD
 from rc_lib.math_utils import vector
 from rc_lib import style
+=======
+from rc_lib import math_types as T
+from rc_lib.style import color
+>>>>>>> origin/development
 
 
 class LineEnd(enum.IntEnum):
@@ -15,9 +20,15 @@ class LineEnd(enum.IntEnum):
 class SketchLine(mn.VGroup):
     def __init__(
         self,
+<<<<<<< HEAD
         start_point: vector.Point2d,
         end_point: vector.Point2d,
         color: style.Color = style.DEFAULT_COLOR,
+=======
+        start_point: T.Point2d,
+        end_point: T.Point2d,
+        color: color.Color = color.FOREGROUND,
+>>>>>>> origin/development
     ) -> None:
         self._color = color
         self.line = mn.Line(start_point, end_point, color=color)
