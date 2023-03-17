@@ -4,7 +4,7 @@ from typing import Self
 import enum
 
 from rc_lib import math_types as T
-from rc_lib import style
+from rc_lib.style import color
 
 __all__ = ["SketchLine"]
 
@@ -19,7 +19,7 @@ class SketchLine(VGroup):
         self,
         start_point: T.Point2d,
         end_point: T.Point2d,
-        color: style.Color = style.DEFAULT_COLOR,
+        color: color.Color = color.FOREGROUND,
     ) -> None:
         self._color = color
         self._line = Line(start_point, end_point, color=color)

@@ -8,7 +8,7 @@ Avoid running animations with non-standard units of time. Prefer using one of th
 When setting the pace of an animation, consider that animations may play in a format which is not easily
 pausable, and that many users prefer a slower format. 
 
-Animations should always finish with a delay equal to `END_DELAY`.
+Animations should always finish with a delay equal to `style.animation.END_DELAY`.
 
 ## Colors
 Use the `Color` type and colors defined in `style`. Do not use colors from manim directly.
