@@ -28,6 +28,7 @@
         "mobjects",
         "Mobjects",
         "ndarray",
+        "nocontrols",
         "opengl",
         "reservee",
         "submobjects",

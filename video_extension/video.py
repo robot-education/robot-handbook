@@ -51,7 +51,9 @@ def get_video(src: str, env: BuildEnvironment) -> Tuple[str, str]:
     suffix = Path(src).suffix
     if suffix not in SUPPORTED_MIME_TYPES:
         logger.warning(
-            f'The provided file type ("{suffix}") is not a supported format. defaulting to ""'
+            'The provided file type ("{}") is not a supported format. defaulting to ""'.format(
+                suffix
+            )
         )
     type = SUPPORTED_MIME_TYPES.get(suffix, "")
 
@@ -59,7 +61,7 @@ def get_video(src: str, env: BuildEnvironment) -> Tuple[str, str]:
 
 
 class video_node(nodes.General, nodes.Element):
-    """Video node."""
+    """Video node combining nodes.General with nodes.Element."""
 
     pass
 
@@ -92,14 +94,18 @@ class Video(SphinxDirective):
         height: str = self.options.get("height", "")
         if height and not height.isdigit():
             logger.warning(
-                f'The provided height ("{height}") is ignored as it\'s not an integer'
+                "The provided height ({}) is ignored as it is not an integer".format(
+                    height
+                )
             )
             height = ""
 
         width: str = self.options.get("width", "")
         if width and not width.isdigit():
             logger.warning(
-                f'The provided width ("{width}") is ignored as it\'s not an integer'
+                "The provided width ({}) is ignored as it is not an integer".format(
+                    width
+                )
             )
             width = ""
 
@@ -107,7 +113,9 @@ class Video(SphinxDirective):
         valid_preload = ["auto", "metadata", "none"]
         if preload not in valid_preload:
             logger.warning(
-                f'The provided preload ("{preload}") is not an accepted value. defaulting to "auto"'
+                'The provided preload ({}) is not an accepted value. defaulting to "auto"'.format(
+                    preload
+                )
             )
             preload = "auto"
 
@@ -120,7 +128,9 @@ class Video(SphinxDirective):
             secondary_src = get_video(self.arguments[1], env)
         elif env.config.video_enforce_extra_source is True:
             logger.warning(
-                f'A secondary source should be provided for "{self.arguments[0]}"'
+                'A secondary source should be provided for "{}"'.format(
+                    self.arguments[0]
+                )
             )
 
         return [
@@ -163,10 +173,12 @@ def depart_video_node_html(translator: SphinxTranslator, node: video_node) -> No
     translator.body.append("</video>")
 
 
-def visit_video_node_unsuported(translator: SphinxTranslator, node: video_node) -> None:
+def visit_video_node_unsupported(
+    translator: SphinxTranslator, node: video_node
+) -> None:
     """Entry point of the ignored video node."""
     logger.warning(
-        f"video {node['primary_src']}: unsupported output format (node skipped)"
+        "video {}: unsupported output format (node skipped)".format(node["primary_src"])
     )
     raise nodes.SkipNode
 
@@ -177,11 +189,11 @@ def setup(app: Sphinx) -> Dict[str, bool]:
     app.add_node(
         video_node,
         html=(visit_video_node_html, depart_video_node_html),
-        epub=(visit_video_node_unsuported, None),
-        latex=(visit_video_node_unsuported, None),
-        man=(visit_video_node_unsuported, None),
-        texinfo=(visit_video_node_unsuported, None),
-        text=(visit_video_node_unsuported, None),
+        epub=(visit_video_node_unsupported, None),
+        latex=(visit_video_node_unsupported, None),
+        man=(visit_video_node_unsupported, None),
+        texinfo=(visit_video_node_unsupported, None),
+        text=(visit_video_node_unsupported, None),
     )
     app.add_directive("video", Video)
 
