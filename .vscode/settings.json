@@ -8,6 +8,7 @@
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
+    "files.eol": "\n",
     "cSpell.allowCompoundWords": true,
     "cSpell.ignorePaths": [
         "build",
@@ -41,5 +42,6 @@
     "python.analysis.extraPaths": [
         "rc_lib"
     ],
-    "files.eol": "\n"
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "basic",
 }

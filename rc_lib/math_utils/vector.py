@@ -3,7 +3,7 @@
 """
 import manim as mn
 import numpy as np
-from typing import NewType
+from typing import Any
 
 Vector = np.ndarray
 # For compatability with manim, a 2d vector is defined as 3d vector with its third coordinate equal to zero.
@@ -20,7 +20,7 @@ Direction2d = np.ndarray
 Direction3d = np.ndarray
 
 
-def norm(point: Point | Vector) -> float:
+def norm(point: Point | Vector) -> np.floating[Any]:
     return np.linalg.norm(point)
 
 
@@ -50,3 +50,10 @@ def point_2d(x: float, y: float) -> Point2d:
 def point_3d(x: float, y: float, z: float) -> Point3d:
     """A constructor for a point3d."""
     return np.array([x, y, z])
+
+def angle_between(x1: Vector, x2: Vector) -> float:
+    # mn.angle_between_vectors is incorrectly typed as np.ndarray, not float
+    return mn.angle_between_vectors(x1, x2)  # type: ignore
+
+def angle_between_points(start: Point, end: Point, center: Point) -> float:
+    return angle_between(start - center, end - center)
