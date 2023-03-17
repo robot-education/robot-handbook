@@ -36,7 +36,8 @@ SUPPORTED_OPTIONS: List[str] = [
 
 
 def get_video(src: str, env: BuildEnvironment) -> Tuple[str, str]:
-    """Return video and suffix.
+    """
+    Return video and suffix.
     Load the video to the static directory if necessary and process the suffix. Raise a warning if not supported but do not stop the computation.
     Args:
         src: The source of the video file (can be local or url)
