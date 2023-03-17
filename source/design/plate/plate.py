@@ -23,8 +23,12 @@ title: title_sequence.TitleSequence = title_sequence.TitleSequence(
 
 class IntakePlateScene(mn.Scene):
     def setup(self):
-        small_base: Callable[[vector.Point2d], plate.PlateCircle] = factory.make_generator(0.15, 0.2)
-        medium_base: Callable[[vector.Point2d], plate.PlateCircle] = factory.make_generator(0.4, 0.2)
+        small_base: Callable[
+            [vector.Point2d], plate.PlateCircle
+        ] = factory.make_generator(0.15, 0.2)
+        medium_base: Callable[
+            [vector.Point2d], plate.PlateCircle
+        ] = factory.make_generator(0.4, 0.2)
 
         front_hole: vector.Point2d = vector.point_2d(-4, -3)
         middle_hole: vector.Point2d = vector.point_2d(-1.5, 0.25)
@@ -184,7 +188,7 @@ class BoundaryConstraintScene(mn.Scene):
             line_end, "point", "tangent_point", "circle"
         )
         return (
-                1 if line_end == sketch.LineEnd.START else -1
+            1 if line_end == sketch.LineEnd.START else -1
         ) * vector.angle_between_points(point, tangent_point, circle.center())
 
     def _do_flash(self, line_end: sketch.LineEnd) -> None:
