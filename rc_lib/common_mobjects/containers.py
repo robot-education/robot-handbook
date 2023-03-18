@@ -8,16 +8,28 @@ import manim as mn
 
 # The VGroup source checks if a mobject is either a VMobject or an OpenGLVMobject;
 # we will do the same here.
+<<<<<<< HEAD
 from manim.mobject.opengl import opengl_vectorized_mobject as opengl_mobject
+=======
+
+from typing import Any, Iterable, List, Self, TypeGuard, cast
+>>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
 
 from typing import Self
 
-def is_valid_vmobject(item) -> bool:
+def is_valid_vmobject(item) -> TypeGuard[mn.VMobject]:
     """Returns True if the given item is a valid mobject, as accepted by
     VGroup."""
+<<<<<<< HEAD
     return isinstance(item, (mn.VMobject, opengl_mobject.OpenGLVMobject))
 
 def all_valid_vmobjects(item_list: list) -> bool:
+=======
+    return isinstance(item, mn.VMobject)
+
+
+def all_valid_vmobjects(item_list: Iterable[Any]) -> TypeGuard[List[mn.VMobject]]:
+>>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
     """Returns True if all items in the given list are valid mobjects, as
     accepted by VGroup."""
     return all(is_valid_vmobject(item) for item in item_list)
@@ -73,6 +85,9 @@ class OrderedVGroup(mn.VGroup):
         """
         return self.submobjects.index(mobject)
 
+    def __getitem__(self, value: int) -> mn.VMobject:
+        return cast(mn.VMobject, super().__getitem__(value))
+
     def __len__(self) -> int:
         """Returns the number of elements in the group."""
         return len(self.submobjects)
@@ -92,7 +107,6 @@ class OrderedVGroup(mn.VGroup):
         self._validate_mobjects(mobject)
         if not self.contains(mobject):
             self.submobjects.insert(index, mobject)
-
         return self
 
     # Removal
@@ -111,4 +125,8 @@ class OrderedVGroup(mn.VGroup):
 
     def pop(self, index: int) -> mn.VMobject:
         """Removes and returns the mobject at the given index."""
+<<<<<<< HEAD
         return self.submobjects.pop(index)
+=======
+        return cast(mn.VMobject, self.submobjects.pop(index))
+>>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)

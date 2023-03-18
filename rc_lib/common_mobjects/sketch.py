@@ -1,15 +1,10 @@
 import manim as mn
 
-from typing import Self
+from typing import cast, Sequence, Self
 import enum
 
-<<<<<<< HEAD
 from rc_lib.math_utils import vector
-from rc_lib import style
-=======
-from rc_lib import math_types as T
 from rc_lib.style import color
->>>>>>> origin/development
 
 
 class LineEnd(enum.IntEnum):
@@ -20,15 +15,9 @@ class LineEnd(enum.IntEnum):
 class SketchLine(mn.VGroup):
     def __init__(
         self,
-<<<<<<< HEAD
         start_point: vector.Point2d,
         end_point: vector.Point2d,
-        color: style.Color = style.DEFAULT_COLOR,
-=======
-        start_point: T.Point2d,
-        end_point: T.Point2d,
         color: color.Color = color.FOREGROUND,
->>>>>>> origin/development
     ) -> None:
         self._color = color
         self.line = mn.Line(start_point, end_point, color=color)
@@ -37,10 +26,15 @@ class SketchLine(mn.VGroup):
         super().__init__(self.line, self.start, self.end)
 
     def set_position(self, new_point: vector.Point2d, line_end: LineEnd) -> Self:
+        new_coords = cast(Sequence[float], new_point)
         if line_end == LineEnd.START:
-            self.line.put_start_and_end_on(new_point, self.end_point())
+            self.line.put_start_and_end_on(
+                new_coords, cast(Sequence[float], self.end_point())
+            )
         else:
-            self.line.put_start_and_end_on(self.start_point(), new_point)
+            self.line.put_start_and_end_on(
+                cast(Sequence[float], self.start_point()), new_coords
+            )
         self.tip(line_end).move_to(new_point)
         return self
 
