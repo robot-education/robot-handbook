@@ -1,6 +1,5 @@
 # Robot Concepts
-![Build and Deploy](https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml/badh.sv?branch=main)
-(https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml)
+[![Build and Deploy](https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml/badge.svg?branch=main)](https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml)
 
 View this website by visiting [eganj.github.io/robot-concepts/](https://eganj.github.io/robot-concepts/).
 
