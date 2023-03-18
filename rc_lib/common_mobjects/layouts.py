@@ -1,15 +1,6 @@
 """
     Mobject groups with available layout methods.
 """
-<<<<<<< HEAD
-import manim as mn
-
-from typing import Callable, List, Any, Self
-
-from rc_lib.math_utils import vector, mobject_geometry
-
-def edge_from_center(mobject: mn.VMobject, direction: vector.Vector2d) -> vector.Vector2d:
-=======
 from typing import Callable, List, Any, Self, Tuple, cast
 
 import manim as mn
@@ -20,7 +11,6 @@ from rc_lib.common_mobjects import containers
 def edge_from_center(
     mobject: mn.VMobject, direction: vector.Vector2d
 ) -> vector.Vector2d:
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
     """Returns a vector for the edge, rather than an absolute position.
     Translational invariant version of get_smooth_boundary_point.
     """
@@ -49,20 +39,7 @@ class Placeholder(mn.VMobject):
     reservee are not considered equal (unless they are the same object).
     """
 
-<<<<<<< HEAD
-    @staticmethod
-    def of_dimensions(width: float, height: float) -> Self:
-        """
-        Returns a placeholder with no reservee of the given dimensions
-        """
-        p = Placeholder(None)
-        p.set_dimensions(width, height)
-        return p
-
-    def __init__(self, reservee: mn.VMobject):
-=======
     def __init__(self, reservee: mn.VMobject | None):
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
         """
         Creates a placeholder for reservee with equivalent bounding rectangle.
 
@@ -78,11 +55,7 @@ class Placeholder(mn.VMobject):
 
         self.set_reservee(reservee)
 
-<<<<<<< HEAD
-    def set_reservee(self, reservee: mn.VMobject) -> Self:
-=======
     def set_reservee(self, reservee: mn.VMobject | None) -> Self:
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
         """
         Sets a new reservee and updates the bounding box. Does not move the
         placeholder.
@@ -95,11 +68,7 @@ class Placeholder(mn.VMobject):
 
         self.reservee = reservee
 
-<<<<<<< HEAD
-        if not reservee == None:
-=======
         if reservee != None:
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
             diagonal = reservee.get_corner(mn.UP + mn.RIGHT) - reservee.get_corner(
                 mn.DOWN + mn.LEFT
             )
@@ -142,9 +111,6 @@ class Placeholder(mn.VMobject):
         return self._bounding_box.__hash__()
 
 
-<<<<<<< HEAD
-class LinearLayout(object.OrderedVGroup):
-=======
 def make_placeholder(width: float, height: float) -> Placeholder:
     """
     Returns a placeholder of the given dimensions with no reservee.
@@ -153,7 +119,6 @@ def make_placeholder(width: float, height: float) -> Placeholder:
 
 
 class LinearLayout(containers.OrderedVGroup):
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
     """
     A VGroup that arranges its elements in order along a given direction.
 
@@ -169,11 +134,7 @@ class LinearLayout(containers.OrderedVGroup):
             this can be changed by passing in a different animation class.
     """
 
-<<<<<<< HEAD
-    def __init__(self, *mobjects: List[mn.VMobject], direction=mn.DOWN):
-=======
     def __init__(self, *mobjects: mn.VMobject, direction=mn.DOWN):
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
         super().__init__(*mobjects)
         self.set_direction(direction)
 
@@ -191,11 +152,7 @@ class LinearLayout(containers.OrderedVGroup):
         self,
         direction: vector.Vector2d | None = None,
         root: vector.Point2d | None = None,
-<<<<<<< HEAD
-        normalize=True,
-=======
         normalize: bool = True,
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
         padding: float = 0.0,
     ) -> List[vector.Point2d]:
         """
@@ -239,11 +196,7 @@ class LinearLayout(containers.OrderedVGroup):
 
         return positions
 
-<<<<<<< HEAD
-    def arrange(self, positions: List[vector.Point2d] = None) -> Self:
-=======
     def arrange(self, positions: List[vector.Point2d] | None = None) -> Self:
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
         """Instantaneously updates the layout along the given direction, as
         according to predict_arrangement().
 
@@ -264,12 +217,8 @@ class LinearLayout(containers.OrderedVGroup):
 
     def animate_arrange(
         self,
-<<<<<<< HEAD
-        anim_function: Callable[[mn.VMobject, vector.Point2d], mn.Animation] | None = None,
-=======
         anim_function: Callable[[mn.VMobject, vector.Point2d], mn.Animation]
         | None = None,
->>>>>>> 69e9e27 (Fixed typing errors and updated to refactored style)
         positions: List[vector.Point2d] | None = None,
     ) -> List[mn.Animation]:
         """
@@ -287,7 +236,6 @@ class LinearLayout(containers.OrderedVGroup):
         def _move_mob_to_pos(
             mobject: mn.VMobject, pos: vector.Vector2d
         ) -> mn.Animation:
-            # mob.animate.move_to(pos).build()
             return mn.Transform(mobject, mobject.move_to(pos))
 
         if positions is None:

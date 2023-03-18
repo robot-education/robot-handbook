@@ -2,16 +2,15 @@ from typing import Callable, List, Tuple, Any
 import operator
 
 import manim as mn
-import numpy as np
-from rc_lib import style
+from rc_lib.style import color, animation
 from rc_lib.math_utils import vector
 from rc_lib.view_utils import title_sequence
 from rc_lib.common_mobjects import plate, sketch
 
 quality: str = "m"  # l or m
 
-inner_color: style.Color = style.GREEN
-boundary_color: style.Color = style.BLUE
+inner_color: color.Color = color.Palette.GREEN
+boundary_color: color.Color = color.Palette.BLUE
 
 factory: plate.PlateCircleFactory = plate.PlateCircleFactory()
 factory.set_inner_color(inner_color).set_outer_color(boundary_color)
@@ -62,7 +61,7 @@ class IntakePlateScene(mn.Scene):
         # self.play(title.next("Trim", color=boundary_color))
         # self.play(plate_group.trim(), run_time=5)
 
-        self.wait(style.END_DELAY)
+        self.wait(animation.END_DELAY)
 
 
 class BoundaryRedrawScene(mn.Scene):
@@ -75,7 +74,7 @@ class BoundaryRedrawScene(mn.Scene):
         )
 
         self._line: mn.Line = plate.plate_circle_tangent_line(
-            self._left, self._right, style.RED
+            self._left, self._right, color.Palette.RED
         )
         self.add(self._left, self._right, self._line, self._middle.inner_circle)
 
@@ -103,7 +102,7 @@ class BoundaryRedrawScene(mn.Scene):
             )
         )
 
-        self.wait(style.END_DELAY)
+        self.wait(animation.END_DELAY)
 
 
 class BoundaryConstraintScene(mn.Scene):
@@ -152,7 +151,7 @@ class BoundaryConstraintScene(mn.Scene):
         self.do_tangent_move(sketch.LineEnd.START)
         self.do_tangent_move(sketch.LineEnd.END)
 
-        self.wait(style.END_DELAY)
+        self.wait(animation.END_DELAY)
 
     def do_coincident_move(self, line_end: sketch.LineEnd) -> None:
         self._do_flash(line_end)
