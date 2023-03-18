@@ -4,10 +4,10 @@ import enum
 import math
 import numpy as np
 
-Color = NewType("Color", str)
+Color = str
 
 
-class Palette(enum.Enum, Color):
+class Palette(Color, enum.Enum):
     """
     General-purpose palette.
 
@@ -15,17 +15,17 @@ class Palette(enum.Enum, Color):
     arbitrary.
     """
 
-    RED = Color(mn.color.Colors.red_c.value)
-    GREEN = Color(mn.color.Colors.green_d.value)
-    BLUE = Color(mn.color.Colors.blue_d.value)
-    YELLOW = Color(mn.color.Colors.yellow_e.value)
-    WHITE = Color(mn.color.Colors.white.value)
+    RED = mn.color.Colors.red_c.value
+    GREEN = mn.color.Colors.green_d.value
+    BLUE = mn.color.Colors.blue_d.value
+    YELLOW = mn.color.Colors.yellow_e.value
+    WHITE = mn.color.Colors.white.value
 
 
 FOREGROUND: Color = Palette.WHITE
 
 
-class CategoricalPalette(enum.Enum, Color):
+class CategoricalPalette(Color, enum.Enum):
     """
     Based on Tol Vibrant.
 
@@ -33,12 +33,12 @@ class CategoricalPalette(enum.Enum, Color):
     to generate colors.
     """
 
-    BLUE = Color("#0077BB")
-    CYAN = Color("#33BBEE")
-    TEAL = Color("#009988")
-    RED = Color("#CC3311")
-    ORANGE = Color("#EE7733")
-    MAGENTA = Color("#EE3377")
+    BLUE = "#0077BB"
+    CYAN = "#33BBEE"
+    TEAL = "#009988"
+    RED = "#CC3311"
+    ORANGE = "#EE7733"
+    MAGENTA = "#EE3377"
 
 
 def color_categories(n_categories: int):
@@ -119,11 +119,11 @@ def sequential_colors(range=(0, 1)):
 
     # Viridis color scale
     colors: List[Color] = [
-        Color("#440154"),
-        Color("#414487"),
-        Color("#2A788E"),
-        Color("#22A884"),
-        Color("#FDE725"),
+        "#440154",
+        "#414487",
+        "#2A788E",
+        "#22A884",
+        "#FDE725",
     ]  # low  # high
 
     unit_sequential = _unit_interpolate_colors(colors)
@@ -146,7 +146,7 @@ def divergent_colors(range=(-1, 1)):
     # Blue-Orange scale
     colors: List[Color] = [
         CategoricalPalette.BLUE,  # negative
-        Color("#EAECCC"),  # zero
+        "#EAECCC",  # zero
         CategoricalPalette.RED,  # positive
     ]
 
