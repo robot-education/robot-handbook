@@ -1,12 +1,10 @@
-from manim import *
+import manim as mn
 
-from typing import Self
+from typing import cast, Sequence, Self
 import enum
 
-from rc_lib import math_types as T
+from rc_lib.math_utils import vector
 from rc_lib.style import color
-
-__all__ = ["SketchLine"]
 
 
 class LineEnd(enum.IntEnum):
@@ -14,55 +12,44 @@ class LineEnd(enum.IntEnum):
     END = 1
 
 
-class SketchLine(VGroup):
+class SketchLine(mn.VGroup):
     def __init__(
         self,
-        start_point: T.Point2d,
-        end_point: T.Point2d,
+        start_point: vector.Point2d,
+        end_point: vector.Point2d,
         color: color.Color = color.FOREGROUND,
     ) -> None:
         self._color = color
-        self._line = Line(start_point, end_point, color=color)
-        self._start = Dot(start_point, color=color)
-        self._end = Dot(end_point, color=color)
-        super().__init__(self._line, self._start, self._end)
+        self.line = mn.Line(start_point, end_point, color=color)
+        self.start = mn.Dot(start_point, color=color)
+        self.end = mn.Dot(end_point, color=color)
+        super().__init__(self.line, self.start, self.end)
 
-        # tip = ArrowCircleFilledTip(stroke_width=0.08, color=color)
-        # self._start = tip.copy()
-        # self._end = tip.copy()
-
-        # self._line.add_tip(self._start, at_start=True)
-        # self._line.add_tip(self._end, at_start=False)
-
-    def set_position(self, new_point: T.Point2d, line_end: LineEnd) -> Self:
+    def set_position(self, new_point: vector.Point2d, line_end: LineEnd) -> Self:
+        new_coords = cast(Sequence[float], new_point)
         if line_end == LineEnd.START:
-            self._line.put_start_and_end_on(new_point, self.end_point())
+            self.line.put_start_and_end_on(
+                new_coords, cast(Sequence[float], self.end_point())
+            )
         else:
-            self._line.put_start_and_end_on(self.start_point(), new_point)
-        self._tip(line_end).move_to(new_point)
+            self.line.put_start_and_end_on(
+                cast(Sequence[float], self.start_point()), new_coords
+            )
+        self.tip(line_end).move_to(new_point)
         return self
 
-    def line(self) -> Line:
-        return self._line
+    def tip(self, line_end: LineEnd):
+        return getattr(self, ("start", "end")[line_end])
 
-    def _tip(self, line_end: LineEnd):
-        return getattr(self, ("_start", "_end")[line_end])
+    def start_point(self) -> vector.Point2d:
+        return self.start.get_center()
 
-    def start(self) -> VMobject:
-        return self._tip(LineEnd.START)
+    def end_point(self) -> vector.Point2d:
+        return self.end.get_center()
 
-    def end(self) -> VMobject:
-        return self._tip(LineEnd.END)
-
-    def start_point(self) -> T.Point2d:
-        return self.start().get_center()
-
-    def end_point(self) -> T.Point2d:
-        return self.end().get_center()
-
-    def create(self) -> Animation:
-        return Succession(
-            Create(self.start(), run_time=0),
-            Create(self._line),
-            Create(self.end(), run_time=0),
+    def draw(self) -> mn.Animation:
+        return mn.Succession(
+            mn.Create(self.start, run_time=0),
+            mn.Create(self.line),
+            mn.Create(self.end, run_time=0),
         )

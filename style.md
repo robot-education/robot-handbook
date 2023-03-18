@@ -31,8 +31,7 @@ Animations should be displayed in the website by copying them from `animations` 
 Constraining a boundary line
 :::
 ```
-Tutorials with only a handful of animations my place all content in the same tutorial folder. Large tutorials may include
-a `media` folder.
+Tutorials must place all rendered video content in a folder named `video`.
 
 # Code
 ## Writing Animations

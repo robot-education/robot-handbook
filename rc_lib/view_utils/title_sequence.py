@@ -1,14 +1,10 @@
-from manim import *
-from typing import List
-
-from rc_lib.style import color
-
-__all__ = ["TitleSequence"]
+import manim as mn
+from rc_lib.style import color, text
 
 
 class TitleSequence:
     """
-    A class which provides a utility for displaying sequential titles in a step-by-step animation.
+    Displays a sequence of titles in a step-by-step animation.
     """
 
     def __init__(
@@ -24,15 +20,20 @@ class TitleSequence:
         """
         self._number = 1
 
-    def next(self, title: str, color: color.Color | None = None) -> Animation:
+    def next(self, title: str, color: color.Color | None = None) -> mn.Animation:
+        """
+        Returns an animation which displays the given title (or transitions from the previous title).
+        """
         text = self._make_text(title, self._default_color if color is None else color)
         self._number += 1
         if self._number == 2:
             self._first = text
-            return Write(self._first, run_time=0.75)
+            return mn.Write(self._first, run_time=0.75)
         else:
-            return Transform(self._first, text, run_time=0.75)
+            return mn.Transform(self._first, text, run_time=0.75)
 
-    def _make_text(self, title: str, color: color.Color) -> Text:
+    def _make_text(self, title: str, color: color.Color) -> mn.Text:
         prefix = str(self._number) + ": " if self._add_numbers else ""
-        return Text(prefix + title, color=color).to_corner(UP + LEFT)
+        return mn.Text(
+            prefix + title, font_size=text.FontSize.LARGE, color=color
+        ).to_corner(mn.UP + mn.LEFT)

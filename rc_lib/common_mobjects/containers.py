@@ -4,33 +4,27 @@
     Semantic extension of Group / VGroup, which behave like sets, to structures
     like lists. 
 """
-
-from manim import *
+import manim as mn
 
 # The VGroup source checks if a mobject is either a VMobject or an OpenGLVMobject;
 # we will do the same here.
-from manim.mobject.opengl.opengl_vectorized_mobject import OpenGLVMobject
 
-from typing import List, Self
-
-__all__ = [
-    "OrderedVGroup",
-]
+from typing import Any, Iterable, List, Self, TypeGuard, cast
 
 
-def is_valid_vmobject(item) -> bool:
+def is_valid_vmobject(item) -> TypeGuard[mn.VMobject]:
     """Returns True if the given item is a valid mobject, as accepted by
     VGroup."""
-    return isinstance(item, (VMobject, OpenGLVMobject))
+    return isinstance(item, mn.VMobject)
 
 
-def all_are_valid_vmobjects(item_list: list) -> bool:
+def all_valid_vmobjects(item_list: Iterable[Any]) -> TypeGuard[List[mn.VMobject]]:
     """Returns True if all items in the given list are valid mobjects, as
     accepted by VGroup."""
     return all(is_valid_vmobject(item) for item in item_list)
 
 
-class OrderedVGroup(VGroup):
+class OrderedVGroup(mn.VGroup):
     """A VGroup that allows for ordered manipulation of its elements.
 
     VGroups are already equipped with +, -, +=, -=, which are understood to
@@ -55,29 +49,33 @@ class OrderedVGroup(VGroup):
     interface, so this may break in future versions of manim.
     """
 
-    def _validate_mobjects(self, *mobjects: VMobject):
+    def _validate_mobjects(self, *mobjects: mn.VMobject):
         """Checks the validity of all provided mobjects and raises a value
         error if any are invalid."""
-        if not all_are_valid_vmobjects(mobjects):
+        if not all_valid_vmobjects(mobjects):
             raise ValueError("Member mobjects must be of type VMobject")
 
     # Constructor is the same as VGroup
-    def __init__(self, *submobjects: VMobject, **kwargs):
+    def __init__(self, *submobjects: mn.VMobject, **kwargs):
         super().__init__(*submobjects, **kwargs)
 
     # a few aliases for methods called on members:
-    def contains(self, mobject: VMobject) -> bool:
+    def contains(self, mobject: mn.VMobject) -> bool:
         """Returns True if the given object is in the group."""
         # count method not needed since we are enforcing uniqueness
         return self.submobjects.count(mobject) > 0
 
-    def index(self, mobject: VMobject) -> int:
-        """Returns the index of the given mobject in the group.
+    def index(self, mobject: mn.VMobject) -> int:
+        """
+        Returns the index of the given mobject in the group.
 
         Raises a ValueError if the mobject is not in the group: use
         `contains(mobject)` to check if it is in the group first.
         """
         return self.submobjects.index(mobject)
+
+    def __getitem__(self, value: int) -> mn.VMobject:
+        return cast(mn.VMobject, super().__getitem__(value))
 
     def __len__(self) -> int:
         """Returns the number of elements in the group."""
@@ -88,8 +86,9 @@ class OrderedVGroup(VGroup):
         return iter(self.submobjects)
 
     # Insertion
-    def insert(self, index: int, mobject: VMobject) -> Self:
-        """Inserts the given mobject at the given index.
+    def insert(self, index: int, mobject: mn.VMobject) -> Self:
+        """
+        Inserts the given mobject at the given index.
 
         Raises a ValueError if not given a valid mobject. Inserting a duplicate
         does nothing.
@@ -97,11 +96,10 @@ class OrderedVGroup(VGroup):
         self._validate_mobjects(mobject)
         if not self.contains(mobject):
             self.submobjects.insert(index, mobject)
-
         return self
 
     # Removal
-    def remove(self, mobject_or_index: VMobject) -> Self:
+    def remove(self, mobject_or_index: mn.VMobject) -> Self:
         """
         Removes the given mobject or index from the group.
 
@@ -114,6 +112,6 @@ class OrderedVGroup(VGroup):
             self -= mobject_or_index
         return self
 
-    def pop(self, index: int) -> VMobject:
+    def pop(self, index: int) -> mn.VMobject:
         """Removes and returns the mobject at the given index."""
-        return self.submobjects.pop(index)
+        return cast(mn.VMobject, self.submobjects.pop(index))
