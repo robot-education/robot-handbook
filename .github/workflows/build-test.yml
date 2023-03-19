@@ -10,4 +10,5 @@ jobs:
       - name: Install and Build
         run: |
           sudo bash setup.sh
+          python build.py
           make html
