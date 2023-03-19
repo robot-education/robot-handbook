@@ -15,5 +15,5 @@ jobs:
       - name: Install and Build
         run: |
           sudo bash setup.sh
-          python3.11 build.py
+          python3.11 -m build
           make html

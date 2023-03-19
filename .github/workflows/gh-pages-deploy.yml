@@ -21,7 +21,7 @@ jobs:
       - name: Install and Build
         run: |
           sudo bash setup.sh
-          python3.11 build.py --production
+          python3.11 -m build --production
           make html
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
