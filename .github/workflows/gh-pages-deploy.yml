@@ -20,8 +20,8 @@ jobs:
 
       - name: Install and Build
         run: |
-          sudo bash setup.sh
-          python -m build --production
+          bash setup.sh
+          python3 -m build
           make html
 
       - name: Deploy
