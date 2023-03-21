@@ -1,4 +1,4 @@
-from typing import Callable, List, Tuple, Any
+from typing import List, Tuple, Any
 import operator
 
 import manim as mn
@@ -6,8 +6,6 @@ from rc_lib.style import color, animation
 from rc_lib.math_utils import vector
 from rc_lib.view_utils import title_sequence
 from rc_lib.common_mobjects import plate, sketch
-
-quality: str = "m"  # l or m
 
 inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE

@@ -3,7 +3,7 @@ This tutorial provides a visual guide to the behavior of various constraints.
 
 ## Coincident Constraint
 * Two points - the points touch each other.
-* A point and a straight edge - the point is in-line with the edge. Note the point does not have to touch the edge.
+* A point and an edge - the point is in-line with the edge. Note the point does not have to touch the edge.
 * Two straight edges - the edges are in-line with each other.
 
 ## Vertical Constraint
