@@ -13,10 +13,19 @@ from rc_lib.math_utils import vector
 from rc_lib.style import color
 
 
+class SketchState(color.Color, enum.Enum):
+    NORMAL = color.Palette.BLUE
+    ERROR = color.Palette.RED
+
+
 class Sketch(ABC):
     """
     An abstract base class for Sketch entities.
     """
+
+    @abstractmethod
+    def set_state(self) -> Self:
+        pass
 
     @abstractmethod
     def draw(self) -> mn.Animation:
@@ -57,7 +66,6 @@ class LineEnd(enum.IntEnum):
 
 class SketchLine(Sketch, mn.VGroup):
     def __init__(self, line: mn.Line, start_vertex: mn.Dot, end_vertex: mn.Dot) -> None:
-        self._color = color
         self.line = line
         self.start_vertex = start_vertex
         self.end_vertex = end_vertex
@@ -87,6 +95,12 @@ class SketchLine(Sketch, mn.VGroup):
 
     def end_point(self) -> vector.Point2d:
         return self.point(LineEnd.END)
+
+    def click_vertex(self, line_end: LineEnd) -> mn.Animation:
+        return mn.Flash(self.vertex(line_end), run_time=0.75)
+
+    def click_line(self) -> mn.Animation:
+        return mn.Flash(self.line, run_time=0.75)
 
     def draw(self) -> mn.Animation:
         return mn.Succession(

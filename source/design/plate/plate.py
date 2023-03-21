@@ -118,6 +118,7 @@ class BoundaryConstraintScene(mn.Scene):
 
         left_start_point = self._tangent_points[0] + vector.point_2d(1.75, 0.75)
         right_start_point = self._tangent_points[1] + vector.point_2d(-2, 0.5)
+
         self._line: sketch.SketchLine = sketch.SketchLine(
             left_start_point, right_start_point, color=boundary_color
         )
@@ -191,8 +192,8 @@ class BoundaryConstraintScene(mn.Scene):
         ) * vector.angle_between_points(point, tangent_point, circle.center())
 
     def _do_flash(self, line_end: sketch.LineEnd) -> None:
-        circle, tip = self.get_vars(line_end, "circle", "tip")
-        self.play(mn.Flash(tip, run_time=0.75))
+        circle = self.get_vars(line_end, "circle")
+        self.play(self._line.click_vertex(line_end))
         self.play(
             mn.Flash(
                 circle, flash_radius=circle.outer_radius(), num_lines=40, run_time=0.75
