@@ -8,6 +8,7 @@
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
+    "files.eol": "\n",
     "cSpell.allowCompoundWords": true,
     "cSpell.ignorePaths": [
         "build",
@@ -20,6 +21,8 @@
         "atleast",
         "Egan",
         "eganj",
+        "finfo",
+        "interp",
         "ipynb",
         "Kempen",
         "kwargs",
@@ -28,11 +31,13 @@
         "mobjects",
         "Mobjects",
         "ndarray",
+        "nocontrols",
         "opengl",
         "reservee",
         "submobjects",
         "unannotate",
         "Uncreate",
+        "Viridis",
         "vmobject",
         "vmobjects",
         "webm"
@@ -40,5 +45,7 @@
     "python.analysis.extraPaths": [
         "rc_lib"
     ],
-    "files.eol": "\n"
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.defaultInterpreterPath": "/usr/local/bin/python"
 }
