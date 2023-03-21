@@ -3,19 +3,20 @@ A module defining sketcher-like entities.
 The following convention is adopted - a vertex is a physical entity (usually a dot), 
 whereas a point is a piece of data.
 """
-import manim as mn
-
 from typing import cast, Sequence, Self
 from abc import ABC, abstractmethod
 import enum
+import math
+
+import manim as mn
 
 from rc_lib.math_utils import vector
 from rc_lib.style import color
 
 
-class SketchState(color.Color, enum.Enum):
-    NORMAL = color.Palette.BLUE
-    ERROR = color.Palette.RED
+# class SketchState(color.Color, enum.Enum):
+#     NORMAL = color.Palette.BLUE
+#     ERROR = color.Palette.RED
 
 
 class Sketch(ABC):
@@ -23,9 +24,9 @@ class Sketch(ABC):
     An abstract base class for Sketch entities.
     """
 
-    @abstractmethod
-    def set_state(self) -> Self:
-        pass
+    # @abstractmethod
+    # def set_state(self) -> Self:
+    #     pass
 
     @abstractmethod
     def draw(self) -> mn.Animation:
@@ -41,6 +42,17 @@ class SketchCircle(Sketch, mn.VGroup):
     def center_point(self) -> vector.Vector2d:
         return self.get_center()
 
+    def click_center(self) -> mn.Animation:
+        return mn.Flash(self.vertex, run_time=0.75)
+
+    def click_circle(self) -> mn.Animation:
+        return mn.Flash(
+            self.vertex,
+            flash_radius=mn.SMALL_BUFF + self.circle.radius,
+            num_lines=math.floor(12 * self.circle.radius),
+            run_time=0.75,
+        )
+
     def draw(self) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.vertex, run_time=0), mn.GrowFromCenter(self.circle)
@@ -54,6 +66,9 @@ class SketchPoint(Sketch, mn.VGroup):
 
     def point(self) -> vector.Vector2d:
         return self.get_center()
+
+    def click(self) -> mn.Animation:
+        return mn.Flash(self.vertex, run_time=0.75)
 
     def draw(self) -> mn.Animation:
         return mn.Create(self)
@@ -107,4 +122,27 @@ class SketchLine(Sketch, mn.VGroup):
             mn.Create(self.start_vertex, run_time=0),
             mn.Create(self.line),
             mn.Create(self.end_vertex, run_time=0),
+        )
+
+
+class SketchFactory:
+    def __init__(self, color: color.Color = color.Palette.BLUE) -> None:
+        self.color = color
+
+    def make_point(self, point: vector.Point2d) -> SketchPoint:
+        return SketchPoint(mn.Dot(point, color=self.color))
+
+    def make_line(
+        self, start_point: vector.Point2d, end_point: vector.Point2d
+    ) -> SketchLine:
+        return SketchLine(
+            mn.Line(start_point, end_point, color=self.color),
+            mn.Dot(start_point, color=self.color),
+            mn.Dot(end_point, color=self.color),
+        )
+
+    def make_circle(self, center_point: vector.Point2d, radius: float) -> SketchCircle:
+        return SketchCircle(
+            mn.Circle(radius, color=self.color).move_to(center_point),
+            mn.Dot(center_point, color=self.color),
         )
