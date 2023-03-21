@@ -100,7 +100,7 @@ class SketchLine(Sketch, mn.VGroup):
         return self
 
     def vertex(self, line_end: LineEnd) -> mn.Dot:
-        return getattr(self, ("start", "end")[line_end])
+        return self.start_vertex if line_end == LineEnd.START else self.end_vertex
 
     def point(self, line_end: LineEnd) -> vector.Point2d:
         return self.vertex(line_end).get_center()
@@ -117,6 +117,13 @@ class SketchLine(Sketch, mn.VGroup):
     def click_line(self) -> mn.Animation:
         return mn.Flash(self.line, run_time=0.75)
 
+    def uncreate(self) -> mn.Animation:
+        return mn.Succession(
+            mn.Uncreate(self.end_vertex, run_time=0),
+            mn.Uncreate(self.line),
+            mn.Uncreate(self.start_vertex, run_time=0),
+        )
+
     def draw(self) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.start_vertex, run_time=0),
@@ -126,23 +133,27 @@ class SketchLine(Sketch, mn.VGroup):
 
 
 class SketchFactory:
-    def __init__(self, color: color.Color = color.Palette.BLUE) -> None:
-        self.color = color
+    def __init__(self) -> None:
+        self._color = color.FOREGROUND
+
+    def set_color(self, color: color.Color) -> Self:
+        self._color = color
+        return self
 
     def make_point(self, point: vector.Point2d) -> SketchPoint:
-        return SketchPoint(mn.Dot(point, color=self.color))
+        return SketchPoint(mn.Dot(point, color=self._color))
 
     def make_line(
         self, start_point: vector.Point2d, end_point: vector.Point2d
     ) -> SketchLine:
         return SketchLine(
-            mn.Line(start_point, end_point, color=self.color),
-            mn.Dot(start_point, color=self.color),
-            mn.Dot(end_point, color=self.color),
+            mn.Line(start_point, end_point, color=self._color),
+            mn.Dot(start_point, color=self._color),
+            mn.Dot(end_point, color=self._color),
         )
 
     def make_circle(self, center_point: vector.Point2d, radius: float) -> SketchCircle:
         return SketchCircle(
-            mn.Circle(radius, color=self.color).move_to(center_point),
-            mn.Dot(center_point, color=self.color),
+            mn.Circle(radius, color=self._color).move_to(center_point),
+            mn.Dot(center_point, color=self._color),
         )

@@ -12,8 +12,10 @@ quality: str = "m"  # l or m
 inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE
 
-factory: plate.PlateCircleFactory = plate.PlateCircleFactory()
-factory.set_inner_color(inner_color).set_outer_color(boundary_color)
+plate_factory: plate.PlateCircleFactory = plate.PlateCircleFactory()
+plate_factory.set_inner_color(inner_color).set_outer_color(boundary_color)
+
+sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(boundary_color)
 
 title: title_sequence.TitleSequence = title_sequence.TitleSequence(
     default_color=boundary_color
@@ -22,12 +24,8 @@ title: title_sequence.TitleSequence = title_sequence.TitleSequence(
 
 class IntakePlateScene(mn.Scene):
     def setup(self):
-        small_base: Callable[
-            [vector.Point2d], plate.PlateCircle
-        ] = factory.make_generator(0.15, 0.2)
-        medium_base: Callable[
-            [vector.Point2d], plate.PlateCircle
-        ] = factory.make_generator(0.4, 0.2)
+        small_base: plate.PlateCircleGenerator = plate_factory.make_generator(0.15, 0.2)
+        medium_base: plate.PlateCircleGenerator = plate_factory.make_generator(0.4, 0.2)
 
         front_hole: vector.Point2d = vector.point_2d(-4, -3)
         middle_hole: vector.Point2d = vector.point_2d(-1.5, 0.25)
@@ -50,13 +48,13 @@ class IntakePlateScene(mn.Scene):
 
     def construct(self):
         self.play(title.next("Draw plate holes", color=inner_color))
-        self.play(self._plate_group.draw_inner_circles(lag_ratio=0.5))
+        self.play(self._plate_group.draw_inner_circles())
 
         self.play(title.next("Add larger circles"))
-        self.play(self._plate_group.draw_outer_circles(lag_ratio=0.5))
+        self.play(self._plate_group.draw_outer_circles())
 
         self.play(title.next("Connect boundary"))
-        self.play(self._plate_group.draw_boundary(lag_ratio=0.75, run_time=5))
+        self.play(self._plate_group.draw_boundary())
 
         # self.play(title.next("Trim", color=boundary_color))
         # self.play(plate_group.trim(), run_time=5)
@@ -66,18 +64,18 @@ class IntakePlateScene(mn.Scene):
 
 class BoundaryRedrawScene(mn.Scene):
     def setup(self):
-        generator = factory.make_generator(1.75, 0.75)
+        generator: plate.PlateCircleGenerator = plate_factory.make_generator(1.75, 0.75)
         self._left: plate.PlateCircle = generator(vector.point_2d(-6, -2))
         self._right: plate.PlateCircle = generator(vector.point_2d(6, -2))
-        self._middle: plate.PlateCircle = factory.make(
+        self._middle: plate.PlateCircle = plate_factory.make(
             1, 0.75, vector.point_2d(0, -0.75)
         )
 
-        self._line: mn.Line = plate.plate_circle_tangent_line(
+        self._line = plate.plate_circle_tangent_line(
             self._left, self._right, color.Palette.RED
         )
-        self.add(self._left, self._right, self._line, self._middle.inner_circle)
 
+        self.add(self._left, self._right, self._line, self._middle.inner_circle)
         title.reset()
 
     def construct(self):
@@ -86,7 +84,7 @@ class BoundaryRedrawScene(mn.Scene):
 
         self.play(title.next("Redraw boundary"))
         self.play(mn.Uncreate(self._line))
-        self.wait(0.25)
+        self.wait(0.5)
         self.play(
             mn.Create(
                 plate.plate_circle_tangent_line(
@@ -107,7 +105,7 @@ class BoundaryRedrawScene(mn.Scene):
 
 class BoundaryConstraintScene(mn.Scene):
     def setup(self):
-        generator = factory.make_generator(1.75, 0.75)
+        generator = plate_factory.make_generator(1.75, 0.75)
         self._left: plate.PlateCircle = generator(vector.point_2d(-6, -2))
         self._right: plate.PlateCircle = generator(vector.point_2d(6, -2))
         self.add(self._left, self._right)
@@ -119,8 +117,8 @@ class BoundaryConstraintScene(mn.Scene):
         left_start_point = self._tangent_points[0] + vector.point_2d(1.75, 0.75)
         right_start_point = self._tangent_points[1] + vector.point_2d(-2, 0.5)
 
-        self._line: sketch.SketchLine = sketch.SketchLine(
-            left_start_point, right_start_point, color=boundary_color
+        self._line: sketch.SketchLine = sketch_factory.make_line(
+            left_start_point, right_start_point
         )
 
         title.reset()
@@ -134,7 +132,6 @@ class BoundaryConstraintScene(mn.Scene):
 
         attributes = {
             "circle": ("_left", "_right"),
-            "tip": ("_line.start", "_line.end"),
             "point": ("_line.start_point", "_line.end_point"),
         }
         result = operator.attrgetter(attributes[key][line_end])(self)
@@ -166,8 +163,8 @@ class BoundaryConstraintScene(mn.Scene):
     def _coincident_point(self, line_end: sketch.LineEnd) -> vector.Point2d:
         circle, point = self.get_vars(line_end, "circle", "point")
         return (
-            circle.center()
-            + vector.normalize(point - circle.center()) * circle.outer_radius()
+            circle.get_center()
+            + vector.normalize(point - circle.get_center()) * circle.outer_radius()
         )
 
     def do_tangent_move(self, line_end: sketch.LineEnd) -> None:
@@ -179,7 +176,7 @@ class BoundaryConstraintScene(mn.Scene):
                 self._line,
                 self._line.copy().set_position(tangent_point, line_end),
                 path_arc=angle,
-                part_arg_centers=[circle.center()],
+                part_arg_centers=[circle.get_center()],
             )
         )
 
@@ -189,10 +186,10 @@ class BoundaryConstraintScene(mn.Scene):
         )
         return (
             1 if line_end == sketch.LineEnd.START else -1
-        ) * vector.angle_between_points(point, tangent_point, circle.center())
+        ) * vector.angle_between_points(point, tangent_point, circle.get_center())
 
     def _do_flash(self, line_end: sketch.LineEnd) -> None:
-        circle = self.get_vars(line_end, "circle")
+        [circle] = self.get_vars(line_end, "circle")
         self.play(self._line.click_vertex(line_end))
         self.play(
             mn.Flash(
