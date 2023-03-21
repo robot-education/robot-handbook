@@ -47,4 +47,5 @@
     ],
     "python.formatting.provider": "black",
     "python.analysis.typeCheckingMode": "basic",
+    "python.defaultInterpreterPath": "/usr/local/bin/python"
 }
