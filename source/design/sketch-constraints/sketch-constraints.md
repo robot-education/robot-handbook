@@ -6,7 +6,6 @@ Most sketch entities have additional points associated with them in addition to 
 For example, the sketch line command creates a line with a control point at either end. 
 Constraining one of the control points results in different behavior compared to constraining the line itself.
 
-
 ## Constraints
 ### Coincident Constraint (i)
 * Two points - the points become touching.
@@ -52,15 +51,16 @@ The following constraints have the additional (niche) modes.
 ### Coincident Constraint
 
 
-
 ### Midpoint Constraint
 * Three points - the middle point is centered between the other two points.
 :::{tip}
     For the three point mode, the order of selection does not affect the result, only the relative position of the points.
 :::
 
+
 ### Perpendicular Constraint
 * A line and a circle or arc - the line becomes perpendicular to the circle or arc.
+
 
 ### Tangent Constraint
 * Two circles or arcs - The circles or arcs become tangent to one another.

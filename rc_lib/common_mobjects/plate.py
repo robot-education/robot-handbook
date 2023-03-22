@@ -12,6 +12,9 @@ class PlateCircle(mn.VGroup):
         self.inner_circle: mn.Circle = inner_circle
         self.outer_circle: mn.Circle = outer_circle
 
+    def center(self) -> vector.Point2d:
+        return self.get_center()
+
     def inner_radius(self) -> float:
         return self.inner_circle.width / 2
 
@@ -23,7 +26,7 @@ def plate_circle_tangent_points(
     start: PlateCircle, end: PlateCircle
 ) -> Tuple[vector.Point2d, vector.Point2d]:
     return tangent.circle_to_circle_tangent(
-        start.get_center(), start.outer_radius(), end.get_center(), end.outer_radius()
+        start.center(), start.outer_radius(), end.center(), end.outer_radius()
     )
 
 

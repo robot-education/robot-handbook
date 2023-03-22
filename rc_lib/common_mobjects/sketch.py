@@ -29,7 +29,7 @@ class Sketch(ABC):
     #     pass
 
     @abstractmethod
-    def draw(self) -> mn.Animation:
+    def create(self) -> mn.Animation:
         pass
 
 
@@ -37,9 +37,9 @@ class SketchCircle(Sketch, mn.VGroup):
     def __init__(self, circle: mn.Circle, vertex: mn.Dot) -> None:
         self.circle = circle
         self.vertex = vertex
-        super().__init__(self.circle, self.point)
+        super().__init__(self.circle, self.vertex)
 
-    def center_point(self) -> vector.Vector2d:
+    def center(self) -> vector.Vector2d:
         return self.get_center()
 
     def click_center(self) -> mn.Animation:
@@ -53,7 +53,7 @@ class SketchCircle(Sketch, mn.VGroup):
             run_time=0.75,
         )
 
-    def draw(self) -> mn.Animation:
+    def create(self) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.vertex, run_time=0), mn.GrowFromCenter(self.circle)
         )
@@ -70,7 +70,7 @@ class SketchPoint(Sketch, mn.VGroup):
     def click(self) -> mn.Animation:
         return mn.Flash(self.vertex, run_time=0.75)
 
-    def draw(self) -> mn.Animation:
+    def create(self) -> mn.Animation:
         return mn.Create(self)
 
 
@@ -124,7 +124,7 @@ class SketchLine(Sketch, mn.VGroup):
             mn.Uncreate(self.start_vertex, run_time=0),
         )
 
-    def draw(self) -> mn.Animation:
+    def create(self) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.start_vertex, run_time=0),
             mn.Create(self.line),
@@ -152,8 +152,8 @@ class SketchFactory:
             mn.Dot(end_point, color=self._color),
         )
 
-    def make_circle(self, center_point: vector.Point2d, radius: float) -> SketchCircle:
+    def make_circle(self, center: vector.Point2d, radius: float) -> SketchCircle:
         return SketchCircle(
-            mn.Circle(radius, color=self._color).move_to(center_point),
-            mn.Dot(center_point, color=self._color),
+            mn.Circle(radius, color=self._color).move_to(center),
+            mn.Dot(center, color=self._color),
         )
