@@ -80,7 +80,7 @@ def get_video(src: str, env: BuildEnvironment) -> Tuple[str, str]:
     return (src, type)
 
 
-class VideoNode(nodes.General, nodes.Element):
+class video_node(nodes.General, nodes.Element):
     """
     Video node combining nodes.General with nodes.Element.
     Named lowercase to match html naming convention.
@@ -115,7 +115,7 @@ class Animation(SphinxDirective):
         )
         return SIZE_LOOKUP["standard"]
 
-    def run(self) -> List[VideoNode]:
+    def run(self) -> List[video_node]:
         """Return the video node based on the set options."""
         env: BuildEnvironment = self.env
 
@@ -125,7 +125,7 @@ class Animation(SphinxDirective):
             logger.warning("Expected text to use as a caption")
 
         return [
-            VideoNode(
+            video_node(
                 primary_src=get_video(self.arguments[0], env),
                 content=self.content,
                 width=width,
@@ -135,7 +135,7 @@ class Animation(SphinxDirective):
         ]
 
 
-def visit_video_node_html(translator: SphinxTranslator, node: VideoNode) -> None:
+def visit_video_node_html(translator: SphinxTranslator, node: video_node) -> None:
     """Entry point of the html video node."""
     # start the video block
     attr: List[str] = [
@@ -160,7 +160,7 @@ def visit_video_node_html(translator: SphinxTranslator, node: VideoNode) -> None
 #     """Exit of the html video node."""
 
 
-def visit_video_node_unsupported(translator: SphinxTranslator, node: VideoNode) -> None:
+def visit_video_node_unsupported(translator: SphinxTranslator, node: video_node) -> None:
     """Entry point of the ignored video node."""
     logger.warning(
         "video {}: unsupported output format (node skipped)".format(node["primary_src"])
@@ -171,7 +171,7 @@ def visit_video_node_unsupported(translator: SphinxTranslator, node: VideoNode) 
 def setup(app: Sphinx) -> Dict[str, bool]:
     """Add video node and parameters to the Sphinx builder."""
     app.add_node(
-        VideoNode,
+        video_node,
         html=(visit_video_node_html, None),
         epub=(visit_video_node_unsupported, None),
         latex=(visit_video_node_unsupported, None),

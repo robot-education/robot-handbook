@@ -56,6 +56,8 @@ class CoincidentScene(mn.Scene):
             )
         )
 
+        self.play(self._line.click_line())
+
     def setup_point_to_line(self):
         self._first = sketch_factory.make_line(
             vector.point_2d(-10, -8), vector.point_2d(10, 8)

@@ -137,6 +137,8 @@ def main():
 
         if args.scene is not None:
             animation_names = [name for name in animation_names if name in args.scene]
+            if (animation_names == []):
+                continue
 
         manim_command = (
             "manim render -v ERROR -q{quality} {file_path} {animation_names}".format(

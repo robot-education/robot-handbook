@@ -43,10 +43,10 @@ class SketchCircle(Sketch, mn.VGroup):
         return self.get_center()
 
     def click_center(self) -> mn.Animation:
-        return mn.Flash(self.vertex, run_time=0.75)
+        return mn.Indicate(self.vertex, run_time=0.75)
 
     def click_circle(self) -> mn.Animation:
-        return mn.Flash(
+        return mn.Indicate(
             self.vertex,
             flash_radius=mn.SMALL_BUFF + self.circle.radius,
             num_lines=math.floor(12 * self.circle.radius),
@@ -68,7 +68,7 @@ class SketchPoint(Sketch, mn.VGroup):
         return self.get_center()
 
     def click(self) -> mn.Animation:
-        return mn.Flash(self.vertex, run_time=0.75)
+        return mn.Indicate(self.vertex, run_time=0.75)
 
     def create(self) -> mn.Animation:
         return mn.Create(self)
@@ -112,10 +112,10 @@ class SketchLine(Sketch, mn.VGroup):
         return self.point(LineEnd.END)
 
     def click_vertex(self, line_end: LineEnd) -> mn.Animation:
-        return mn.Flash(self.vertex(line_end), run_time=0.75)
+        return mn.Indicate(self.vertex(line_end), run_time=0.75)
 
     def click_line(self) -> mn.Animation:
-        return mn.Flash(self.line, run_time=0.75)
+        return mn.Indicate(self.line, run_time=0.75)
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(

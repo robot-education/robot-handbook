@@ -188,8 +188,5 @@ class BoundaryConstraintScene(mn.Scene):
     def _do_flash(self, line_end: sketch.LineEnd) -> None:
         [circle] = self.get_vars(line_end, "circle")
         self.play(self._line.click_vertex(line_end))
-        self.play(
-            mn.Flash(
-                circle, flash_radius=circle.outer_radius(), num_lines=40, run_time=0.75
-            )
-        )
+        # We need to adjust the scale factor to be consistent
+        self.play(mn.Indicate(circle.outer_circle, run_time=0.75))
