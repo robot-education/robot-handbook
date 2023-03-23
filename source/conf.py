@@ -32,7 +32,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
     "myst_parser",
-    "video_extension.video",
+    "video_extension.animation"
 ]
 
 myst_enable_extensions = [

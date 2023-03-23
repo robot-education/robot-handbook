@@ -10,8 +10,11 @@ The basic process for modeling a plate is demonstrated in the following animatio
 Sketching a simple plate
 ::: -->
 
-:::{video} video/plate.mp4
-    :width: 500
+:::{animation} IntakePlateScene.mp4
+    :size: standard
+    :loop:
+    :autoplay:
+    Some text
 :::
 
 <figure class="align-center" id="id1">
