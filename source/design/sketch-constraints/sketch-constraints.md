@@ -10,10 +10,23 @@ Constraining one of the control points results in different behavior compared to
 ### Coincident Constraint (i)
 * Two points - the points become touching.
 * A point and a line, circle or arc - the point becomes in-line with the path of the line, circle, or arc.
-    :::{note}
-        Note this mode does not force the point to physically touch a line or arc.
+    :::{note} Note this mode does not force the point to physically touch a line or arc.
     :::
 * Two lines - the lines become in-line with each other.
+
+:::{figure} images/coincident.svg
+:alt: Redrawing the boundary
+:width: 60%
+:align: center
+Redrawing the boundary of the plate
+:::
+
+:::{animation} media/CoincidentScene.mp4
+    :size: standard
+    :loop:
+    :autoplay:
+    Some text I guess?
+:::
 
 ### Vertical Constraint (v)
 * Line - the line becomes vertical.
@@ -53,8 +66,7 @@ The following constraints have the additional (niche) modes.
 
 ### Midpoint Constraint
 * Three points - the middle point is centered between the other two points.
-:::{tip}
-    For the three point mode, the order of selection does not affect the result, only the relative position of the points.
+:::{tip} For the three point mode, the order of selection does not affect the result, only the relative position of the points.
 :::
 
 
