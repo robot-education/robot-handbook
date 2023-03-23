@@ -135,7 +135,7 @@ class SketchLine(Sketch, mn.VGroup):
         Transforms the line to the specified point.
         **kwargs: kwargs to be passed in to transform.
         """
-        return mn.Transform(self, self.copy().set_position(new_point, line_end))
+        return mn.Transform(self, self.copy().set_position(new_point, line_end), **kwargs)
 
 
 class SketchFactory:

@@ -20,6 +20,9 @@ Direction = np.ndarray
 Direction2d = np.ndarray
 Direction3d = np.ndarray
 
+# An angle in radians
+Angle = float
+
 
 def norm(point: Point | Vector) -> float:
     return cast(float, np.linalg.norm(point))
@@ -53,10 +56,31 @@ def point_3d(x: float, y: float, z: float) -> Point3d:
     return np.array([x, y, z])
 
 
-def angle_between_vectors(x1: Vector, x2: Vector) -> float:
+def angle_between_vectors(x1: Vector, x2: Vector) -> Angle:
     # mn.angle_between_vectors is incorrectly typed as np.ndarray, not float
     return mn.angle_between_vectors(x1, x2)  # type: ignore
 
 
-def angle_between_points(start: Point, end: Point, center: Point) -> float:
+def angle_between_points(start: Point, end: Point, center: Point) -> Angle:
     return angle_between_vectors(start - center, end - center)
+
+
+def project_to_line(point: Point, start: Point, end: Point) -> Point:
+    """Projects point onto the line defined by start, end."""
+    vector = normalize(end - start)
+    return start + vector * dot(vector, point - start)
+
+
+# def rotate_vector(vector: Vector, angle: Angle, axis: Vector) -> Vector:
+#     """Function for rotating a vector.
+
+#     Parameters
+#     ----------
+#     vector
+#         The vector to be rotated.
+#     angle
+#         The angle to rotate by.
+#     axis
+#         A point specifying the axis to rotate about.
+#     """
+#     return mn.rotate_vector(vector, angle, axis)
