@@ -15,17 +15,16 @@ title: title_sequence.TitleSequence = title_sequence.TitleSequence(
     default_color=sketch_color, add_numbers=False
 )
 
-
 class CoincidentScene(mn.Scene):
     def setup(self):
         title.reset()
 
-    def setup_two_points(self):
+    def setup_first_scene(self):
         self._circle: sketch.SketchCircle = sketch_factory.make_circle(
             vector.point_2d(-4.5, 0), 1.5
         )
         self._line: sketch.SketchLine = sketch_factory.make_line(
-            vector.point_2d(5.25, 4.5 / 2), vector.point_2d(5.25, -4.5 / 2)
+            vector.point_2d(5.25, 4 / 2), vector.point_2d(5.25, -4 / 2)
         )
         self._move_line: sketch.SketchLine = sketch_factory.make_line(
             vector.point_2d(-1.75, 0.75), vector.point_2d(4.25, -1)
@@ -45,6 +44,8 @@ class CoincidentScene(mn.Scene):
             )
         )
 
+        self.wait(0.5)
+
         self.play(self._move_line.click_vertex(sketch.LineEnd.END))
         self.play(self._line.click_vertex(sketch.LineEnd.END))
         self.play(
@@ -55,29 +56,37 @@ class CoincidentScene(mn.Scene):
                 ),
             )
         )
-
         self.play(self._line.click_line())
+        self.play(self._circle.click_circle())
 
-    def setup_point_to_line(self):
-        self._first = sketch_factory.make_line(
-            vector.point_2d(-10, -8), vector.point_2d(10, 8)
-        )
-        self._second = sketch_factory.make_line(
-            vector.point_2d(-2, -2), vector.point_2d(-2, 2)
-        )
+        self.wait(2)
+        self.clear()
 
-    def setup_line_to_line(self):
-        pass
+    # def setup_point_to_line(self):
+    #     self._first = sketch_factory.make_line(
+    #         vector.point_2d(-10, -8), vector.point_2d(10, 8)
+    #     )
+    #     self._second = sketch_factory.make_line(
+    #         vector.point_2d(-2, -2), vector.point_2d(-2, 2)
+    #     )
+
+    def play_point_to_line(self):
+        self.play(title.next("Point and a line"))
+
+        self.play(self._line.click_vertex(sketch.LineEnd.START))
+        self.play(self._circle.click_circle())
+        # self.play(Transform(self._line, self._line.copy())
+
+        self.wait(2)
+        self.clear()
 
     def construct(self):
-        self.setup_two_points()
+        self.setup_first_scene()
         self.play_two_points()
-        self.wait(2)
-        self.clear()
 
-        self.play(title.next("Point and a line"))
-        self.wait(2)
-        self.clear()
+        self.setup_first_scene()
+        self.play_point_to_line()
+
         self.play(title.next("Two lines"))
 
         self.wait(animation.END_DELAY)

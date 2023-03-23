@@ -1,5 +1,4 @@
 from typing import List, Tuple, Any
-import operator
 
 import manim as mn
 from rc_lib.style import color, animation
@@ -149,13 +148,9 @@ class BoundaryConstraintScene(mn.Scene):
         self.wait(animation.END_DELAY)
 
     def do_coincident_move(self, line_end: sketch.LineEnd) -> None:
-        self._do_flash(line_end)
+        self._do_clicks(line_end)
         new_point = self._coincident_point(line_end)
-        self.play(
-            mn.Transform(
-                self._line, self._line.copy().set_position(new_point, line_end)
-            )
-        )
+        self.play(self._line.transform(new_point, line_end))
 
     def _coincident_point(self, line_end: sketch.LineEnd) -> vector.Point2d:
         circle, point = self.get_vars(line_end, "circle", "point")
@@ -165,13 +160,13 @@ class BoundaryConstraintScene(mn.Scene):
         )
 
     def do_tangent_move(self, line_end: sketch.LineEnd) -> None:
-        self._do_flash(line_end)
+        self._do_clicks(line_end)
         circle, tangent_point = self.get_vars(line_end, "circle", "tangent_point")
         angle = self._tangent_angle(line_end)
         self.play(
-            mn.Transform(
-                self._line,
-                self._line.copy().set_position(tangent_point, line_end),
+            self._line.transform(
+                tangent_point,
+                line_end,
                 path_arc=angle,
                 part_arg_centers=[circle.center()],
             )
@@ -185,8 +180,7 @@ class BoundaryConstraintScene(mn.Scene):
             1 if line_end == sketch.LineEnd.START else -1
         ) * vector.angle_between_points(point, tangent_point, circle.center())
 
-    def _do_flash(self, line_end: sketch.LineEnd) -> None:
+    def _do_clicks(self, line_end: sketch.LineEnd) -> None:
         [circle] = self.get_vars(line_end, "circle")
         self.play(self._line.click_vertex(line_end))
-        # We need to adjust the scale factor to be consistent
-        self.play(mn.Indicate(circle.outer_circle, run_time=0.75))
+        self.play(sketch.click(circle.outer_circle))

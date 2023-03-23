@@ -13,20 +13,21 @@ import manim as mn
 from rc_lib.math_utils import vector
 from rc_lib.style import color
 
+z_index = 100
 
-# class SketchState(color.Color, enum.Enum):
-#     NORMAL = color.Palette.BLUE
-#     ERROR = color.Palette.RED
+
+def click(mobject: mn.VMobject) -> mn.Animation:
+    global z_index
+    target = mobject.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
+    mobject.set_z_index(z_index)
+    z_index += 1
+    return mn.Transform(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
 
 
 class Sketch(ABC):
     """
     An abstract base class for Sketch entities.
     """
-
-    # @abstractmethod
-    # def set_state(self) -> Self:
-    #     pass
 
     @abstractmethod
     def create(self) -> mn.Animation:
@@ -42,16 +43,14 @@ class SketchCircle(Sketch, mn.VGroup):
     def center(self) -> vector.Vector2d:
         return self.get_center()
 
+    def radius(self) -> float:
+        return self.circle.radius
+
     def click_center(self) -> mn.Animation:
-        return mn.Indicate(self.vertex, run_time=0.75)
+        return click(self.vertex)
 
     def click_circle(self) -> mn.Animation:
-        return mn.Indicate(
-            self.vertex,
-            flash_radius=mn.SMALL_BUFF + self.circle.radius,
-            num_lines=math.floor(12 * self.circle.radius),
-            run_time=0.75,
-        )
+        return click(self.circle)
 
     def create(self) -> mn.Animation:
         return mn.Succession(
@@ -68,7 +67,7 @@ class SketchPoint(Sketch, mn.VGroup):
         return self.get_center()
 
     def click(self) -> mn.Animation:
-        return mn.Indicate(self.vertex, run_time=0.75)
+        return click(self.vertex)
 
     def create(self) -> mn.Animation:
         return mn.Create(self)
@@ -112,10 +111,10 @@ class SketchLine(Sketch, mn.VGroup):
         return self.point(LineEnd.END)
 
     def click_vertex(self, line_end: LineEnd) -> mn.Animation:
-        return mn.Indicate(self.vertex(line_end), run_time=0.75)
+        return click(self.vertex(line_end))
 
     def click_line(self) -> mn.Animation:
-        return mn.Indicate(self.line, run_time=0.75)
+        return click(self.line)
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
@@ -130,6 +129,13 @@ class SketchLine(Sketch, mn.VGroup):
             mn.Create(self.line),
             mn.Create(self.end_vertex, run_time=0),
         )
+
+    def transform(self, new_point: vector.Point2d, line_end: LineEnd, **kwargs) -> mn.Animation:
+        """
+        Transforms the line to the specified point.
+        **kwargs: kwargs to be passed in to transform.
+        """
+        return mn.Transform(self, self.copy().set_position(new_point, line_end))
 
 
 class SketchFactory:
