@@ -1,4 +1,7 @@
-"""Video extention to embed video in a html sphinx output."""
+"""
+Video extention to embed video in a html sphinx output.
+Kept as a reference, but animation.py is the one intended to be actually used.
+"""
 
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -61,7 +64,10 @@ def get_video(src: str, env: BuildEnvironment) -> Tuple[str, str]:
 
 
 class video_node(nodes.General, nodes.Element):
-    """Video node combining nodes.General with nodes.Element."""
+    """
+    Video node combining nodes.General with nodes.Element.
+    Written lowercase to match html naming convention.
+    """
 
     pass
 

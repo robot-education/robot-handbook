@@ -12,7 +12,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("/video_extension"))
+sys.path.append(os.path.abspath("/video_extension"))
 
 # -- Project information -----------------------------------------------------
 
@@ -28,7 +28,7 @@ release = "1.0.0"
 
 extensions = [
     "sphinx_rtd_theme",
-    "sphinx.ext.autosectionlabel",
+    # "sphinx.ext.autosectionlabel",
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
     "myst_parser",
