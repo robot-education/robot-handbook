@@ -9,28 +9,41 @@ Constraining one of the control points results in different behavior compared to
 ## Constraints
 ### Coincident Constraint (i)
 * Two points - the points become touching.
+
+    :::{animation} CoincidentPointToPointScene.mp4
+        :autoplay:
+        Applying a coincident constraint to two points
+    :::
+
 * A point and a line, circle or arc - the point becomes in-line with the path of the line, circle, or arc.
+
+    :::{animation} CoincidentPointToLineScene.mp4
+        :autoplay:
+        Applying a coincident constraint to a point and a line or circle
+    :::
+
     :::{note} Note this mode does not force the point to physically touch a line or arc.
     :::
+
 * Two lines - the lines become in-line with each other.
 
-:::{figure} images/coincident.svg
+    :::{animation} CoincidentLineToLineScene.mp4
+        :autoplay:
+        Applying a coincident constraint to two lines
+    :::
+
+<!-- :::{figure} images/coincident.svg
 :alt: Redrawing the boundary
 :width: 60%
 :align: center
 Redrawing the boundary of the plate
-:::
-
-:::{animation} media/CoincidentScene.mp4
-    :size: standard
-    :loop:
-    :autoplay:
-    Some text I guess?
-:::
+::: -->
 
 ### Vertical Constraint (v)
 * Line - the line becomes vertical.
+
 * Two points - the points become vertically in-line with each other.
+
 
 ### Horizontal Constraint (h)
 * Line - the line becomes horizontal.

@@ -127,7 +127,7 @@ class BoundaryConstraintScene(mn.Scene):
         if key == "tangent_point":
             return self._tangent_points[line_end]
         elif key == "point":
-            return self._line.point(line_end)
+            return self._line.get_point(line_end)
         elif key == "circle":
             return self._left if line_end == sketch.LineEnd.START else self._right
         else:

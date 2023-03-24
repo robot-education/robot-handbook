@@ -31,7 +31,7 @@ class Sketch(ABC):
 
     @abstractmethod
     def create(self) -> mn.Animation:
-        pass
+        raise NotImplementedError
 
 
 class SketchCircle(Sketch, mn.VGroup):
@@ -40,10 +40,7 @@ class SketchCircle(Sketch, mn.VGroup):
         self.vertex = vertex
         super().__init__(self.circle, self.vertex)
 
-    def center(self) -> vector.Vector2d:
-        return self.get_center()
-
-    def radius(self) -> float:
+    def get_radius(self) -> float:
         return self.circle.radius
 
     def click_center(self) -> mn.Animation:
@@ -61,9 +58,9 @@ class SketchCircle(Sketch, mn.VGroup):
 class SketchPoint(Sketch, mn.VGroup):
     def __init__(self, vertex: mn.Dot) -> None:
         self.vertex = vertex
-        super().__init__(self.point)
+        super().__init__(self.get_point)
 
-    def point(self) -> vector.Vector2d:
+    def get_point(self) -> vector.Vector2d:
         return self.get_center()
 
     def click(self) -> mn.Animation:
@@ -89,29 +86,35 @@ class SketchLine(Sketch, mn.VGroup):
         new_coords = cast(Sequence[float], new_point)
         if line_end == LineEnd.START:
             self.line.put_start_and_end_on(
-                new_coords, cast(Sequence[float], self.end_point())
+                new_coords, cast(Sequence[float], self.get_end())
             )
         else:
             self.line.put_start_and_end_on(
-                cast(Sequence[float], self.start_point()), new_coords
+                cast(Sequence[float], self.get_start()), new_coords
             )
-        self.vertex(line_end).move_to(new_point)
+        self.get_vertex(line_end).move_to(new_point)
         return self
 
-    def vertex(self, line_end: LineEnd) -> mn.Dot:
+    def get_vertex(self, line_end: LineEnd) -> mn.Dot:
         return self.start_vertex if line_end == LineEnd.START else self.end_vertex
 
-    def point(self, line_end: LineEnd) -> vector.Point2d:
-        return self.vertex(line_end).get_center()
+    def get_point(self, line_end: LineEnd) -> vector.Point2d:
+        return self.get_vertex(line_end).get_center()
 
-    def start_point(self) -> vector.Point2d:
-        return self.point(LineEnd.START)
+    def get_start(self) -> vector.Point2d:
+        return self.get_point(LineEnd.START)
 
-    def end_point(self) -> vector.Point2d:
-        return self.point(LineEnd.END)
+    def get_end(self) -> vector.Point2d:
+        return self.get_point(LineEnd.END)
 
     def click_vertex(self, line_end: LineEnd) -> mn.Animation:
-        return click(self.vertex(line_end))
+        return click(self.get_vertex(line_end))
+
+    def click_start(self) -> mn.Animation:
+        return self.click_vertex(LineEnd.START)
+
+    def click_end(self) -> mn.Animation:
+        return self.click_vertex(LineEnd.END)
 
     def click_line(self) -> mn.Animation:
         return click(self.line)
@@ -130,12 +133,16 @@ class SketchLine(Sketch, mn.VGroup):
             mn.Create(self.end_vertex, run_time=0),
         )
 
-    def transform(self, new_point: vector.Point2d, line_end: LineEnd, **kwargs) -> mn.Animation:
+    def transform(
+        self, new_point: vector.Point2d, line_end: LineEnd, **kwargs
+    ) -> mn.Animation:
         """
         Transforms the line to the specified point.
         **kwargs: kwargs to be passed in to transform.
         """
-        return mn.Transform(self, self.copy().set_position(new_point, line_end), **kwargs)
+        return mn.Transform(
+            self, self.copy().set_position(new_point, line_end), **kwargs
+        )
 
 
 class SketchFactory:
