@@ -38,42 +38,41 @@ class video(nodes.General, nodes.Element):
     pass
 
 
-"""
-Target HTML:
-<figure class="align-center" id="id1">
-<a class="reference internal image-reference" href="video/plate.mp4">
-    <video width="80%" controls>
-        <source src="video/plate.mp4" type="video/mp4">
-        Drawing a plate
-    </video>
-</a>
-<figcaption>
-<p><span class="caption-text">Sketching a plate</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
-</figcaption>
-</figure>
-"""
-
-
 class VideoTranslator(docutils.SphinxTranslator):
     def visit_video(self, node: video) -> None:
-        """Entry point of the html video node."""
-        # self.starttag, self.emptytag?
-
-        attribute_string: str = '{key}="{value}"'
+        # value attributes
         attr: List[str] = [
-            attribute_string.format(key=k, value=node[k]) for k in ["width"] if node[k]
+            '{k} = "v"'.format(k=k, v=node[k])
+            for k in [
+                "controlslist",
+                "crossorigin",
+                "height",
+                "width",
+                "poster",
+                "preload",
+                "src",
+            ]
+            if node[k]
         ]
-        attr.extend([k for k in ["autoplay", "loop"] if node[k]])
-        attr.extend([k for k in ["muted", "controls"]])
+
+        # boolean attributes
         attr.extend(
             [
-                attribute_string.format(key=k, value=v)
-                for k, v in {"preload": "auto"}.items()
+                k
+                for k in [
+                    "autoplay",
+                    "autopictureinpicture",
+                    "controls",
+                    "disablepictureinpicture",
+                    "disableremoteplayback",
+                    "loop",
+                    "playsinline",
+                    "muted",
+                ]
+                if node[k]
             ]
         )
-        html: str = "<video {}>\n".format(" ".join(attr))
-
-        self.body.append(html)
+        self.body.append("<video {}>\n".format(" ".join(attr)))
 
     def depart_video(self, _: video) -> None:
         """Exit the video node."""

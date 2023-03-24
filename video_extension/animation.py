@@ -51,7 +51,6 @@ class Animation(docutils.SphinxDirective):
     option_spec: typing.OptionSpec = {
         "autoplay": directives.flag,
         "size": size,
-        # "alt": directives.unchanged,
     }
 
     def run(self) -> List[nodes.Node]:
@@ -67,21 +66,26 @@ class Animation(docutils.SphinxDirective):
         video_node = local_nodes.video(
             # add entire directive for error handling
             rawsource=self.block_text,
+            src=uri,
             width=self._parse_width(),
             autoplay=("autoplay" in self.options),
             loop=("autoplay" in self.options),
-            # alt=self._parse_alt(),
+            controls=True,
+            playsinline=True,
+            muted=True,
+            disablepictureinpicture=True,
         )
+        figure_node += video_node
 
         # sketchy - co-opt nodes.image to fetch our image for us
         image_node = nodes.image(rawsource=self.block_text, uri=uri)
         video_node += image_node
 
-        source_node = local_nodes.source(
-            rawsource=self.arguments[0], src=uri, type="video/mp4"
-        )
-        video_node += source_node
-        figure_node += video_node
+        # Use source nodes/support multiple sources
+        # source_node = local_nodes.source(
+        #     rawsource=self.arguments[0], src=uri, type="video/mp4"
+        # )
+        # video_node += source_node
 
         text = "".join(self.content)
         caption_node = nodes.caption(rawsource=text, text=text)
