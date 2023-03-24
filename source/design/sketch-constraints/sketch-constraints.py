@@ -68,8 +68,9 @@ class CoincidentPointToLineScene(mn.Scene):
         self.play(self._move_line.transform(point, sketch.LineEnd.START))
         self.wait(0.5)
 
-        self.play(self._move_line.click_start())
+        self.play(self._move_line.click_end())
         self.play(self._line.click_line())
+
         point = vector.project_to_line(
             self._move_line.get_end(),
             self._line.get_start(),

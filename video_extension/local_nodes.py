@@ -1,13 +1,8 @@
 from typing import List
-from docutils import nodes
-
 import pathlib
 
-# from docutils.writers import html4css1 as docutils_html
-from docutils.writers import html5_polyglot as html5
-
+from docutils import nodes
 from sphinx.util import docutils, logging
-
 from sphinx import application
 
 logger = logging.getLogger(__name__)
@@ -25,15 +20,10 @@ class SourceTranslator(docutils.SphinxTranslator):
     def visit_source(self, node: source) -> None:
         src_path = (
             pathlib.Path(self.builder.imgpath) / pathlib.Path(node["src"]).parts[-1]
-        )
-        # self.starttag, self.emptytag?
-        attr = {"src": src_path.as_posix(), "type": node["type"]}
-        self.body.append(self.emptytag(node, "source", **attr))
-        # self.body.append(
-        #     '<source src="{src}" type="{type}">'.format(
-        #         src=src_path.as_posix(), type=node["type"]
-        #     )
-        # )
+        ).as_posix()
+
+        attributes = {"src": src_path, "type": node["type"]}
+        self.body.append(self.emptytag(node, "source", **attributes))
 
     def depart_source(self, _: source) -> None:
         """Exit the video node."""
@@ -67,7 +57,8 @@ Target HTML:
 class VideoTranslator(docutils.SphinxTranslator):
     def visit_video(self, node: video) -> None:
         """Entry point of the html video node."""
-        # start the video block
+        # self.starttag, self.emptytag?
+
         attribute_string: str = '{key}="{value}"'
         attr: List[str] = [
             attribute_string.format(key=k, value=node[k]) for k in ["width"] if node[k]

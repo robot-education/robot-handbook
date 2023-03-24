@@ -15,11 +15,11 @@ playsinline: true
 preload: metadata
 """
 
-from typing import Any, Dict, List
+from typing import Dict, List
 from pathlib import Path
 
 from sphinx import application
-from sphinx.util import logging, docutils, typing
+from sphinx.util import docutils, typing
 
 from docutils.parsers.rst import directives
 from docutils import nodes
@@ -58,7 +58,6 @@ class Animation(docutils.SphinxDirective):
         self.assert_has_content()
 
         uri = self._parse_uri()
-        # image_node = nodes.image(rawsource=self.block_text, uri=uri)
 
         figure_node = nodes.figure(
             rawsource=self.block_text,
@@ -73,6 +72,10 @@ class Animation(docutils.SphinxDirective):
             loop=("autoplay" in self.options),
             # alt=self._parse_alt(),
         )
+
+        # sketchy - co-opt nodes.image to fetch our image for us
+        image_node = nodes.image(rawsource=self.block_text, uri=uri)
+        video_node += image_node
 
         source_node = local_nodes.source(
             rawsource=self.arguments[0], src=uri, type="video/mp4"
@@ -98,7 +101,6 @@ class Animation(docutils.SphinxDirective):
 
     def _parse_uri(self) -> str:
         path = Path(self.arguments[0])
-        # if path.suffix in SUPPORTED_MIME_TYPES:
         if len(path.parts) == 1:
             path = "media" / path
         else:

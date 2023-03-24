@@ -15,17 +15,17 @@ Constraining one of the control points results in different behavior compared to
         Applying a coincident constraint to two points
     :::
 
-* A point and a line, circle or arc - the point becomes in-line with the path of the line, circle, or arc.
+* A point and a line, circle or arc - the point becomes inline with the path of the line, circle, or arc.
 
     :::{animation} CoincidentPointToLineScene.mp4
         :autoplay:
         Applying a coincident constraint to a point and a line or circle
     :::
 
-    :::{note} Note this mode does not force the point to physically touch a line or arc.
+    :::{note} This mode does not guarantee that a point will lie on a given line or arc, just that it is inline with one.
     :::
 
-* Two lines - the lines become in-line with each other.
+* Two lines - the lines become inline with each other.
 
     :::{animation} CoincidentLineToLineScene.mp4
         :autoplay:
@@ -42,12 +42,12 @@ Redrawing the boundary of the plate
 ### Vertical Constraint (v)
 * Line - the line becomes vertical.
 
-* Two points - the points become vertically in-line with each other.
+* Two points - the points become vertically inline with each other.
 
 
 ### Horizontal Constraint (h)
 * Line - the line becomes horizontal.
-* Two points - the points become horizontally in-line with each other.
+* Two points - the points become horizontally inline with each other.
 
 ### Parallel Constraint (b)
 * Two lines - the lines become parallel.
@@ -62,33 +62,19 @@ Redrawing the boundary of the plate
 ### Midpoint Constraint
 * A point and a line - the point is placed in the middle of the line.
 
+* Three points - the middle point is centered between the other two points.
+:::{tip} The order of selection does not matter.
+:::
+
 
 ### Tangent Constraint (t)
 * A line and a circle or arc - the line becomes tangent to the circle or arc.
+
+* Two circles or arcs - The circles or arcs become tangent to one another.
 
 
 ### Coincentric Constraint
 * Two circles or arcs - the circles or arcs share the same center point.
 
-
-# Appendix
-## Miscellaneous Behaviors
-The following constraints have the additional (niche) modes.
-### Coincident Constraint
-
-
-### Midpoint Constraint
-* Three points - the middle point is centered between the other two points.
-:::{tip} For the three point mode, the order of selection does not affect the result, only the relative position of the points.
-:::
-
-
-### Perpendicular Constraint
-* A line and a circle or arc - the line becomes perpendicular to the circle or arc.
-
-
-### Tangent Constraint
-* Two circles or arcs - The circles or arcs become tangent to one another.
-
-
-## Examples
+<!-- # Appendix
+## Additional Examples -->
