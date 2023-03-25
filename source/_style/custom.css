@@ -1,0 +1,5 @@
+.thumbnail {
+    width: 25px;
+    vertical-align: middle;
+    pointer-events: none;
+}

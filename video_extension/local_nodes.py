@@ -40,9 +40,13 @@ class video(nodes.General, nodes.Element):
 
 class VideoTranslator(docutils.SphinxTranslator):
     def visit_video(self, node: video) -> None:
-        # value attributes
-        attr: List[str] = [
-            '{k} = "v"'.format(k=k, v=node[k])
+        if "src" in node:
+            node["src"] = (
+                pathlib.Path(self.builder.imgpath) / pathlib.Path(node["src"]).parts[-1]
+            ).as_posix()
+
+        attributes: List[str] = [
+            '{k} = "{v}"'.format(k=k, v=node[k])
             for k in [
                 "controlslist",
                 "crossorigin",
@@ -52,11 +56,11 @@ class VideoTranslator(docutils.SphinxTranslator):
                 "preload",
                 "src",
             ]
-            if node[k]
+            if k in node
         ]
 
         # boolean attributes
-        attr.extend(
+        attributes.extend(
             [
                 k
                 for k in [
@@ -69,10 +73,10 @@ class VideoTranslator(docutils.SphinxTranslator):
                     "playsinline",
                     "muted",
                 ]
-                if node[k]
+                if k in node
             ]
         )
-        self.body.append("<video {}>\n".format(" ".join(attr)))
+        self.body.append("<video {}>\n".format(" ".join(attributes)))
 
     def depart_video(self, _: video) -> None:
         """Exit the video node."""

@@ -32,7 +32,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
     "myst_parser",
-    "video_extension.animation"
+    "video_extension.animation",
 ]
 
 myst_enable_extensions = [
@@ -41,6 +41,8 @@ myst_enable_extensions = [
     "dollarmath",  # Parse $2 = 2$ and $$2 = 2$$
     "substitution",  # Enables substituions here and at the top of files
     "colon_fence",  # Enables directives using ::: and md-figure directive
+    "attrs_inline",
+    "substitution",
 ]
 
 # autosectionlabel_prefix_document = True
@@ -61,4 +63,6 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ["_style"]
+
+html_css_files = ["custom.css"]
