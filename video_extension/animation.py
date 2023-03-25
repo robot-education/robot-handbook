@@ -8,7 +8,7 @@ from typing import Dict, List
 from pathlib import Path
 
 from sphinx import application
-from sphinx.util import docutils, typing
+from sphinx.util import docutils, typing, logging
 
 from docutils.parsers.rst import directives
 from docutils import nodes
@@ -41,13 +41,13 @@ class Animation(docutils.SphinxDirective):
 
     def run(self) -> List[nodes.Node]:
         uri = self._parse_uri()
+
         caption = self._parse_caption()
 
         figure_node = nodes.figure(
             rawsource=self.block_text,
             align="center",  # may also be left or right
         )
-
         video_node = local_nodes.video(
             # add entire directive for error handling
             rawsource=self.block_text,
@@ -100,7 +100,15 @@ class Animation(docutils.SphinxDirective):
 def setup(app: application.Sphinx) -> Dict[str, bool]:
     """Add video node and parameters to the Sphinx builder."""
     local_nodes.register_video_nodes(app)
+
     app.add_directive("animation", Animation)
+
+    # app.builder.supported_image_types = [
+    #     "image/svg+xml",
+    #     "image/png",
+    #     "image/gif",
+    #     "video/mp4",
+    # ]
 
     return {
         "parallel_read_safe": False,  # sphinx docs suggest we need to actually handle this
