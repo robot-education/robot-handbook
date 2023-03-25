@@ -60,12 +60,10 @@ class Animation(docutils.SphinxDirective):
             muted=True,
             disablepictureinpicture=True,
         )
-        figure_node += video_node
 
-        # sketchy - co-opt nodes.image to fetch the uri for us
-        # video_node += nodes.image(rawsource=self.block_text, uri=uri)
         # ref_node = nodes.reference(refuri=uri)
-        # video_node += ref_node
+        # ref_node += video_node
+        figure_node += video_node  # ref_node
 
         # optional - use source nodes to support multiple sources
         # source_node = local_nodes.source(

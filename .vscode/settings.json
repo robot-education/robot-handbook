@@ -36,6 +36,7 @@
         "ndarray",
         "nocontrols",
         "opengl",
+        "refid",
         "reservee",
         "submobjects",
         "unannotate",

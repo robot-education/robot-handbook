@@ -15,9 +15,11 @@ from typing import List
 import pathlib
 
 from docutils import nodes
-from sphinx.util import docutils
+from sphinx.util import docutils, logging
 from sphinx.writers import html
 from sphinx import application
+
+logger = logging.getLogger(__name__)
 
 
 class source(nodes.Inline, nodes.Element):
@@ -28,17 +30,12 @@ class source(nodes.Inline, nodes.Element):
     pass
 
 
-class video(nodes.image, nodes.General, nodes.TextElement):
+class video(nodes.General, nodes.TextElement):
     """
     A docutils node corresponding to a video html element.
     """
 
-    def __init__(self, *args, **kwargs):
-        if "src" in kwargs:
-            kwargs["uri"] = kwargs["src"]
-        else:
-            kwargs["uri"] = ""
-        super().__init__(*args, **kwargs)
+    pass
 
 
 class VideoTranslator(html.HTMLTranslator, docutils.SphinxTranslator):
@@ -96,6 +93,23 @@ class VideoTranslator(html.HTMLTranslator, docutils.SphinxTranslator):
     def depart_video(self, _: video) -> None:
         """Exit the video node."""
         self.body.append("</video>\n")
+
+    # def visit_reference(self, node):
+    #     if isinstance(node.children[0], video) or isinstance(node.children[0], source):
+    #         attributes = {"class": "reference image-reference"}
+    #         if "refuri" in node:
+    #             attributes["href"] = self._get_src_path(node["refuri"])
+    #             attributes["class"] += " external"
+    #         else:
+    #             assert (
+    #                 "refid" in node
+    #             ), 'References must have "refuri" or "refid" attribute.'
+    #             attributes["href"] = "#" + node["refid"]
+    #         self.body.append(self.starttag(node, "a", "", **attributes))
+    #     else:
+    #         super().visit_reference(node)
+
+    # Don't override depart_reference
 
 
 # No args might not be valid here, I haven't checked
