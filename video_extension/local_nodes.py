@@ -1,12 +1,23 @@
+"""
+Local nodes which may be used to create videos.
+Useful links:
+
+
+rst directive writing documentation:
+https://docutils.sourceforge.io/docs/howto/rst-directives.html
+
+image directive source code:
+https://github.com/docutils/docutils/blob/master/docutils/docutils/parsers/rst/directives/images.py
+"""
+
+
 from typing import List
 import pathlib
 
 from docutils import nodes
-from sphinx.util import docutils, logging
+from sphinx.util import docutils
 from sphinx.writers import html
 from sphinx import application
-
-logger = logging.getLogger(__name__)
 
 
 class source(nodes.Inline, nodes.Element):
@@ -17,12 +28,17 @@ class source(nodes.Inline, nodes.Element):
     pass
 
 
-class video(nodes.General, nodes.Element):
+class video(nodes.image, nodes.General, nodes.TextElement):
     """
     A docutils node corresponding to a video html element.
     """
 
-    pass
+    def __init__(self, *args, **kwargs):
+        if "src" in kwargs:
+            kwargs["uri"] = kwargs["src"]
+        else:
+            kwargs["uri"] = ""
+        super().__init__(*args, **kwargs)
 
 
 class VideoTranslator(html.HTMLTranslator, docutils.SphinxTranslator):
@@ -83,9 +99,9 @@ class VideoTranslator(html.HTMLTranslator, docutils.SphinxTranslator):
 
 
 # No args might not be valid here, I haven't checked
-def visit_node_unsupported() -> None:
-    """Entry point of the ignored video node."""
-    logger.warning("unsupported output format (node skipped)")
+def visit_node_unsupported(
+    translator: docutils.SphinxTranslator, node: nodes.Element
+) -> None:
     raise nodes.SkipNode
 
 

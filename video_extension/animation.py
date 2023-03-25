@@ -4,17 +4,6 @@ A sphinx extension designed to work with the build script to automatically inser
 Supports .mp4 videos compiled by the build script.
 """
 
-"""
-Videos have the following settings:
-autoplay: optional, true for gif like content - defaults to false
-loop: optional, true for gif like content - defaults to false
-width: set based on SIZE, defaults to standard (80%)
-controls: true
-muted: true
-playsinline: true
-preload: metadata
-"""
-
 from typing import Dict, List
 from pathlib import Path
 
@@ -51,13 +40,12 @@ class Animation(docutils.SphinxDirective):
     }
 
     def run(self) -> List[nodes.Node]:
-        self.assert_has_content()
-
         uri = self._parse_uri()
+        caption = self._parse_caption()
 
         figure_node = nodes.figure(
             rawsource=self.block_text,
-            align="center",  # becomes an align-{str}
+            align="center",  # may also be left or right
         )
 
         video_node = local_nodes.video(
@@ -74,26 +62,28 @@ class Animation(docutils.SphinxDirective):
         )
         figure_node += video_node
 
-        # sketchy - co-opt nodes.image to fetch our image for us
-        image_node = nodes.image(rawsource=self.block_text, uri=uri)
-        video_node += image_node
+        # sketchy - co-opt nodes.image to fetch the uri for us
+        # video_node += nodes.image(rawsource=self.block_text, uri=uri)
+        # ref_node = nodes.reference(refuri=uri)
+        # video_node += ref_node
 
-        # Use source nodes/support multiple sources
+        # optional - use source nodes to support multiple sources
         # source_node = local_nodes.source(
         #     rawsource=self.arguments[0], src=uri, type="video/mp4"
         # )
         # video_node += source_node
 
-        text = "".join(self.content)
-        caption_node = nodes.caption(rawsource=text, text=text)
-        figure_node += caption_node
+        # Add caption
+        figure_node += nodes.caption(rawsource=self.block_text, text=caption)
 
         return [figure_node]
 
-    # def _parse_alt(self) -> str:
-    #     if "alt" not in self.options:
-    #         self.warning("Expected animation to have alt text")
-    #     return self.options["alt"]
+    def _parse_alt(self, caption: str) -> str:
+        return self.options["alt"] if "alt" in self.options else caption
+
+    def _parse_caption(self) -> str:
+        self.assert_has_content()
+        return "".join(self.content)
 
     def _parse_width(self) -> str:
         return SIZE_LOOKUP[
@@ -115,6 +105,5 @@ def setup(app: application.Sphinx) -> Dict[str, bool]:
     app.add_directive("animation", Animation)
 
     return {
-        "parallel_read_safe": True,
-        "parallel_write_safe": True,
+        "parallel_read_safe": False,  # sphinx docs suggest we need to actually handle this
     }
