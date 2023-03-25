@@ -29,9 +29,6 @@ from video_extension import local_nodes
 SIZE_LOOKUP: Dict[str, str] = {"small": "60%", "standard": "80%"}
 "Maps size options to the width"
 
-SUPPORTED_MIME_TYPES: Dict[str, str] = {".mp4": "video/mp4"}
-"Supported mime types of the link tag"
-
 
 def size(argument: str):
     return directives.choice(argument, ("standard", "small"))
@@ -114,7 +111,7 @@ class Animation(docutils.SphinxDirective):
 
 def setup(app: application.Sphinx) -> Dict[str, bool]:
     """Add video node and parameters to the Sphinx builder."""
-    local_nodes.add_nodes(app)
+    local_nodes.register_video_nodes(app)
     app.add_directive("animation", Animation)
 
     return {

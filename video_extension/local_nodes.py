@@ -3,6 +3,7 @@ import pathlib
 
 from docutils import nodes
 from sphinx.util import docutils, logging
+from sphinx.writers import html
 from sphinx import application
 
 logger = logging.getLogger(__name__)
@@ -16,20 +17,6 @@ class source(nodes.Inline, nodes.Element):
     pass
 
 
-class SourceTranslator(docutils.SphinxTranslator):
-    def visit_source(self, node: source) -> None:
-        src_path = (
-            pathlib.Path(self.builder.imgpath) / pathlib.Path(node["src"]).parts[-1]
-        ).as_posix()
-
-        attributes = {"src": src_path, "type": node["type"]}
-        self.body.append(self.emptytag(node, "source", **attributes))
-
-    def depart_source(self, _: source) -> None:
-        """Exit the video node."""
-        pass
-
-
 class video(nodes.General, nodes.Element):
     """
     A docutils node corresponding to a video html element.
@@ -38,12 +25,24 @@ class video(nodes.General, nodes.Element):
     pass
 
 
-class VideoTranslator(docutils.SphinxTranslator):
+class VideoTranslator(html.HTMLTranslator, docutils.SphinxTranslator):
+    def _get_src_path(self, src: str) -> str:
+        return (
+            pathlib.Path(self.builder.imgpath) / pathlib.Path(src).parts[-1]
+        ).as_posix()
+
+    def visit_source(self, node: source) -> None:
+        src_path = self._get_src_path(node["src"])
+        attributes = {"src": src_path, "type": node["type"]}
+        self.body.append(self.emptytag(node, "source", **attributes))
+
+    def depart_source(self, _: source) -> None:
+        """Exit the video node."""
+        pass
+
     def visit_video(self, node: video) -> None:
         if "src" in node:
-            node["src"] = (
-                pathlib.Path(self.builder.imgpath) / pathlib.Path(node["src"]).parts[-1]
-            ).as_posix()
+            node["src"] = self._get_src_path(node["src"])
 
         attributes: List[str] = [
             '{k} = "{v}"'.format(k=k, v=node[k])
@@ -83,32 +82,24 @@ class VideoTranslator(docutils.SphinxTranslator):
         self.body.append("</video>\n")
 
 
-def visit_node_unsupported(translator: docutils.SphinxTranslator, node: video) -> None:
+# No args might not be valid here, I haven't checked
+def visit_node_unsupported() -> None:
     """Entry point of the ignored video node."""
     logger.warning("unsupported output format (node skipped)")
     raise nodes.SkipNode
 
 
-def add_nodes(app: application.Sphinx) -> None:
-    """
-    Registers nodes with sphinx
-    """
-    app.add_node(
-        video,
-        html=(VideoTranslator.visit_video, VideoTranslator.depart_video),
-        epub=(visit_node_unsupported, None),
-        latex=(visit_node_unsupported, None),
-        man=(visit_node_unsupported, None),
-        texinfo=(visit_node_unsupported, None),
-        text=(visit_node_unsupported, None),
-    )
+unsupported_tuple = (visit_node_unsupported, None)
+unsupported_dict = dict(
+    [(k, unsupported_tuple) for k in ["epub", "latex", "man", "texinfo", "text"]]
+)
 
-    app.add_node(
-        source,
-        html=(SourceTranslator.visit_source, SourceTranslator.depart_source),
-        epub=(visit_node_unsupported, None),
-        latex=(visit_node_unsupported, None),
-        man=(visit_node_unsupported, None),
-        texinfo=(visit_node_unsupported, None),
-        text=(visit_node_unsupported, None),
-    )
+
+def register_video_nodes(app: application.Sphinx) -> None:
+    """
+    Registers video nodes and the updated translator with sphinx
+    """
+    app.set_translator("html", VideoTranslator)
+
+    app.add_node(video, **unsupported_dict)
+    app.add_node(source, **unsupported_dict)
