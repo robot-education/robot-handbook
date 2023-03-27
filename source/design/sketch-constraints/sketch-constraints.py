@@ -11,9 +11,9 @@ sketch_color = color.Palette.BLUE
 
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
 
-title: title_sequence.TitleSequence = title_sequence.TitleSequence(
-    default_color=sketch_color, add_numbers=False
-)
+# title: title_sequence.TitleSequence = title_sequence.TitleSequence(
+#     default_color=sketch_color, add_numbers=False
+# )
 
 coincident_objects: Tuple[sketch.SketchCircle, sketch.SketchLine, sketch.SketchLine] = (
     sketch_factory.make_circle(vector.point_2d(-4.5, 0), 1.5),
@@ -26,13 +26,11 @@ coincident_objects: Tuple[sketch.SketchCircle, sketch.SketchLine, sketch.SketchL
 
 class CoincidentPointToPointScene(mn.Scene):
     def setup(self) -> None:
-        title.reset()
         copies = [c.copy() for c in coincident_objects]
         self._circle, self._line, self._move_line = copies
         self.add(*copies)
 
     def construct(self) -> None:
-        self.play(title.next("Two points"))
         self.play(self._move_line.click_start())
         self.play(self._circle.click_center())
         self.play(
@@ -49,14 +47,11 @@ class CoincidentPointToPointScene(mn.Scene):
 
 class CoincidentPointToLineScene(mn.Scene):
     def setup(self) -> None:
-        title.reset()
         copies = [c.copy() for c in coincident_objects]
         self._circle, self._line, self._move_line = copies
         self.add(*copies)
 
     def construct(self) -> None:
-        self.play(title.next("Point and a line, circle, or arc"))
-
         self.play(self._move_line.click_start())
         self.play(self._circle.click_circle())
 
@@ -82,7 +77,6 @@ class CoincidentPointToLineScene(mn.Scene):
 
 class CoincidentLineToLineScene(mn.Scene):
     def setup(self) -> None:
-        title.reset()
         start_point = vector.point_2d(-6, 1.25)
         middle_point = vector.point_2d(-1.5, -0.25)  # closest to the middle
         self._fixed_line = sketch_factory.make_line(start_point, middle_point)
@@ -96,7 +90,6 @@ class CoincidentLineToLineScene(mn.Scene):
         self.add(self._fixed_line, self._start_line)
 
     def construct(self) -> None:
-        self.play(title.next("Two lines"))
         self.play(self._start_line.click_line())
         self.play(self._fixed_line.click_line())
         self.play(

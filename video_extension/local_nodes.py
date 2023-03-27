@@ -10,19 +10,18 @@ image directive source code:
 https://github.com/docutils/docutils/blob/master/docutils/docutils/parsers/rst/directives/images.py
 """
 
+from typing import List
 
-from typing import Any, List
-import os
+import pathlib, os
 
 from docutils import nodes
 from sphinx.util import docutils, logging
 from sphinx.writers import html as html_writers
-from sphinx import application, transforms
+from sphinx import application, environment  # , transforms
 from sphinx.builders import html as html_builders
+from sphinx.environment import collectors
 
-# from sphinx.environment.adapters import asset
-
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class source(nodes.Inline, nodes.Element):
@@ -41,66 +40,45 @@ class video(nodes.General, nodes.TextElement):
     pass
 
 
-class VideoTransform(transforms.SphinxTransform):
-    def apply(self, **kwargs: Any) -> None:
-        for node in list(self.document.findall(video)) + list(
-            self.document.findall(source)
-        ):
-            self.handle(node)
+"""
+The build process for images is as follows:
+1. A collector runs and does some image stuff. This adds images to the environment and fills in candidates, which
+    enables transforms later on.
 
-    def handle(self, node: video | source) -> None:
-        file_name = Path(node["src"])
-        dest_path = os.path.join(self.imagedir, file_name)
-        abs_src_path = os.path.join(self.app.srcdir, src_path)
-        if self.convert(abs_src_path, dest_path):
-            if "*" in node["candidates"]:
-                node["candidates"]["*"] = dest_path
-            else:
-                node["candidates"][_to] = dest_path
-            node["src"] = dest_path
+The sphinx image collector is here:
+https://github.com/sphinx-doc/sphinx/blob/ff852bc7c31f48e66100e4647749fc199d92ca79/sphinx/environment/collectors/asset.py
 
-            self.env.original_image_uri[dest_path] = src_path
-            self.env.images.add_file(self.env.docname, dest_path)
+2. Image converters change files from one type to another. 
+    They do this using a combination of candidates and updates to the environment and uri to correct the paths.
+3. Images are moved from the environment to their specific folders by the appropriate builders. Note this process
+    is different for each builder.
+    The builder also updates uris to be in-place relative to the correct target folder.
 
+For videos, we do not care about convertors, which also means convertor and candidate logic is moot. We also ignore
+internationalization (languages and whatnot) for now.
+"""
+
+class VideoCollector(collectors.EnvironmentCollector):
+    def clear_doc(self, app: application.Sphinx, env: environment.BuildEnvironment, docname: str) -> None:
+        env.images.purge_doc(docname)
+
+    def merge_other(self, app: application.Sphinx, env: environment.BuildEnvironment,
+        docnames: set[str], other: environment.BuildEnvironment) -> None:
+        env.images.merge_other(docnames, other.images)
+
+    def process_doc(self, app: application.Sphinx, doctree: nodes.document) -> None:
+        for node in list(doctree.findall(video)) + list(doctree.findall(source)):
+            docname = app.env.docname
+            image_uri, _ = app.env.relfn2path(node["src"], docname)
+            node["src"] = image_uri
+            app.env.dependencies[docname].add(image_uri)
+            app.env.images.add_file(docname, image_uri)
 
 class VideoBuilder(html_builders.StandaloneHTMLBuilder):
     def post_process_images(self, doctree: nodes.Node) -> None:
         super().post_process_images(doctree)
-        # adapter = asset.ImageAdapter(self.env)
-        # for node in list(doctree.findall(video)) + list(doctree.findall(source)):
-        #     candidate = node["candidates"]["video/mp4"]
-        #     node["src"] = candidate
-        #     self.images[candidate] = self.env.images[candidate][1]
-
-        # """Pick the best candidate for all image URIs."""
-        # images = ImageAdapter(self.env)
-        # for node in doctree.findall(nodes.image):
-        #     if '?' in node['candidates']:
-        #         # don't rewrite nonlocal image URIs
-        #         continue
-        #     if '*' not in node['candidates']:
-        #         for imgtype in self.supported_image_types:
-        #             candidate = node['candidates'].get(imgtype, None)
-        #             if candidate:
-        #                 break
-        #         else:
-        #             mimetypes = sorted(node['candidates'])
-        #             image_uri = images.get_original_image_uri(node['uri'])
-        #             if mimetypes:
-        #                 logger.warning(__('a suitable image for %s builder not found: '
-        #                                   '%s (%s)'),
-        #                                self.name, mimetypes, image_uri, location=node)
-        #             else:
-        #                 logger.warning(__('a suitable image for %s builder not found: %s'),
-        #                                self.name, image_uri, location=node)
-        #             continue
-        #         node['uri'] = candidate
-        #     else:
-        #         candidate = node['uri']
-        #     if candidate not in self.env.images:
-        #         # non-existing URI; let it alone
-        #         continue
-        #     self.images[candidate] = self.env.images[candidate][1]
+        for node in list(doctree.findall(video)) + list(doctree.findall(source)):
+            self.images[node["src"]] = self.env.images[node["src"]][1]
 
 
 class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
@@ -194,6 +172,7 @@ def register_video_nodes(app: application.Sphinx) -> None:
     """
     Registers video nodes and the updated translator with sphinx
     """
+    app.add_env_collector(VideoCollector)
     app.add_builder(VideoBuilder, override=True)
     app.set_translator("html", VideoTranslator)
 
