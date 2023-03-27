@@ -4,16 +4,11 @@ import math
 import manim as mn
 from rc_lib.style import color, animation
 from rc_lib.math_utils import vector
-from rc_lib.view_utils import title_sequence
 from rc_lib.common_mobjects import sketch
 
 sketch_color = color.Palette.BLUE
 
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
-
-# title: title_sequence.TitleSequence = title_sequence.TitleSequence(
-#     default_color=sketch_color, add_numbers=False
-# )
 
 coincident_objects: Tuple[sketch.SketchCircle, sketch.SketchLine, sketch.SketchLine] = (
     sketch_factory.make_circle(vector.point_2d(-4.5, 0), 1.5),
@@ -87,9 +82,11 @@ class CoincidentLineToLineScene(mn.Scene):
             middle_point + mn.rotate_vector(slope * 1.25, self._angle),
             middle_point + mn.rotate_vector(slope * 7, self._angle),
         )
-        self.add(self._fixed_line, self._start_line)
 
     def construct(self) -> None:
+        self.play(mn.AnimationGroup(self._fixed_line.create(), self._start_line.create()))
+        self.wait(1)
+
         self.play(self._start_line.click_line())
         self.play(self._fixed_line.click_line())
         self.play(
@@ -99,7 +96,10 @@ class CoincidentLineToLineScene(mn.Scene):
                 about_point=cast(Sequence[float], self._fixed_line.get_end()),
             )
         )
+
         self.wait(animation.END_DELAY)
+        self.play(mn.AnimationGroup(self._fixed_line.uncreate(), self._start_line.uncreate()))
+        self.wait(1)
 
 
 # class VerticalScene(mn.Scene):
