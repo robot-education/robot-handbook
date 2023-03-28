@@ -72,15 +72,15 @@ class CoincidentPointToLineScene(mn.Scene):
 
 class CoincidentLineToLineScene(mn.Scene):
     def setup(self) -> None:
-        start_point = vector.point_2d(-6, 1.25)
-        middle_point = vector.point_2d(-1.5, -0.25)  # closest to the middle
+        start_point = vector.point_2d(-5.75, 2.5)
+        middle_point = vector.point_2d(-1.15, 0.5)  # closest to the middle
         self._fixed_line = sketch_factory.make_line(start_point, middle_point)
 
         slope = vector.normalize(middle_point - start_point)
-        self._angle = math.radians(30)
+        self._angle = math.radians(38)
         self._start_line = sketch_factory.make_line(
-            middle_point + mn.rotate_vector(slope * 1.25, self._angle),
-            middle_point + mn.rotate_vector(slope * 7, self._angle),
+            middle_point + mn.rotate_vector(slope * 2, self._angle),
+            middle_point + mn.rotate_vector(slope * 7.5, self._angle),
         )
 
     def construct(self) -> None:

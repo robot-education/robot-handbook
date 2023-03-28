@@ -75,7 +75,7 @@ The parallel constraint is used to make lines parallel to each other, meaning th
 * Two lines - the lines become parallel.
 
 :::{note} Parallel {{parallel}} makes lines share the same direction, but it does not force them to be inline with each other. 
-    To make two lines inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
+    To make two lines parallel and inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
 :::
 
 
