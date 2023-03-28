@@ -84,7 +84,9 @@ class CoincidentLineToLineScene(mn.Scene):
         )
 
     def construct(self) -> None:
-        self.play(mn.AnimationGroup(self._fixed_line.create(), self._start_line.create()))
+        self.play(
+            mn.AnimationGroup(self._fixed_line.create(), self._start_line.create())
+        )
         self.wait(1)
 
         self.play(self._start_line.click_line())
@@ -98,7 +100,9 @@ class CoincidentLineToLineScene(mn.Scene):
         )
 
         self.wait(animation.END_DELAY)
-        self.play(mn.AnimationGroup(self._fixed_line.uncreate(), self._start_line.uncreate()))
+        self.play(
+            mn.AnimationGroup(self._fixed_line.uncreate(), self._start_line.uncreate())
+        )
         self.wait(1)
 
 

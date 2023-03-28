@@ -11,15 +11,15 @@ myst:
         tangent_title: "![tangent](images/tangent.svg){.thumbnail} Tangent Constraint (t)"
         concentric_title: "![concentric](images/concentric.svg){.thumbnail} Concentric Constraint"
 
-        coincident: "coincident ![coincident](images/coincident.svg){.inline}"
-        vertical: "vertical ![vertical](images/vertical.svg){.inline}"
-        horizontal: "horizontal ![horizontal](images/horizontal.svg){.inline}"
-        parallel: "parallel ![parallel](images/parallel.svg){.inline}"
-        perpendicular: "perpendicular ![perpendicular](images/perpendicular.svg){.inline}"
-        equal: "equal ![equal](images/equal.svg){.inline}"
-        midpoint: "midpoint ![midpoint](images/midpoint.svg){.inline}"
-        tangent: "tangent ![tangent](images/tangent.svg){.inline}"
-        concentric: "concentric ![concentric](images/concentric.svg){.inline}"
+        coincident: "![coincident](images/coincident.svg){.inline}"
+        vertical: "![vertical](images/vertical.svg){.inline}"
+        horizontal: "![horizontal](images/horizontal.svg){.inline}"
+        parallel: "![parallel](images/parallel.svg){.inline}"
+        perpendicular: "![perpendicular](images/perpendicular.svg){.inline}"
+        equal: "![equal](images/equal.svg){.inline}"
+        midpoint: "![midpoint](images/midpoint.svg){.inline}"
+        tangent: "![tangent](images/tangent.svg){.inline}"
+        concentric: "![concentric](images/concentric.svg){.inline}"
 ---
 
 # Sketch Constraints
@@ -30,27 +30,33 @@ The coincident constraint is used to make points touch other entities. The avail
 
 * Two points - the points become touching.
 
-    :::{animation} CoincidentPointToPointScene.mp4
-        :autoplay:
-        Applying a {{coincident}} to two points
-    :::
+:::{animation} CoincidentPointToPointScene.mp4
+:autoplay:
+
+Applying {{coincident}} to two points
+
+:::
 
 * A point and a line, circle or arc - the point becomes inline with the path of the line, circle, or arc.
 
-    :::{animation} CoincidentPointToLineScene.mp4
-        :autoplay:
-        Applying a {{coincident}} to a point and a line or circle
-    :::
+:::{animation} CoincidentPointToLineScene.mp4
+:autoplay:
 
-    :::{note} This mode treats arcs as circles and lines as infinite, so points are not required to lie within the physical limits of the edge.
-    :::
+Applying {{coincident}} to a point and a line or circle
+
+:::
+
+:::{note} This mode treats arcs as circles and lines as infinite, so points are not required to lie within the physical limits of the edge.
+:::
 
 * [Two lines - the lines become inline with each other.]{#coincident-two-lines}
 
-    :::{animation} CoincidentLineToLineScene.mp4
-        :autoplay:
-        Applying a {{coincident}} to two lines
-    :::
+:::{animation} CoincidentLineToLineScene.mp4
+:autoplay:
+
+Applying {{coincident}} to two lines
+
+:::
 
 ## {{vertical_title}}
 The vertical constraint is used to make lines or pairs of points vertical relative to the sketch plane. The available modes are:
@@ -65,11 +71,11 @@ The vertical constraint is used to make lines or pairs of points horizontal rela
 * Two points - the points become horizontally inline with each other.
 
 ## {{parallel_title}}
-The parallel constraint is used to make lines parallel to each other (meaning their direction is the same). The available mode is:
+The parallel constraint is used to make lines parallel to each other, meaning they point in the same direction. The available mode is:
 * Two lines - the lines become parallel.
 
-:::{note} Parallel makes lines share the same direction, but it does not force them to be inline with each other. 
-    To make two lines inline, use the [two line mode of {{coincident}}](#coincident-two-lines).
+:::{note} Parallel {{parallel}} makes lines share the same direction, but it does not force them to be inline with each other. 
+    To make two lines inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
 :::
 
 
@@ -88,7 +94,7 @@ The midpoint constraint is used constrain points to lie along the center of a li
 * A point and a line - the point is placed in the middle of the line.
 
 * Three points - the middle point is centered between the other two points.
-:::{tip} The order of selection does not matter, only the relative position of the points prior to the constraint being added.
+:::{tip} The order of selection does not matter, only the relative position of the points prior to midpoint {{midpoint}} being added.
 :::
 
 

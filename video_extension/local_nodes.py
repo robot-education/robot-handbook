@@ -12,16 +12,14 @@ https://github.com/docutils/docutils/blob/master/docutils/docutils/parsers/rst/d
 
 from typing import List
 
-import pathlib, os
+import pathlib
 
 from docutils import nodes
-from sphinx.util import docutils, logging
+from sphinx.util import docutils
 from sphinx.writers import html as html_writers
-from sphinx import application, environment  # , transforms
+from sphinx import application, environment
 from sphinx.builders import html as html_builders
 from sphinx.environment import collectors
-
-logger = logging.getLogger(__name__)
 
 
 class source(nodes.Inline, nodes.Element):
@@ -50,20 +48,28 @@ https://github.com/sphinx-doc/sphinx/blob/ff852bc7c31f48e66100e4647749fc199d92ca
 
 2. Image converters change files from one type to another. 
     They do this using a combination of candidates and updates to the environment and uri to correct the paths.
+    We skip this step since we don't worry about changing one video to another.
 3. Images are moved from the environment to their specific folders by the appropriate builders. Note this process
     is different for each builder.
     The builder also updates uris to be in-place relative to the correct target folder.
-
-For videos, we do not care about convertors, which also means convertor and candidate logic is moot. We also ignore
-internationalization (languages and whatnot) for now.
+    We update the builder to implement this logic. However, this logic currently targets all https:// links, which 
+    is possibly a problem.
 """
 
+
 class VideoCollector(collectors.EnvironmentCollector):
-    def clear_doc(self, app: application.Sphinx, env: environment.BuildEnvironment, docname: str) -> None:
+    def clear_doc(
+        self, app: application.Sphinx, env: environment.BuildEnvironment, docname: str
+    ) -> None:
         env.images.purge_doc(docname)
 
-    def merge_other(self, app: application.Sphinx, env: environment.BuildEnvironment,
-        docnames: set[str], other: environment.BuildEnvironment) -> None:
+    def merge_other(
+        self,
+        app: application.Sphinx,
+        env: environment.BuildEnvironment,
+        docnames: set[str],
+        other: environment.BuildEnvironment,
+    ) -> None:
         env.images.merge_other(docnames, other.images)
 
     def process_doc(self, app: application.Sphinx, doctree: nodes.document) -> None:
@@ -73,6 +79,7 @@ class VideoCollector(collectors.EnvironmentCollector):
             node["src"] = image_uri
             app.env.dependencies[docname].add(image_uri)
             app.env.images.add_file(docname, image_uri)
+
 
 class VideoBuilder(html_builders.StandaloneHTMLBuilder):
     def post_process_images(self, doctree: nodes.Node) -> None:
@@ -136,23 +143,6 @@ class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
     def depart_video(self, _: video) -> None:
         """Exit the video node."""
         self.body.append("</video>\n")
-
-    # def visit_reference(self, node):
-    #     if isinstance(node.children[0], video) or isinstance(node.children[0], source):
-    #         attributes = {"class": "reference image-reference"}
-    #         if "refuri" in node:
-    #             attributes["href"] = self._get_src_path(node["refuri"])
-    #             attributes["class"] += " external"
-    #         else:
-    #             assert (
-    #                 "refid" in node
-    #             ), 'References must have "refuri" or "refid" attribute.'
-    #             attributes["href"] = "#" + node["refid"]
-    #         self.body.append(self.starttag(node, "a", "", **attributes))
-    #     else:
-    #         super().visit_reference(node)
-
-    # Don't override depart_reference
 
 
 # No args might not be valid here, I haven't checked
