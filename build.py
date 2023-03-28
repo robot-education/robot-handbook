@@ -1,5 +1,5 @@
 """
-A build script which can be used to compile animations in "source".
+A build script which can be used to compile animations in "website".
 Takes as arguments -p, for production, as well as -h for help.
 If -p is omitted, output is optimized for compile speed.
 A file may be specified, as well as an optional list of classes to compile within that file.
@@ -20,7 +20,7 @@ import manim as mn
 
 sys.stdout = sys.__stdout__
 
-source_path = "source"
+source_path = "website"
 quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
 
 
@@ -39,7 +39,7 @@ def get_python_file_paths(path: str | None = None) -> List[str]:
     return [
         file_path
         for file_path in file_paths
-        if os.path.splitext(file_path)[1] == ".py" and file_path != "source/conf.py"
+        if os.path.splitext(file_path)[1] == ".py" and file_path != "{}/conf.py".format(source_path)
     ]
 
 
@@ -61,7 +61,7 @@ def get_animation_names(file_path: str) -> List[str]:
 
 
 def move_output(quality: str, file_path: str, animations: List[str]) -> None:
-    """Moves produced files from media to the appropriate location in source."""
+    """Moves produced files from media to the appropriate location in website."""
     quality_folder = quality_folder_lookup[quality]
     path, sub_folder = os.path.split(file_path)
 
@@ -99,7 +99,7 @@ def get_arg_parser() -> argparse.ArgumentParser:
         "--path",
         nargs="*",
         default=None,
-        help='paths relative to "/source" which are recursively searched for files',
+        help='paths relative to "/{}" which are recursively searched for files'.format(source_path),
     )
     parser.add_argument(
         "-s",
@@ -128,7 +128,7 @@ def main():
             file_path = get_path(file_name)
             if file_path is None:
                 raise ValueError(
-                    'Failed to find the specified file "{file_name}" in "/source". Aborting.'
+                    'Failed to find the specified file "{}" in "/{}". Aborting.'.format(file_name, file_path)
                 )
             file_paths.append(file_path)
 

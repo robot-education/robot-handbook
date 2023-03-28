@@ -17,6 +17,9 @@ z_index = 100
 
 
 def click(mobject: mn.VMobject) -> mn.Animation:
+    """
+    Represents clicking a mobject by setting its stroke width and playing an animation transforming it.
+    """
     global z_index
     target = mobject.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
     mobject.set_z_index(z_index)
@@ -31,6 +34,10 @@ class Sketch(ABC):
 
     @abstractmethod
     def create(self) -> mn.Animation:
+        raise NotImplementedError
+
+    @abstractmethod
+    def uncreate(self) -> mn.Animation:
         raise NotImplementedError
 
 
@@ -54,6 +61,12 @@ class SketchCircle(Sketch, mn.VGroup):
             mn.Create(self.vertex, run_time=0), mn.GrowFromCenter(self.circle)
         )
 
+    def uncreate(self) -> mn.Animation:
+        return mn.Succession(
+            mn.GrowFromCenter(self.circle, rate_func=mn.rush_from),
+            mn.Uncreate(self.vertex, run_time=0),
+        )
+
 
 class SketchPoint(Sketch, mn.VGroup):
     def __init__(self, vertex: mn.Dot) -> None:
@@ -68,6 +81,9 @@ class SketchPoint(Sketch, mn.VGroup):
 
     def create(self) -> mn.Animation:
         return mn.Create(self)
+
+    def uncreate(self) -> mn.Animation:
+        return mn.Uncreate(self)
 
 
 class LineEnd(enum.IntEnum):
@@ -119,18 +135,18 @@ class SketchLine(Sketch, mn.VGroup):
     def click_line(self) -> mn.Animation:
         return click(self.line)
 
-    def uncreate(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Uncreate(self.end_vertex, run_time=0),
-            mn.Uncreate(self.line),
-            mn.Uncreate(self.start_vertex, run_time=0),
-        )
-
     def create(self) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.start_vertex, run_time=0),
             mn.Create(self.line),
             mn.Create(self.end_vertex, run_time=0),
+        )
+
+    def uncreate(self) -> mn.Animation:
+        return mn.Succession(
+            mn.Uncreate(self.end_vertex, run_time=0),
+            mn.Uncreate(self.line),
+            mn.Uncreate(self.start_vertex, run_time=0),
         )
 
     def transform(
