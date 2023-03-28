@@ -103,9 +103,9 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
         )
 
 
-# class VerticalScene(mn.Scene):
-#     def setup(self):
-#         pass
+class VerticalScene(sketch_scene.SketchScene):
+    def setup(self):
+        pass
 
-#     def construct(self):
-#         pass
+    def construct(self):
+        pass
