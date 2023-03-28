@@ -35,6 +35,7 @@
         "Mobjects",
         "ndarray",
         "nocontrols",
+        "onshape",
         "opengl",
         "refid",
         "reservee",
@@ -45,6 +46,9 @@
         "vmobject",
         "vmobjects",
         "webm"
+    ],
+    "cSpell.flagWords": [
+        "coincentric"
     ],
     "python.analysis.extraPaths": [
         "rc_lib"

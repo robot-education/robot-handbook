@@ -3,3 +3,9 @@
     vertical-align: middle;
     pointer-events: none;
 }
+
+.inline {
+    width: 15px;
+    vertical-align: middle;
+    pointer-events: none;
+}

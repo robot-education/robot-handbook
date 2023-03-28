@@ -43,6 +43,8 @@ myst_enable_extensions = [
     "colon_fence",  # Enables directives using ::: and md-figure directive
     "attrs_inline",
     "substitution",
+    "attrs_block",
+    "attrs_inline",
 ]
 
 # autosectionlabel_prefix_document = True
