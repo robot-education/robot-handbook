@@ -31,21 +31,18 @@ class CoincidentPointToPointScene(sketch_scene.SketchScene):
         self._circle, self._line, self._move_line = mobjects
         self.set_static_mobjects(*mobjects)
 
-    def make_animations(self) -> List[List[mn.Animation]]:
-        return [
-            [
-                self._move_line.click_start(),
-                self._circle.click_center(),
-                self._move_line.transform(
-                    self._circle.get_center(), sketch.LineEnd.START
-                ),
-            ],
-            [
-                self._move_line.click_end(),
-                self._line.click_end(),
-                self._move_line.transform(self._line.get_end(), sketch.LineEnd.END),
-            ],
-        ]
+    def construct(self) -> None:
+        self.run_group(
+            self._move_line.click_start(),
+            self._circle.click_center(),
+            self._move_line.transform(self._circle.get_center(), sketch.LineEnd.START),
+        )
+
+        self.run_group(
+            self._move_line.click_end(),
+            self._line.click_end(),
+            self._move_line.transform(self._line.get_end(), sketch.LineEnd.END),
+        )
 
 
 class CoincidentPointToLineScene(sketch_scene.SketchScene):
@@ -54,21 +51,17 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
         self._circle, self._line, self._move_line = mobjects
         self.set_static_mobjects(*mobjects)
 
-    def make_animations(self) -> List[List[mn.Animation]]:
-        result = []
-
+    def construct(self) -> None:
         point = (
             self._circle.get_center()
             + vector.normalize(self._move_line.get_start() - self._circle.get_center())
             * self._circle.get_radius()
         )
 
-        result.append(
-            [
-                self._move_line.click_start(),
-                self._circle.click_circle(),
-                self._move_line.transform(point, sketch.LineEnd.START),
-            ]
+        self.run_group(
+            self._move_line.click_start(),
+            self._circle.click_circle(),
+            self._move_line.transform(point, sketch.LineEnd.START),
         )
 
         point = vector.project_to_line(
@@ -77,14 +70,11 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
             self._line.get_end(),
         )
 
-        result.append(
-            [
-                self._move_line.click_end(),
-                self._line.click_line(),
-                self._move_line.transform(point, sketch.LineEnd.END),
-            ]
+        self.run_group(
+            self._move_line.click_end(),
+            self._line.click_line(),
+            self._move_line.transform(point, sketch.LineEnd.END),
         )
-        return result
 
 
 class CoincidentLineToLineScene(sketch_scene.SketchScene):
@@ -101,18 +91,16 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
         )
         self.set_static_mobjects(self._fixed_line, self._start_line)
 
-    def make_animations(self) -> List[List[mn.Animation]]:
-        return [
-            [
-                self._start_line.click_line(),
-                self._fixed_line.click_line(),
-                mn.Rotate(
-                    self._start_line,
-                    angle=-self._angle,
-                    about_point=cast(Sequence[float], self._fixed_line.get_end()),
-                ),
-            ]
-        ]
+    def construct(self) -> None:
+        self.run_group(
+            self._start_line.click_line(),
+            self._fixed_line.click_line(),
+            mn.Rotate(
+                self._start_line,
+                angle=-self._angle,
+                about_point=cast(Sequence[float], self._fixed_line.get_end()),
+            ),
+        )
 
 
 # class VerticalScene(mn.Scene):

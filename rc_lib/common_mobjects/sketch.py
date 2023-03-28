@@ -63,7 +63,7 @@ class SketchCircle(Sketch, mn.VGroup):
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
-            mn.GrowFromCenter(self.circle, rate_func=mn.rush_from),
+            mn.GrowFromCenter(self.circle, reverse_rate_function=True),
             mn.Uncreate(self.vertex, run_time=0),
         )
 

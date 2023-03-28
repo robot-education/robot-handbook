@@ -111,8 +111,6 @@ The concentric constraint makes circular entities share the same center point. T
 
 * A point and a circle - the point becomes coincident to the center of the circle.
 
-
-
 <!-- # Appendix
 ## Miscellaneous Behaviors
 This section documents additional niche behaviors which are not generally applicable to standard use.
