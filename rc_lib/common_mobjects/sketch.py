@@ -111,6 +111,9 @@ class SketchLine(Sketch, mn.VGroup):
         self.get_vertex(line_end).move_to(new_point)
         return self
 
+    def get_length(self) -> float:
+        return vector.norm(self.get_start() - self.get_end())
+
     def get_vertex(self, line_end: LineEnd) -> mn.Dot:
         return self.start_vertex if line_end == LineEnd.START else self.end_vertex
 
@@ -159,6 +162,7 @@ class SketchLine(Sketch, mn.VGroup):
         return mn.Transform(
             self, self.copy().set_position(new_point, line_end), **kwargs
         )
+    
 
 
 class SketchFactory:

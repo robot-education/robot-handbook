@@ -103,9 +103,103 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
         )
 
 
-class VerticalScene(sketch_scene.SketchScene):
+def vh_common_line() -> Tuple[sketch.SketchLine, float]:
+    return (
+        sketch_factory.make_line(
+            vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3)
+        ),
+        math.radians(45),
+    )
+
+
+class VerticalLineScene(sketch_scene.SketchScene):
     def setup(self):
-        pass
+        self._start_line, angle = vh_common_line()
+        self._angle = math.radians(90) - angle
+        self.set_static_mobjects(self._start_line)
 
     def construct(self):
-        pass
+        self.run_group(
+            self._start_line.click_line(),
+            mn.Rotate(self._start_line, angle=self._angle),
+        )
+
+
+class HorizontalLineScene(sketch_scene.SketchScene):
+    def setup(self):
+        self._start_line, angle = vh_common_line()
+        self._angle = -angle
+        self.set_static_mobjects(self._start_line)
+
+    def construct(self):
+        self.run_group(
+            self._start_line.click_line(),
+            mn.Rotate(self._start_line, angle=self._angle),
+        )
+
+
+class VerticalPointsScene(sketch_scene.SketchScene):
+    def setup(self):
+        self._circle = sketch_factory.make_circle(vector.point_2d(-4, 1.5), 1.5)
+        self._line = sketch_factory.make_line(
+            vector.point_2d(0, 3), vector.point_2d(5.5, 1.5)
+        )
+        self._move_line = sketch_factory.make_line(
+            vector.point_2d(-5, -2.5), vector.point_2d(4.5, -1.5)
+        )
+        self.set_static_mobjects(self._circle, self._line, self._move_line)
+
+    def construct(self):
+        self.run_group(
+            self._move_line.click_start(),
+            self._circle.click_center(),
+            self._move_line.transform(
+                vector.point_2d(
+                    self._circle.get_center()[0], self._move_line.get_start()[1]
+                ),
+                sketch.LineEnd.START,
+            ),
+        )
+
+        self.run_group(
+            self._move_line.click_end(),
+            self._line.click_end(),
+            self._move_line.transform(
+                vector.point_2d(self._line.get_end()[0], self._move_line.get_end()[1]),
+                sketch.LineEnd.END,
+            ),
+        )
+
+
+class HorizontalPointsScene(sketch_scene.SketchScene):
+    def setup(self):
+        self._circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
+        self._line = sketch_factory.make_line(
+            vector.point_2d(-5, -0.5), vector.point_2d(-1, -3)
+        )
+        self._move_line = sketch_factory.make_line(
+            vector.point_2d(2, -2), vector.point_2d(5, 2.5)
+        )
+        self.set_static_mobjects(self._circle, self._line, self._move_line)
+
+    def construct(self):
+        self.run_group(
+            self._move_line.click_start(),
+            self._line.click_end(),
+            self._move_line.transform(
+                vector.point_2d(self._move_line.get_start()[0], self._line.get_end()[1]),
+                sketch.LineEnd.START,
+            ),
+        )
+
+        self.run_group(
+            self._move_line.click_end(),
+            self._circle.click_center(),
+            self._move_line.transform(
+                vector.point_2d(
+                    self._move_line.get_end()[0],
+                    self._circle.get_center()[1],
+                ),
+                sketch.LineEnd.END,
+            ),
+        )

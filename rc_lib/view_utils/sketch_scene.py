@@ -13,7 +13,7 @@ class SketchScene(mn.Scene, ABC):
 
         # rebind construct so that the manim compiler is happy
         self._child_construct = self.construct
-        self.construct = self._sketch_construct
+        self.construct = self._construct_sketch
 
         self._groups = []
         self._static_mobjects = []
@@ -33,7 +33,7 @@ class SketchScene(mn.Scene, ABC):
     def construct(self) -> None:
         raise NotImplementedError
 
-    def _sketch_construct(self):
+    def _construct_sketch(self):
         self._begin()
         self._child_construct()
         self._end()
@@ -51,4 +51,4 @@ class SketchScene(mn.Scene, ABC):
                 *[mobject.uncreate() for mobject in self._static_mobjects]
             )
         )
-        self.wait(self.CONSTRAINT_DELAY * 2)
+        self.wait(self.CONSTRAINT_DELAY * 1.5)

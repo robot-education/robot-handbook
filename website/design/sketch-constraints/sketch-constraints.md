@@ -62,13 +62,41 @@ Applying {{coincident}} to two lines
 The vertical constraint is used to make lines or pairs of points vertical relative to the sketch plane. The available modes are:
 * Line - the line becomes vertical.
 
+:::{animation} VerticalLineScene.mp4
+:autoplay:
+
+Applying {{vertical}} to a line
+
+:::
+
 * Two points - the points become vertically inline with each other.
 
+:::{animation} VerticalPointsScene.mp4
+:autoplay:
+
+Applying {{vertical}} to two points
+
+:::
 
 ## {{horizontal_title}}
 The vertical constraint is used to make lines or pairs of points horizontal relative to the sketch plane. The available modes are:
 * Line - the line becomes horizontal.
+
+:::{animation} HorizontalLineScene.mp4
+:autoplay:
+
+Applying {{horizontal}} to a line
+
+:::
+
 * Two points - the points become horizontally inline with each other.
+
+:::{animation} HorizontalPointsScene.mp4
+:autoplay:
+
+Applying {{horizontal}} to two points
+
+:::
 
 ## {{parallel_title}}
 The parallel constraint is used to make lines parallel to each other, meaning they point in the same direction. The available mode is:
@@ -77,7 +105,6 @@ The parallel constraint is used to make lines parallel to each other, meaning th
 :::{note} Parallel {{parallel}} makes lines share the same direction, but it does not force them to be inline with each other. 
     To make two lines parallel and inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
 :::
-
 
 ## {{perpendicular_title}}
 The perpendicular constraint is used to make lines perpendicular to each other, meaning they are at right angles relative to each other. The available mode is:

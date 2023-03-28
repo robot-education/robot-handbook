@@ -24,8 +24,11 @@ Direction3d = np.ndarray
 Angle = float
 
 
-def norm(point: Point | Vector) -> float:
-    return cast(float, np.linalg.norm(point))
+def norm(vector: Point | Vector) -> float:
+    """
+    Returns the norm (length) of a vector.
+    """
+    return cast(float, np.linalg.norm(vector))
 
 
 def normalize(vector: Vector) -> Direction:
