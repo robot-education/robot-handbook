@@ -4,7 +4,7 @@ myst:
         coincident_title: "![coincident](images/coincident.svg){.thumbnail} Coincident Constraint (i)"
         vertical_title: "![vertical](images/vertical.svg){.thumbnail} Vertical Constraint (v)"
         horizontal_title: "![horizontal](images/horizontal.svg){.thumbnail} Horizontal Constraint (h)"
-        parallel_title: "![parallel](images/parallel.svg){.thumbnail} Parallel Constraint"
+        parallel_title: "![parallel](images/parallel.svg){.thumbnail} Parallel Constraint (b)"
         perpendicular_title: "![perpendicular](images/perpendicular.svg){.thumbnail} Perpendicular Constraint"
         equal_title: "![equal](images/equal.svg){.thumbnail} Equal Constraint (e)"
         midpoint_title: "![midpoint](images/midpoint.svg){.thumbnail} Midpoint Constraint"
