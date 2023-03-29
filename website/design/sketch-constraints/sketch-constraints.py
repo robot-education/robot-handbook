@@ -142,10 +142,10 @@ class VerticalPointsScene(sketch_scene.SketchScene):
     def setup(self):
         self._circle = sketch_factory.make_circle(vector.point_2d(-4, 1.5), 1.5)
         self._line = sketch_factory.make_line(
-            vector.point_2d(0, 3), vector.point_2d(5.5, 1.5)
+            vector.point_2d(0, 2.5), vector.point_2d(5.5, 1.5)
         )
         self._move_line = sketch_factory.make_line(
-            vector.point_2d(-5, -2.5), vector.point_2d(4.5, -1.5)
+            vector.point_2d(-5.5, -2.5), vector.point_2d(3.5, -1.5)
         )
         self.set_static_mobjects(self._circle, self._line, self._move_line)
 
@@ -175,10 +175,10 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
     def setup(self):
         self._circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
         self._line = sketch_factory.make_line(
-            vector.point_2d(-5, -0.5), vector.point_2d(-1, -3)
+            vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5)
         )
         self._move_line = sketch_factory.make_line(
-            vector.point_2d(2, -2), vector.point_2d(5, 2.5)
+            vector.point_2d(2, -1.5), vector.point_2d(4.5, 3)
         )
         self.set_static_mobjects(self._circle, self._line, self._move_line)
 
@@ -187,7 +187,9 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
             self._move_line.click_start(),
             self._line.click_end(),
             self._move_line.transform(
-                vector.point_2d(self._move_line.get_start()[0], self._line.get_end()[1]),
+                vector.point_2d(
+                    self._move_line.get_start()[0], self._line.get_end()[1]
+                ),
                 sketch.LineEnd.START,
             ),
         )

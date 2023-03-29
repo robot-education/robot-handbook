@@ -1,5 +1,5 @@
 import manim as mn
-from typing import NewType, Tuple, List
+from typing import Tuple, List
 import enum
 import math
 import numpy as np

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 import manim as mn
 
 from rc_lib.common_mobjects import sketch
@@ -15,11 +16,10 @@ class SketchScene(mn.Scene, ABC):
         self._child_construct = self.construct
         self.construct = self._construct_sketch
 
-        self._groups = []
-        self._static_mobjects = []
+        self._static_mobjects: List[sketch.Sketch] = []
 
     def set_static_mobjects(self, *mobjects: sketch.Sketch):
-        self._static_mobjects = mobjects
+        self._static_mobjects.extend(mobjects)
 
     def run_group(self, *animation: mn.Animation):
         self.play(mn.Succession(*animation))
@@ -33,22 +33,26 @@ class SketchScene(mn.Scene, ABC):
     def construct(self) -> None:
         raise NotImplementedError
 
-    def _construct_sketch(self):
-        self._begin()
-        self._child_construct()
-        self._end()
-
-    def _begin(self):
-        self.play(
-            mn.AnimationGroup(*[mobject.create() for mobject in self._static_mobjects])
-        )
-        self.wait(self.CONSTRAINT_DELAY)
-
-    def _end(self):
+    def tear_down(self):
         self.wait(animation.END_DELAY - self.CONSTRAINT_DELAY)
+
+        # Prevents bug where circles would sometimes not shrink
+        # a_lot = 999999
+        # [mobject.set_z_index(a_lot := a_lot + 1) for mobject in self._static_mobjects]
+
         self.play(
             mn.AnimationGroup(
                 *[mobject.uncreate() for mobject in self._static_mobjects]
             )
         )
         self.wait(self.CONSTRAINT_DELAY * 1.5)
+
+    def _construct_sketch(self):
+        self._setup_sketch()
+        self._child_construct()
+
+    def _setup_sketch(self):
+        self.play(
+            mn.AnimationGroup(*[mobject.create() for mobject in self._static_mobjects])
+        )
+        self.wait(self.CONSTRAINT_DELAY)

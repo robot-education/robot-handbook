@@ -12,6 +12,7 @@ import manim as mn
 
 from rc_lib.math_utils import vector
 from rc_lib.style import color
+from rc_lib.style import animation
 
 z_index = 100
 
@@ -22,12 +23,14 @@ def click(mobject: mn.VMobject) -> mn.Animation:
     """
     global z_index
     target = mobject.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
-    mobject.set_z_index(z_index)
+    mobject.set_z_index(
+        z_index
+    )  # set z_index to make highlight go over the top (a bit suss)
     z_index += 1
     return mn.Transform(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
 
 
-class Sketch(ABC):
+class Sketch(mn.VGroup, ABC):
     """
     An abstract base class for Sketch entities.
     """
@@ -41,7 +44,7 @@ class Sketch(ABC):
         raise NotImplementedError
 
 
-class SketchCircle(Sketch, mn.VGroup):
+class SketchCircle(Sketch):
     def __init__(self, circle: mn.Circle, vertex: mn.Dot) -> None:
         self.circle = circle
         self.vertex = vertex
@@ -63,12 +66,12 @@ class SketchCircle(Sketch, mn.VGroup):
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
-            mn.GrowFromCenter(self.circle, reverse_rate_function=True),
+            animation.ShrinkToCenter(self.circle),
             mn.Uncreate(self.vertex, run_time=0),
         )
 
 
-class SketchPoint(Sketch, mn.VGroup):
+class SketchPoint(Sketch):
     def __init__(self, vertex: mn.Dot) -> None:
         self.vertex = vertex
         super().__init__(self.get_point)
@@ -91,7 +94,7 @@ class LineEnd(enum.IntEnum):
     END = 1
 
 
-class SketchLine(Sketch, mn.VGroup):
+class SketchLine(Sketch):
     def __init__(self, line: mn.Line, start_vertex: mn.Dot, end_vertex: mn.Dot) -> None:
         self.line = line
         self.start_vertex = start_vertex
@@ -162,7 +165,6 @@ class SketchLine(Sketch, mn.VGroup):
         return mn.Transform(
             self, self.copy().set_position(new_point, line_end), **kwargs
         )
-    
 
 
 class SketchFactory:
