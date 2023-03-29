@@ -115,7 +115,10 @@ class SketchLine(Sketch):
         return self
 
     def get_length(self) -> float:
-        return vector.norm(self.get_start() - self.get_end())
+        return vector.norm(self.get_end() - self.get_start())
+    
+    def get_direction(self) -> vector.Direction2d:
+        return vector.normalize(self.get_end() - self.get_start())
 
     def get_vertex(self, line_end: LineEnd) -> mn.Dot:
         return self.start_vertex if line_end == LineEnd.START else self.end_vertex

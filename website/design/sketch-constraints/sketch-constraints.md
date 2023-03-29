@@ -100,7 +100,16 @@ Applying {{horizontal}} to two points
 
 ## {{parallel_title}}
 The parallel constraint is used to make lines parallel to each other, meaning they point in the same direction. The available mode is:
+
 * Two lines - the lines become parallel.
+
+:::{animation} ParallelScene.mp4
+:autoplay:
+
+Applying {{parallel}} to two lines
+
+:::
+
 
 :::{note} Parallel {{parallel}} makes lines share the same direction, but it does not force them to be inline with each other. 
     To make two lines parallel and inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
@@ -108,7 +117,16 @@ The parallel constraint is used to make lines parallel to each other, meaning th
 
 ## {{perpendicular_title}}
 The perpendicular constraint is used to make lines perpendicular to each other, meaning they are at right angles relative to each other. The available mode is:
+
 * Two lines - the lines become perpendicular to each other.
+
+:::{animation} PerpendicularScene.mp4
+:autoplay:
+
+Applying {{perpendicular}} to two lines
+
+:::
+
 
 ## {{equal_title}}
 The equal constraint is used to constrain the lengths of lines or the radius of arcs/circles to be the same. The available modes are:

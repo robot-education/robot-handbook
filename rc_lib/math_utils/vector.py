@@ -45,18 +45,26 @@ def vector_2d(x: float, y: float) -> Vector2d:
 
 
 def vector_3d(x: float, y: float, z: float) -> Vector3d:
-    """A constructor for a vector3d."""
+    """A constructor for a 3D vector."""
     return np.array([x, y, z])
 
 
 def point_2d(x: float, y: float) -> Point2d:
-    """A constructor for a point2d."""
+    """A constructor for a 2D point."""
     return np.array([x, y, 0])
 
 
 def point_3d(x: float, y: float, z: float) -> Point3d:
-    """A constructor for a point3d."""
+    """A constructor for a 3D point."""
     return np.array([x, y, z])
+
+def direction_2d(x: float, y: float) -> Direction2d:
+    """A constructor for a 2D direction."""
+    return normalize(np.array([x, y, 0]))
+
+def direction_3d(x: float, y: float, z: float) -> Direction3d:
+    """A constructor for a 3D direction."""
+    return normalize(np.array([x, y, z]))
 
 
 def angle_between_vectors(x1: Vector, x2: Vector) -> Angle:

@@ -1,8 +1,8 @@
-from typing import Dict, Iterable, List, Sequence, Tuple, cast
+from typing import Sequence, Tuple, cast
 import math
 
 import manim as mn
-from rc_lib.style import color, animation
+from rc_lib.style import color
 from rc_lib.math_utils import vector
 from rc_lib.view_utils import sketch_scene
 from rc_lib.common_mobjects import sketch
@@ -26,54 +26,50 @@ def coincident_common_mobjects() -> (
 
 
 class CoincidentPointToPointScene(sketch_scene.SketchScene):
-    def setup(self) -> None:
-        mobjects = coincident_common_mobjects()
-        self._circle, self._line, self._move_line = mobjects
-        self.set_static_mobjects(*mobjects)
-
     def construct(self) -> None:
+        circle, line, move_line = coincident_common_mobjects()
+        self.introduce(circle, line, move_line)
+
         self.run_group(
-            self._move_line.click_start(),
-            self._circle.click_center(),
-            self._move_line.transform(self._circle.get_center(), sketch.LineEnd.START),
+            move_line.click_start(),
+            circle.click_center(),
+            move_line.transform(circle.get_center(), sketch.LineEnd.START),
         )
 
         self.run_group(
-            self._move_line.click_end(),
-            self._line.click_end(),
-            self._move_line.transform(self._line.get_end(), sketch.LineEnd.END),
+            move_line.click_end(),
+            line.click_end(),
+            move_line.transform(line.get_end(), sketch.LineEnd.END),
         )
 
 
 class CoincidentPointToLineScene(sketch_scene.SketchScene):
-    def setup(self) -> None:
-        mobjects = coincident_common_mobjects()
-        self._circle, self._line, self._move_line = mobjects
-        self.set_static_mobjects(*mobjects)
-
     def construct(self) -> None:
+        circle, line, move_line = coincident_common_mobjects()
+        self.introduce(circle, line, move_line)
+
         point = (
-            self._circle.get_center()
-            + vector.normalize(self._move_line.get_start() - self._circle.get_center())
-            * self._circle.get_radius()
+            circle.get_center()
+            + vector.normalize(move_line.get_start() - circle.get_center())
+            * circle.get_radius()
         )
 
         self.run_group(
-            self._move_line.click_start(),
-            self._circle.click_circle(),
-            self._move_line.transform(point, sketch.LineEnd.START),
+            move_line.click_start(),
+            circle.click_circle(),
+            move_line.transform(point, sketch.LineEnd.START),
         )
 
         point = vector.project_to_line(
-            self._move_line.get_end(),
-            self._line.get_start(),
-            self._line.get_end(),
+            move_line.get_end(),
+            line.get_start(),
+            line.get_end(),
         )
 
         self.run_group(
-            self._move_line.click_end(),
-            self._line.click_line(),
-            self._move_line.transform(point, sketch.LineEnd.END),
+            move_line.click_end(),
+            line.click_line(),
+            move_line.transform(point, sketch.LineEnd.END),
         )
 
 
@@ -83,13 +79,13 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
         middle_point = vector.point_2d(-1.15, 0.5)  # closest to the middle
         self._fixed_line = sketch_factory.make_line(start_point, middle_point)
 
-        slope = vector.normalize(middle_point - start_point)
+        slope = self._fixed_line.get_direction()
         self._angle = math.radians(38)
         self._start_line = sketch_factory.make_line(
             middle_point + mn.rotate_vector(slope * 2, self._angle),
             middle_point + mn.rotate_vector(slope * 7.5, self._angle),
         )
-        self.set_static_mobjects(self._fixed_line, self._start_line)
+        self.introduce(self._fixed_line, self._start_line)
 
     def construct(self) -> None:
         self.run_group(
@@ -113,28 +109,27 @@ def vh_common_line() -> Tuple[sketch.SketchLine, float]:
 
 
 class VerticalLineScene(sketch_scene.SketchScene):
-    def setup(self):
-        self._start_line, angle = vh_common_line()
-        self._angle = math.radians(90) - angle
-        self.set_static_mobjects(self._start_line)
-
     def construct(self):
+        start_line, angle = vh_common_line()
+        angle = math.radians(90) - angle
+
+        self.introduce(start_line)
+
         self.run_group(
-            self._start_line.click_line(),
-            mn.Rotate(self._start_line, angle=self._angle),
+            start_line.click_line(),
+            mn.Rotate(start_line, angle=angle),
         )
 
 
 class HorizontalLineScene(sketch_scene.SketchScene):
-    def setup(self):
-        self._start_line, angle = vh_common_line()
-        self._angle = -angle
-        self.set_static_mobjects(self._start_line)
-
     def construct(self):
+        start_line, angle = vh_common_line()
+        angle = -angle
+        self.introduce(start_line)
+
         self.run_group(
-            self._start_line.click_line(),
-            mn.Rotate(self._start_line, angle=self._angle),
+            start_line.click_line(),
+            mn.Rotate(start_line, angle=angle),
         )
 
 
@@ -147,7 +142,7 @@ class VerticalPointsScene(sketch_scene.SketchScene):
         self._move_line = sketch_factory.make_line(
             vector.point_2d(-5.5, -2.5), vector.point_2d(3.5, -1.5)
         )
-        self.set_static_mobjects(self._circle, self._line, self._move_line)
+        self.introduce(self._circle, self._line, self._move_line)
 
     def construct(self):
         self.run_group(
@@ -180,7 +175,7 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
         self._move_line = sketch_factory.make_line(
             vector.point_2d(2, -1.5), vector.point_2d(4.5, 3)
         )
-        self.set_static_mobjects(self._circle, self._line, self._move_line)
+        self.introduce(self._circle, self._line, self._move_line)
 
     def construct(self):
         self.run_group(
@@ -204,4 +199,51 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
                 ),
                 sketch.LineEnd.END,
             ),
+        )
+
+
+class ParallelScene(sketch_scene.SketchScene):
+    def setup(self):
+        self._line = sketch_factory.make_line(
+            vector.point_2d(-6, -3), vector.point_2d(6, 0.5)
+        )
+        direction = self._line.get_direction()
+
+        end_point = vector.point_2d(5, 3)
+        start_point = end_point - direction * 10.5
+        self._mid_point = (start_point + end_point) / 2
+        end_line = sketch_factory.make_line(start_point, end_point)
+        self._angle = math.radians(16.26)
+        self._start_line = end_line.rotate(-self._angle, about_point=self._mid_point)  # type: ignore
+
+    def construct(self):
+        self.introduce(self._line, self._start_line)
+        self.run_group(
+            self._start_line.click_line(),
+            self._line.click_line(),
+            mn.Rotate(self._start_line, self._angle, about_point=self._mid_point),  # type: ignore
+        )
+
+
+class PerpendicularScene(sketch_scene.SketchScene):
+    def construct(self):
+        line = sketch_factory.make_line(
+            vector.point_2d(-5, -2.75), vector.point_2d(5.5, 0.5)
+        )
+        direction = line.get_direction()
+        rotation_point = line.get_start() + direction * 2
+        perpendicular_direction = vector.direction_2d(-direction[1], direction[0])
+        end_line = sketch_factory.make_line(
+            rotation_point + perpendicular_direction * 1,
+            rotation_point + perpendicular_direction * 5.25,
+        )
+
+        angle = math.radians(45)
+        start_line = end_line.rotate(-angle, about_point=rotation_point)  # type: ignore
+
+        self.introduce(start_line, line)
+        self.run_group(
+            start_line.click_line(),
+            line.click_line(),
+            mn.Rotate(start_line, angle, about_point=rotation_point),  # type: ignore
         )
