@@ -5,7 +5,6 @@ Plates are common components on many robots. Plates can be easily cut from sheet
 The basic process for modeling a plate is demonstrated in the following animation.
 
 :::{animation} IntakePlateScene.mp4
-
 Sketching a basic plate
 :::
 
@@ -17,7 +16,6 @@ Some considerations are as follows:
 * In the event a hole is too close to the boundary of the circle, you may need to redraw the boundary.
 
 :::{animation} BoundaryRedrawScene.mp4
-
 Redrawing the boundary of a plate
 :::
 
@@ -25,6 +23,5 @@ Redrawing the boundary of a plate
 Lines should be constrained to each circle using both a coincident and a tangent constraint.
 
 :::{animation} BoundaryConstraintScene.mp4
-
 Constraining a boundary line
 :::
