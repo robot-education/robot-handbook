@@ -47,12 +47,15 @@ class Sketch(mn.VGroup, ABC):
 class SketchCircleBase(Sketch, ABC):
     # type as mn.Arc since a circle is just an arc
     def __init__(self, *, circle: mn.Arc, center_vertex: mn.Dot, **kwargs):
-        super().__init__(**kwargs)
+        Sketch.__init__(self)
         self.add(circle, center_vertex)
         self.circle = circle
         self.center_vertex = center_vertex
 
     def get_center(self) -> vector.Point2d:
+        """
+        Returns the true center of the circle.
+        """
         return self.center_vertex.get_center()
 
     def get_radius(self) -> float:
@@ -60,9 +63,15 @@ class SketchCircleBase(Sketch, ABC):
 
     def set_radius(self, radius: float) -> Self:
         # Changing the size of the radius doesn't change the size of the circle
-        self.circle = mn.Circle(radius, color=self.circle.get_color()).move_to(
-            self.circle.get_center()
+        scale_factor = radius / self.circle.radius
+        point = self.center_vertex.get_center()
+        print(point)
+        print(self.get_center())
+        print(super().get_center())
+        self.circle.apply_points_function_about_point(
+            lambda point: scale_factor * point, about_point=point
         )
+        # self.circle.scale(radius / self.circle.radius, about_point=self.get_center())
         return self
 
     def click_center(self) -> mn.Animation:
@@ -99,7 +108,7 @@ class SketchEdgeBase(Sketch, ABC):
     def __init__(
         self, *, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot, **kwargs
     ):
-        super().__init__(**kwargs)
+        Sketch.__init__(self)
         self.add(edge, start_vertex, end_vertex)
         self._edge = edge
         self.start_vertex = start_vertex
@@ -210,7 +219,6 @@ class SketchLine(SketchEdgeBase):
         )
 
 
-# CircleBase first to access methods first
 class SketchArc(SketchCircleBase, SketchEdgeBase):
     def __init__(
         self,
@@ -219,31 +227,34 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         end_vertex: mn.Dot,
         center_vertex: mn.Dot,
     ) -> None:
-        super().__init__(
+        SketchCircleBase.__init__(
+            self,
+            circle=arc,
+            center_vertex=center_vertex,
+        )
+        SketchEdgeBase.__init__(
+            self,
             edge=arc,
             start_vertex=start_vertex,
             end_vertex=end_vertex,
-            circle=arc,
-            center_vertex=center_vertex,
         )
         self.arc = arc
 
     def set_radius(self, radius: float) -> Self:
-        super().set_radius(radius)
+        center = SketchCircleBase.get_center(self)  # self.get_center()
         self.start_vertex.move_to(
-            vector.norm(self.get_start() - self.get_center()) * radius
+            center + vector.normalize(SketchEdgeBase.get_start(self) - center) * radius
         )
         self.end_vertex.move_to(
-            vector.norm(self.get_end() - self.get_center()) * radius
+            center + vector.normalize(SketchEdgeBase.get_end(self) - center) * radius
         )
+        SketchCircleBase.set_radius(self, radius)
         return self
 
     @mn.override_animation(mn.Create)
     def _create_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            # mn.Create(self.center_vertex, run_time=0),
-            # mn.GrowFromCenter(self.arc),
-            super()._create_override(**kwargs),
+            SketchCircleBase._create_override(self, **kwargs),
             mn.Create(self.start_vertex, run_time=0),
             mn.Create(self.end_vertex, run_time=0),
         )

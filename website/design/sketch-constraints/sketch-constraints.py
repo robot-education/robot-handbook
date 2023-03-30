@@ -8,7 +8,7 @@ from rc_lib.view_utils import sketch_scene
 from rc_lib.common_mobjects import sketch
 
 sketch_color = color.Palette.BLUE
-sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
+sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color) # type: ignore
 
 
 def coincident_common_mobjects() -> (
@@ -296,8 +296,8 @@ class EqualCircleScene(sketch_scene.SketchScene):
 
         self.introduce(base, arc, circle)
         self.run_group(
-            base.click(), circle.click(), circle.animate.set_radius(1.5)  # type: ignore
+            base.click(), circle.click(), circle.animate.set_radius(1.5)
         )
         self.run_group(
-            base.click(), arc.click(), arc.animate.set_radius(1.5)  # type: ignore
+            base.click(), arc.click(), arc.animate.set_radius(1.5)
         )

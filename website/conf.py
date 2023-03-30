@@ -17,8 +17,8 @@ sys.path.append(os.path.abspath("/video_extension"))
 # -- Project information -----------------------------------------------------
 
 project = "Robot Concepts"
-copyright = "2023, Alex Kempen, Egan Johnson"
-author = "Alex Kempen, Egan Johnson"
+copyright = "2023, Alex Kempen and Egan Johnson"
+author = "Alex Kempen and Egan Johnson"
 
 # The full version, including alpha/beta/rc tags
 release = "1.0.0"
