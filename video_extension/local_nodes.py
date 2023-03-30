@@ -104,6 +104,10 @@ class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
         pass
 
     def visit_video(self, node: video) -> None:
+        if "src" in node:
+            node["src"] = self._get_src_path(node["src"])
+
+        # key value attributes
         attributes: List[str] = [
             '{k} = "{v}"'.format(k=k, v=node[k])
             for k in [
@@ -113,13 +117,10 @@ class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
                 "width",
                 "poster",
                 "preload",
+                "src",
             ]
             if k in node
         ]
-
-        if "src" in node:
-            uri = self._get_src_path(node["src"])
-            attributes.append('src = "{}"'.format(uri))
 
         # boolean attributes
         attributes.extend(
@@ -135,7 +136,7 @@ class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
                     "playsinline",
                     "muted",
                 ]
-                if k in node
+                if k in node and node[k]  # value is truthy
             ]
         )
         self.body.append("<video {}>\n".format(" ".join(attributes)))

@@ -110,9 +110,18 @@ Applying {{perpendicular}} to two lines
 The equal constraint is used to constrain the lengths of lines or the radius of arcs/circles to be the same. The available modes are:
 * Two lines - the length of each line becomes the same.
 
-* Two circles or arcs - the radius of each circle or arc becomes the same.
+:::{animation} EqualLineScene.mp4
+:autoplay:
+Applying {{equal}} to lines
+:::
 
-:::{tip} Equal {{equal}} may be applied to multiple entities at once by selecting multiple entities before clicking {{equal}}.
+* Two circles or arcs - the radius of each circle or arc becomes the same.
+<!-- :::{animation} EqualCircleScene.mp4
+:autoplay:
+Applying {{equal}} to circles and arcs
+::: -->
+
+:::{tip} Equal {{equal}} may be applied to multiple entities at once by preselecting multiple entities before clicking {{equal}}.
 :::
 
 ## {{midpoint_title}}
@@ -138,11 +147,4 @@ The concentric constraint makes circular entities share the same center point. T
 
 * A point and a circle - the point becomes coincident to the center of the circle.
 
-<!-- # Appendix
-## Miscellaneous Behaviors
-This section documents additional niche behaviors which are not generally applicable to standard use.
-
-## {{concentric_title}}
-* Two points - the points become coincident.
-
-## Additional Examples -->
+<!-- * Two points - the points become coincident. -->
