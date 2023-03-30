@@ -112,7 +112,7 @@ The equal constraint is used to constrain the lengths of lines or the radius of 
 
 * Two circles or arcs - the radius of each circle or arc becomes the same.
 
-:::{tip} Equal {{equal}} may be applied to multiple entities at once by selecting entities before clicking {{equal}}.
+:::{tip} Equal {{equal}} may be applied to multiple entities at once by selecting multiple entities before clicking {{equal}}.
 :::
 
 ## {{midpoint_title}}

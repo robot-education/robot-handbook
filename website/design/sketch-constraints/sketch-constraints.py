@@ -56,7 +56,7 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
 
         self.run_group(
             move_line.click_start(),
-            circle.click_circle(),
+            circle.click(),
             move_line.transform(point, sketch.LineEnd.START),
         )
 
@@ -68,7 +68,7 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
 
         self.run_group(
             move_line.click_end(),
-            line.click_line(),
+            line.click(),
             move_line.transform(point, sketch.LineEnd.END),
         )
 
@@ -89,8 +89,8 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
 
     def construct(self) -> None:
         self.run_group(
-            self._start_line.click_line(),
-            self._fixed_line.click_line(),
+            self._start_line.click(),
+            self._fixed_line.click(),
             mn.Rotate(
                 self._start_line,
                 angle=-self._angle,
@@ -116,7 +116,7 @@ class VerticalLineScene(sketch_scene.SketchScene):
         self.introduce(start_line)
 
         self.run_group(
-            start_line.click_line(),
+            start_line.click(),
             mn.Rotate(start_line, angle=angle),
         )
 
@@ -128,7 +128,7 @@ class HorizontalLineScene(sketch_scene.SketchScene):
         self.introduce(start_line)
 
         self.run_group(
-            start_line.click_line(),
+            start_line.click(),
             mn.Rotate(start_line, angle=angle),
         )
 
@@ -219,8 +219,8 @@ class ParallelScene(sketch_scene.SketchScene):
     def construct(self):
         self.introduce(self._line, self._start_line)
         self.run_group(
-            self._start_line.click_line(),
-            self._line.click_line(),
+            self._start_line.click(),
+            self._line.click(),
             mn.Rotate(self._start_line, self._angle, about_point=self._mid_point),  # type: ignore
         )
 
@@ -237,13 +237,56 @@ class PerpendicularScene(sketch_scene.SketchScene):
             rotation_point + perpendicular_direction * 1,
             rotation_point + perpendicular_direction * 5.25,
         )
-
         angle = math.radians(45)
+
+        # move to start position
         start_line = end_line.rotate(-angle, about_point=rotation_point)  # type: ignore
 
         self.introduce(start_line, line)
         self.run_group(
-            start_line.click_line(),
-            line.click_line(),
+            start_line.click(),
+            line.click(),
+            # rotate to end position
             mn.Rotate(start_line, angle, about_point=rotation_point),  # type: ignore
         )
+
+
+def centered_line(line: sketch.SketchLine, length: float) -> sketch.SketchLine:
+    """Returns a line centered on the given line with the specified length."""
+    center = (line.get_start() + line.get_end()) / 2
+    offset = line.get_direction() * length / 2
+    return sketch_factory.make_line(center - offset, center + offset)
+
+
+class EqualLineScene(sketch_scene.SketchScene):
+    def construct(self):
+        base = sketch_factory.make_line(
+            vector.point_2d(-5.5, -1.5), vector.point_2d(-1.25, 2)
+        )
+        first = sketch_factory.make_line(
+            vector.point_2d(-5, -3), vector.point_2d(5, -1)
+        )
+        second = sketch_factory.make_line(
+            vector.point_2d(-0.5, 2.75), vector.point_2d(6, 0.5)
+        )
+
+        length = base.get_length()
+
+        self.introduce(base, first, second)
+        self.run_group(
+            base.click(),
+            first.click(),
+            mn.Transform(first, centered_line(first, length)),
+        )
+
+        self.run_group(
+            base.click(),
+            second.click(),
+            mn.Transform(second, centered_line(second, length)),
+        )
+
+
+# class EqualCircleScene(sketch_scene.SketchScene):
+#     def construct(self):
+#         first = sketch_factory.make_circle(vector.point_2d(-4, 1), 4.5 / 2)
+#         base = sketch_factory.make_circle(vector.point_2d(0, -1.5), 1.5)

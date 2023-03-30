@@ -125,3 +125,11 @@ The following admonitions should not be used:
 - `attention`: `attention` is too similar to `warning` and `important`.
 - `caution`: `caution` is too similar to `warning`, `danger`, and `important`.
 - `error`: `error`'s use case is too niche to justify using it.
+
+
+
+### Manim Bugs
+mn.Arc's start_angle is typed as int, not float
+Sequence[float], np.ndarray, and sometimes Sequence[float] | np.ndarray are used somewhat interchangably
+mn.Color seems to be unhappy with literal strings from time to time
+np.float64 is returned by coords (somewhat arbitrarily)
