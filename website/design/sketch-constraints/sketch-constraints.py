@@ -301,3 +301,5 @@ class EqualCircleScene(sketch_scene.SketchScene):
         self.run_group(
             base.click(), arc.click(), arc.animate.set_radius(1.5)
         )
+
+        self.play(mn.Rotate(arc.start_vertex, angle=2 * mn.PI, about_point=arc.get_center()), run_time=5) # type: ignore

@@ -46,9 +46,8 @@ class Sketch(mn.VGroup, ABC):
 
 class SketchCircleBase(Sketch, ABC):
     # type as mn.Arc since a circle is just an arc
-    def __init__(self, *, circle: mn.Arc, center_vertex: mn.Dot, **kwargs):
-        Sketch.__init__(self)
-        self.add(circle, center_vertex)
+    def __init__(self, circle: mn.Arc, center_vertex: mn.Dot):
+        Sketch.__init__(self, circle, center_vertex)
         self.circle = circle
         self.center_vertex = center_vertex
 
@@ -62,16 +61,7 @@ class SketchCircleBase(Sketch, ABC):
         return self.circle.radius
 
     def set_radius(self, radius: float) -> Self:
-        # Changing the size of the radius doesn't change the size of the circle
-        scale_factor = radius / self.circle.radius
-        point = self.center_vertex.get_center()
-        print(point)
-        print(self.get_center())
-        print(super().get_center())
-        self.circle.apply_points_function_about_point(
-            lambda point: scale_factor * point, about_point=point
-        )
-        # self.circle.scale(radius / self.circle.radius, about_point=self.get_center())
+        self.circle.scale(radius / self.circle.radius, about_point=self.get_center())
         return self
 
     def click_center(self) -> mn.Animation:
@@ -105,11 +95,8 @@ class SketchEdgeBase(Sketch, ABC):
     A class defining Sketch entity which has an edge with two end vertices.
     """
 
-    def __init__(
-        self, *, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot, **kwargs
-    ):
-        Sketch.__init__(self)
-        self.add(edge, start_vertex, end_vertex)
+    def __init__(self, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot):
+        Sketch.__init__(self, edge, start_vertex, end_vertex)
         self._edge = edge
         self.start_vertex = start_vertex
         self.end_vertex = end_vertex
@@ -124,9 +111,15 @@ class SketchEdgeBase(Sketch, ABC):
         return self.get_vertex(line_end).get_center()
 
     def get_start(self) -> vector.Point2d:
+        """
+        Returns the start point of the line.
+        """
         return self.get_point(LineEnd.START)
 
     def get_end(self) -> vector.Point2d:
+        """
+        Returns the end point of the line.
+        """
         return self.get_point(LineEnd.END)
 
     def click_vertex(self, line_end: LineEnd) -> mn.Animation:
@@ -159,8 +152,7 @@ class SketchEdgeBase(Sketch, ABC):
 
 
 class SketchCircle(SketchCircleBase):
-    def __init__(self, circle: mn.Circle, center_vertex: mn.Dot) -> None:
-        super().__init__(circle=circle, center_vertex=center_vertex)
+    pass
 
 
 class SketchPoint(Sketch):
@@ -177,7 +169,7 @@ class SketchPoint(Sketch):
 
 class SketchLine(SketchEdgeBase):
     def __init__(self, line: mn.Line, start_vertex: mn.Dot, end_vertex: mn.Dot) -> None:
-        super().__init__(edge=line, start_vertex=start_vertex, end_vertex=end_vertex)
+        super().__init__(line, start_vertex, end_vertex)
         self.line = line
 
     def set_position(self, new_point: vector.Point2d, line_end: LineEnd) -> Self:
@@ -227,27 +219,18 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         end_vertex: mn.Dot,
         center_vertex: mn.Dot,
     ) -> None:
-        SketchCircleBase.__init__(
-            self,
-            circle=arc,
-            center_vertex=center_vertex,
-        )
-        SketchEdgeBase.__init__(
-            self,
-            edge=arc,
-            start_vertex=start_vertex,
-            end_vertex=end_vertex,
-        )
+        SketchCircleBase.__init__(self, arc, center_vertex)
+        SketchEdgeBase.__init__(self, arc, start_vertex, end_vertex)
         self.arc = arc
 
     def set_radius(self, radius: float) -> Self:
-        center = SketchCircleBase.get_center(self)  # self.get_center()
-        self.start_vertex.move_to(
-            center + vector.normalize(SketchEdgeBase.get_start(self) - center) * radius
-        )
-        self.end_vertex.move_to(
-            center + vector.normalize(SketchEdgeBase.get_end(self) - center) * radius
-        )
+        # center = self.get_center()  # self.get_center()
+        # self.start_vertex.move_to(
+        #     center + vector.normalize(self.get_start() - center) * radius
+        # )
+        # self.end_vertex.move_to(
+        #     center + vector.normalize(self.get_end() - center) * radius
+        # )
         SketchCircleBase.set_radius(self, radius)
         return self
 

@@ -140,7 +140,6 @@ The tangent constraint is used to make lines tangent to a circle or arc. A line 
 
 * Two circles or arcs - The circles or arcs become tangent to one another.
 
-
 ## {{concentric_title}}
 The concentric constraint makes circular entities share the same center point. The available modes are:
 * Two circles or arcs - the circles or arcs share the same center point.
