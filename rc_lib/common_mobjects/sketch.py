@@ -65,7 +65,12 @@ class SketchCircleBase(Sketch, ABC):
         # Changing the size of the radius doesn't change the size of the circle
         scale_factor = radius / self.circle.radius
         point = self.center_vertex.get_center()
-        self.circle.apply_points_function_about_point(lambda points: scale_factor * points, about_point=point)
+        print(point)
+        print(self.get_center())
+        print(super().get_center())
+        self.circle.apply_points_function_about_point(
+            lambda point: scale_factor * point, about_point=point
+        )
         # self.circle.scale(radius / self.circle.radius, about_point=self.get_center())
         return self
 
@@ -236,7 +241,7 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         self.arc = arc
 
     def set_radius(self, radius: float) -> Self:
-        center = self.get_center() # SketchCircleBase.get_center(self)
+        center = SketchCircleBase.get_center(self)  # self.get_center()
         self.start_vertex.move_to(
             center + vector.normalize(SketchEdgeBase.get_start(self) - center) * radius
         )
