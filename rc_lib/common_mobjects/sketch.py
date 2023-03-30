@@ -6,7 +6,6 @@ whereas a point is a piece of data.
 from typing import cast, Sequence, Self
 from abc import ABC, abstractmethod
 import enum
-import math
 
 import manim as mn
 
@@ -32,65 +31,55 @@ def click(mobject: mn.VMobject) -> mn.Animation:
 
 class Sketch(mn.VGroup, ABC):
     """
-    An abstract base class for Sketch entities.
-    """
+    An abstract base class for Sketch entities."""
 
     @abstractmethod
     def click(self) -> mn.Animation:
         raise NotImplementedError
 
-    @abstractmethod
-    def create(self) -> mn.Animation:
+    def _create_override(self, **kwargs) -> mn.Animation:
         raise NotImplementedError
 
-    @abstractmethod
-    def uncreate(self) -> mn.Animation:
+    def _uncreate_override(self, **kwargs) -> mn.Animation:
         raise NotImplementedError
 
 
-class SketchCircle(Sketch):
-    def __init__(self, circle: mn.Circle, vertex: mn.Dot) -> None:
+class SketchCircleBase(Sketch, ABC):
+    def __init__(self, *, circle: mn.Arc, center_vertex: mn.Dot, **kwargs):
+        super().__init__(**kwargs)
+        self.add(circle, center_vertex)
         self.circle = circle
-        self.vertex = vertex
-        super().__init__(self.circle, self.vertex)
+        self.center_vertex = center_vertex
+
+    def get_center(self) -> vector.Point2d:
+        return self.center_vertex.get_center()
 
     def get_radius(self) -> float:
         return self.circle.radius
 
+    def set_radius(self, radius: float) -> Self:
+        self.circle.radius = radius
+        return self
+
     def click_center(self) -> mn.Animation:
-        return click(self.vertex)
+        return click(self.center_vertex)
 
     def click(self) -> mn.Animation:
         return click(self.circle)
 
-    def create(self) -> mn.Animation:
+    @mn.override_animation(mn.Create)
+    def _create_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            mn.Create(self.vertex, run_time=0), mn.GrowFromCenter(self.circle)
+            mn.Create(self.center_vertex, run_time=0),
+            mn.GrowFromCenter(self.circle, **kwargs),
         )
 
-    def uncreate(self) -> mn.Animation:
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            animation.ShrinkToCenter(self.circle),
-            mn.Uncreate(self.vertex, run_time=0),
+            animation.ShrinkToCenter(self.circle, **kwargs),
+            mn.Uncreate(self.center_vertex, run_time=0),
         )
-
-
-class SketchPoint(Sketch):
-    def __init__(self, vertex: mn.Dot) -> None:
-        self.vertex = vertex
-        super().__init__(self.get_point)
-
-    def get_point(self) -> vector.Vector2d:
-        return self.get_center()
-
-    def click(self) -> mn.Animation:
-        return click(self.vertex)
-
-    def create(self) -> mn.Animation:
-        return mn.Create(self)
-
-    def uncreate(self) -> mn.Animation:
-        return mn.Uncreate(self)
 
 
 class LineEnd(enum.IntEnum):
@@ -98,20 +87,17 @@ class LineEnd(enum.IntEnum):
     END = 1
 
 
-class SketchEdge(Sketch, ABC):
+class SketchEdgeBase(Sketch, ABC):
     """
     A class defining Sketch entity which has an edge with two end vertices.
     """
 
     def __init__(
-        self,
-        edge: mn.VMobject,
-        start_vertex: mn.Dot,
-        end_vertex: mn.Dot,
-        *mobjects: mn.VMobject
+        self, *, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot, **kwargs
     ):
-        super().__init__(edge, start_vertex, end_vertex, *mobjects)
-        self.edge = edge
+        super().__init__(**kwargs)
+        self.add(edge, start_vertex, end_vertex)
+        self._edge = edge
         self.start_vertex = start_vertex
         self.end_vertex = end_vertex
 
@@ -140,12 +126,45 @@ class SketchEdge(Sketch, ABC):
         return self.click_vertex(LineEnd.END)
 
     def click(self) -> mn.Animation:
-        return click(self.edge)
+        return click(self._edge)
+
+    @mn.override_animation(mn.Create)
+    def _create_override(self, **kwargs) -> mn.Animation:
+        return mn.Succession(
+            mn.Create(self.start_vertex, run_time=0),
+            mn.Create(self._edge, **kwargs),
+            mn.Create(self.end_vertex, run_time=0),
+        )
+
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self, **kwargs) -> mn.Animation:
+        return mn.Succession(
+            mn.Uncreate(self.end_vertex, run_time=0),
+            mn.Uncreate(self._edge, **kwargs),
+            mn.Uncreate(self.start_vertex, run_time=0),
+        )
 
 
-class SketchLine(SketchEdge):
+class SketchCircle(SketchCircleBase):
+    def __init__(self, circle: mn.Circle, center_vertex: mn.Dot) -> None:
+        super().__init__(circle=circle, center_vertex=center_vertex)
+
+
+class SketchPoint(Sketch):
+    def __init__(self, vertex: mn.Dot) -> None:
+        self.vertex = vertex
+        super().__init__(self.get_point)
+
+    def get_point(self) -> vector.Vector2d:
+        return self.get_center()
+
+    def click(self) -> mn.Animation:
+        return click(self.vertex)
+
+
+class SketchLine(SketchEdgeBase):
     def __init__(self, line: mn.Line, start_vertex: mn.Dot, end_vertex: mn.Dot) -> None:
-        super().__init__(line, start_vertex, end_vertex)
+        super().__init__(edge=line, start_vertex=start_vertex, end_vertex=end_vertex)
         self.line = line
 
     def set_position(self, new_point: vector.Point2d, line_end: LineEnd) -> Self:
@@ -167,20 +186,6 @@ class SketchLine(SketchEdge):
     def get_direction(self) -> vector.Direction2d:
         return vector.normalize(self.get_end() - self.get_start())
 
-    def create(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Create(self.start_vertex, run_time=0),
-            mn.Create(self.edge),
-            mn.Create(self.end_vertex, run_time=0),
-        )
-
-    def uncreate(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Uncreate(self.end_vertex, run_time=0),
-            mn.Uncreate(self.edge),
-            mn.Uncreate(self.start_vertex, run_time=0),
-        )
-
     def transform(
         self, new_point: vector.Point2d, line_end: LineEnd, **kwargs
     ) -> mn.Animation:
@@ -193,7 +198,8 @@ class SketchLine(SketchEdge):
         )
 
 
-class SketchArc(SketchEdge):
+# CircleBase first to access methods first
+class SketchArc(SketchCircleBase, SketchEdgeBase):
     def __init__(
         self,
         arc: mn.Arc,
@@ -201,31 +207,43 @@ class SketchArc(SketchEdge):
         end_vertex: mn.Dot,
         center_vertex: mn.Dot,
     ) -> None:
-        super().__init__(arc, start_vertex, end_vertex, center_vertex)
+        super().__init__(
+            edge=arc,
+            start_vertex=start_vertex,
+            end_vertex=end_vertex,
+            circle=arc,
+            center_vertex=center_vertex,
+        )
         self.arc = arc
-        self.center_vertex = center_vertex
 
-    def get_radius(self) -> float:
-        return self.arc.radius
+    def set_radius(self, radius: float) -> Self:
+        super().set_radius(radius)
+        self.start_vertex.move_to(
+            vector.norm(self.get_start() - self.get_center())
+            * (self.get_radius() - radius)
+        )
+        self.end_vertex.move_to(
+            vector.norm(self.get_end() - self.get_center())
+            * (self.get_radius() - radius)
+        )
+        return self
 
-    def get_center(self) -> vector.Point2d:
-        # there's also self.arc.get_arc_center(), but this is defined for even parallel case
-        return self.center_vertex.get_center()
-
-    def create(self) -> mn.Animation:
+    @mn.override_animation(mn.Create)
+    def _create_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            mn.Create(self.center_vertex, run_time=0),
-            mn.GrowFromCenter(self.arc),
+            # mn.Create(self.center_vertex, run_time=0),
+            # mn.GrowFromCenter(self.arc),
+            super()._create_override(**kwargs),
             mn.Create(self.start_vertex, run_time=0),
             mn.Create(self.end_vertex, run_time=0),
         )
 
-    def uncreate(self) -> mn.Animation:
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
             mn.Uncreate(self.start_vertex, run_time=0),
             mn.Uncreate(self.end_vertex, run_time=0),
-            animation.ShrinkToCenter(self.arc),
-            mn.Uncreate(self.center_vertex, run_time=0),
+            super()._uncreate_override(**kwargs),
         )
 
 
@@ -258,7 +276,7 @@ class SketchFactory:
         return mn.Dot(center, color=self._color)
 
     def make_arc(
-        self, start_angle: float, angle: float, center: vector.Point2d, radius: float
+        self, center: vector.Point2d, radius: float, start_angle: float, angle: float
     ) -> SketchArc:
         # start_angle is typed as int, not float (for some reason...)
         arc = mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color).move_to(center)  # type: ignore

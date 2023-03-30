@@ -232,7 +232,7 @@ class PerpendicularScene(sketch_scene.SketchScene):
         )
         direction = line.get_direction()
         rotation_point = line.get_start() + direction * 2
-        perpendicular_direction = vector.direction_2d(-direction[1], direction[0])
+        perpendicular_direction = vector.direction_2d(-direction[1], direction[0]) # type: ignore
         end_line = sketch_factory.make_line(
             rotation_point + perpendicular_direction * 1,
             rotation_point + perpendicular_direction * 5.25,
@@ -286,7 +286,20 @@ class EqualLineScene(sketch_scene.SketchScene):
         )
 
 
-# class EqualCircleScene(sketch_scene.SketchScene):
-#     def construct(self):
-#         first = sketch_factory.make_circle(vector.point_2d(-4, 1), 4.5 / 2)
-#         base = sketch_factory.make_circle(vector.point_2d(0, -1.5), 1.5)
+class EqualCircleScene(sketch_scene.SketchScene):
+    def construct(self):
+        circle = sketch_factory.make_circle(vector.point_2d(-4, 1), 2)
+        base = sketch_factory.make_circle(vector.point_2d(0, -1.5), 1.5)
+        arc = sketch_factory.make_arc(
+            vector.point_2d(4, 1), 2, math.radians(90), math.radians(-225)
+        )
+
+        self.introduce(base, arc, circle)
+        self.run_group(
+            base.click(), circle.click(), 
+            circle.animate.set_radius(1.5) # type: ignore
+        )
+        self.run_group(
+            base.click(), arc.click(),
+            arc.animate.set_radius(1.5) # type: ignore
+        )

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterable, List
+from typing import Any, Iterable, List
 import manim as mn
 
 from rc_lib.common_mobjects import sketch
@@ -22,11 +22,13 @@ class SketchScene(mn.Scene, ABC):
         self._static_mobjects = mobjects
 
         self.play(
-            mn.AnimationGroup(*[mobject.create() for mobject in self._static_mobjects])
+            mn.AnimationGroup(
+                *[mn.Create(mobject) for mobject in self._static_mobjects]
+            )
         )
         self.wait(self.CONSTRAINT_DELAY)
 
-    def run_group(self, *animation: mn.Animation):
+    def run_group(self, *animation: mn.Animation | Any):
         self.play(mn.Succession(*animation))
         self.wait(self.CONSTRAINT_DELAY)
 
@@ -35,7 +37,7 @@ class SketchScene(mn.Scene, ABC):
 
         self.play(
             mn.AnimationGroup(
-                *[mobject.uncreate() for mobject in self._static_mobjects]
+                *[mn.Uncreate(mobject) for mobject in self._static_mobjects]
             )
         )
         self.wait(self.CONSTRAINT_DELAY * 1.5)

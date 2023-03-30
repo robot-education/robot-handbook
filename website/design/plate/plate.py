@@ -135,7 +135,7 @@ class BoundaryConstraintScene(mn.Scene):
 
     def construct(self):
         self.play(title.next("Create line"))
-        self.play(self._line.create())
+        self.play(mn.Create(self._line))
 
         self.play(title.next("Add coincident constraints"))
         self.do_coincident_move(sketch.LineEnd.START)
