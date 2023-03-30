@@ -33,13 +33,13 @@ class CoincidentPointToPointScene(sketch_scene.SketchScene):
         self.run_group(
             move_line.click_start(),
             circle.click_center(),
-            move_line.transform(circle.get_center(), sketch.LineEnd.START),
+            move_line.animate.set_position(circle.get_center(), sketch.LineEnd.START),
         )
 
         self.run_group(
             move_line.click_end(),
             line.click_end(),
-            move_line.transform(line.get_end(), sketch.LineEnd.END),
+            move_line.animate.set_position(line.get_end(), sketch.LineEnd.END),
         )
 
 
@@ -148,7 +148,7 @@ class VerticalPointsScene(sketch_scene.SketchScene):
         self.run_group(
             self._move_line.click_start(),
             self._circle.click_center(),
-            self._move_line.transform(
+            self._move_line.animate.set_position(
                 vector.point_2d(
                     self._circle.get_center()[0], self._move_line.get_start()[1]
                 ),
@@ -159,10 +159,10 @@ class VerticalPointsScene(sketch_scene.SketchScene):
         self.run_group(
             self._move_line.click_end(),
             self._line.click_end(),
-            self._move_line.transform(
+            self._move_line.animate.set_position(
                 vector.point_2d(self._line.get_end()[0], self._move_line.get_end()[1]),
                 sketch.LineEnd.END,
-            ),
+            )
         )
 
 
@@ -181,7 +181,7 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
         self.run_group(
             self._move_line.click_start(),
             self._line.click_end(),
-            self._move_line.transform(
+            self._move_line.animate.set_position(
                 vector.point_2d(
                     self._move_line.get_start()[0], self._line.get_end()[1]
                 ),
@@ -192,7 +192,7 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
         self.run_group(
             self._move_line.click_end(),
             self._circle.click_center(),
-            self._move_line.transform(
+            self._move_line.animate.set_position(
                 vector.point_2d(
                     self._move_line.get_end()[0],
                     self._circle.get_center()[1],
@@ -232,7 +232,7 @@ class PerpendicularScene(sketch_scene.SketchScene):
         )
         direction = line.get_direction()
         rotation_point = line.get_start() + direction * 2
-        perpendicular_direction = vector.direction_2d(-direction[1], direction[0]) # type: ignore
+        perpendicular_direction = vector.direction_2d(-direction[1], direction[0])  # type: ignore
         end_line = sketch_factory.make_line(
             rotation_point + perpendicular_direction * 1,
             rotation_point + perpendicular_direction * 5.25,
@@ -296,10 +296,8 @@ class EqualCircleScene(sketch_scene.SketchScene):
 
         self.introduce(base, arc, circle)
         self.run_group(
-            base.click(), circle.click(), 
-            circle.animate.set_radius(1.5) # type: ignore
+            base.click(), circle.click(), circle.animate.set_radius(1.5)  # type: ignore
         )
         self.run_group(
-            base.click(), arc.click(),
-            arc.animate.set_radius(1.5) # type: ignore
+            base.click(), arc.click(), arc.animate.set_radius(1.5)  # type: ignore
         )

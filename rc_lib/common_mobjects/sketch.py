@@ -45,6 +45,7 @@ class Sketch(mn.VGroup, ABC):
 
 
 class SketchCircleBase(Sketch, ABC):
+    # type as mn.Arc since a circle is just an arc
     def __init__(self, *, circle: mn.Arc, center_vertex: mn.Dot, **kwargs):
         super().__init__(**kwargs)
         self.add(circle, center_vertex)
@@ -58,7 +59,10 @@ class SketchCircleBase(Sketch, ABC):
         return self.circle.radius
 
     def set_radius(self, radius: float) -> Self:
-        self.circle.radius = radius
+        # Changing the size of the radius doesn't change the size of the circle
+        self.circle = mn.Circle(radius, color=self.circle.get_color()).move_to(
+            self.circle.get_center()
+        )
         return self
 
     def click_center(self) -> mn.Animation:
@@ -180,6 +184,14 @@ class SketchLine(SketchEdgeBase):
         self.get_vertex(line_end).move_to(new_point)
         return self
 
+    @mn.override_animate(set_position)
+    def _set_position_animation(
+        self, new_point: vector.Point2d, line_end: LineEnd, anim_args={}
+    ) -> mn.Animation:
+        return mn.Transform(
+            self, self.copy().set_position(new_point, line_end), **anim_args
+        )
+
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
 
@@ -219,12 +231,10 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
     def set_radius(self, radius: float) -> Self:
         super().set_radius(radius)
         self.start_vertex.move_to(
-            vector.norm(self.get_start() - self.get_center())
-            * (self.get_radius() - radius)
+            vector.norm(self.get_start() - self.get_center()) * radius
         )
         self.end_vertex.move_to(
-            vector.norm(self.get_end() - self.get_center())
-            * (self.get_radius() - radius)
+            vector.norm(self.get_end() - self.get_center()) * radius
         )
         return self
 
