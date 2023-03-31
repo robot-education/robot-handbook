@@ -58,9 +58,15 @@ def point_3d(x: float, y: float, z: float) -> Point3d:
     """A constructor for a 3D point."""
     return np.array([x, y, z])
 
+
+def direction(from_point: Point, to_point: Point) -> Direction:
+    return normalize(to_point - from_point)
+
+
 def direction_2d(x: float, y: float) -> Direction2d:
     """A constructor for a 2D direction."""
     return normalize(np.array([x, y, 0]))
+
 
 def direction_3d(x: float, y: float, z: float) -> Direction3d:
     """A constructor for a 3D direction."""

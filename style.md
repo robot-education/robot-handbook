@@ -133,3 +133,4 @@ mn.Arc's start_angle is typed as int, not float
 Sequence[float], np.ndarray, and sometimes Sequence[float] | np.ndarray are used somewhat interchangably
 mn.Color seems to be unhappy with literal strings from time to time
 np.float64 is returned by coords (somewhat arbitrarily)
+GrowFromCenter, GrowFromPoint colors typed as str, not Color and missing | None

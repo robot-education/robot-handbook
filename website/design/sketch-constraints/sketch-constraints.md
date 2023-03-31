@@ -30,7 +30,7 @@ The coincident constraint is used to make points touch other entities. The avail
 * Two points - the points become touching.
 :::{animation} CoincidentPointToPointScene.mp4
 :autoplay:
-Applying {{coincident}} to two points
+Applying {{coincident}} to points
 :::
 
 * A point and a line, circle or arc - the point becomes inline with the path of the line, circle, or arc.
@@ -47,7 +47,7 @@ Applying {{coincident}} to a point and a line or circle
 
 :::{animation} CoincidentLineToLineScene.mp4
 :autoplay:
-Applying {{coincident}} to two lines
+Applying {{coincident}} to lines
 :::
 
 ## {{vertical_title}}
@@ -116,10 +116,11 @@ Applying {{equal}} to lines
 :::
 
 * Two circles or arcs - the radius of each circle or arc becomes the same.
-<!-- :::{animation} EqualCircleScene.mp4
+
+:::{animation} EqualCircleScene.mp4
 :autoplay:
 Applying {{equal}} to circles and arcs
-::: -->
+:::
 
 :::{tip} Equal {{equal}} may be applied to multiple entities at once by preselecting multiple entities before clicking {{equal}}.
 :::
@@ -128,7 +129,17 @@ Applying {{equal}} to circles and arcs
 The midpoint constraint is used constrain points to lie along the center of a line or between two other points. The available modes are:
 * A point and a line - the point is placed in the middle of the line.
 
+:::{animation} MidpointLineScene.mp4
+:autoplay:
+Applying {{midpoint}} to points and lines
+:::
+
 * Three points - the middle point is centered between the other two points.
+
+:::{animation} MidpointPointScene.mp4
+:autoplay:
+Applying {{midpoint}} to points
+:::
 
 :::{tip} The order of selection does not matter, only the relative position of the points prior to midpoint {{midpoint}} being added.
 :::
@@ -138,12 +149,32 @@ The midpoint constraint is used constrain points to lie along the center of a li
 The tangent constraint is used to make lines tangent to a circle or arc. A line is tangent when its edge touches the circle at a single point. The available modes are:
 * A line and a circle or arc - the line becomes tangent to the circle or arc.
 
+:::{animation} TangentLineScene.mp4
+:autoplay:
+Applying {{tangent}} to lines and a circle
+:::
+
 * Two circles or arcs - The circles or arcs become tangent to one another.
+
+:::{animation} TangentCircleScene.mp4
+:autoplay:
+Applying {{tangent}} to circles and arcs
+:::
 
 ## {{concentric_title}}
 The concentric constraint makes circular entities share the same center point. The available modes are:
-* Two circles or arcs - the circles or arcs share the same center point.
+* Two circles or arcs - the centers of the circles or arcs become coincident.
 
-* A point and a circle - the point becomes coincident to the center of the circle.
+:::{animation} ConcentricEdgeScene.mp4
+:autoplay:
+Applying {{concentric}} to circles and arcs
+:::
+
+* A point and a circle or arc - the point becomes coincident to the center of the circle or arc.
+
+:::{animation} ConcentricPointScene.mp4
+:autoplay:
+Applying {{concentric}} to points
+:::
 
 <!-- * Two points - the points become coincident. -->

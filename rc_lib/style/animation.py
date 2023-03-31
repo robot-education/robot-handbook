@@ -1,19 +1,23 @@
 """
-    Style elements intrinsically linked with animation, such as timing.
+Style elements intrinsically linked with animation, such as timing.
 """
 import manim as mn
-
+import numpy as np
+from rc_lib.style import color
+from rc_lib.math_utils import vector
 
 END_DELAY = 2.5
 
 
-class ShrinkToCenter(mn.Transform):
-    """Remove an :class:`~.Mobject` by shrinking it to a point."""
-
+class ShrinkToPoint(mn.Transform):
     def __init__(
-        self, mobject: mn.Mobject, point_color: str | None = None, **kwargs
+        self,
+        mobject: mn.Mobject,
+        point: vector.Point2d,
+        point_color: color.Color | None = None,
+        **kwargs
     ) -> None:
-        self.point = mobject.get_center()
+        self.point = point
         self.point_color = point_color
         super().__init__(
             mobject,
@@ -28,8 +32,18 @@ class ShrinkToCenter(mn.Transform):
 
     def create_starting_mobject(self) -> mn.Mobject:
         start = super().create_starting_mobject()
-        start.scale(0)
-        start.move_to(self.point)
+        start.scale(0).move_to(self.point)
         if self.point_color:
             start.set_color(self.point_color)  # type: ignore
         return start
+
+
+class ShrinkToCenter(ShrinkToPoint):
+    """Remove an :class:`~.Mobject` by shrinking it to a point."""
+
+    def __init__(
+        self, mobject: mn.Mobject, point_color: color.Color | None = None, **kwargs
+    ) -> None:
+        super().__init__(
+            mobject, point=mobject.get_center(), point_color=point_color, **kwargs
+        )

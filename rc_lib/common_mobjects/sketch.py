@@ -47,7 +47,8 @@ class Sketch(mn.VGroup, ABC):
 class SketchCircleBase(Sketch, ABC):
     # type as mn.Arc since a circle is just an arc
     def __init__(self, circle: mn.Arc, center_vertex: mn.Dot):
-        Sketch.__init__(self, circle, center_vertex)
+        Sketch.__init__(self)
+        self.add(circle, center_vertex)
         self.circle = circle
         self.center_vertex = center_vertex
 
@@ -74,13 +75,14 @@ class SketchCircleBase(Sketch, ABC):
     def _create_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.center_vertex, run_time=0),
-            mn.GrowFromCenter(self.circle, **kwargs),
+            mn.GrowFromPoint(self.circle, point=self.get_center(), **kwargs),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            animation.ShrinkToCenter(self.circle, **kwargs),
+            # self.get_center() is not overridden for self.circle
+            animation.ShrinkToPoint(self.circle, self.get_center(), **kwargs),
             mn.Uncreate(self.center_vertex, run_time=0),
         )
 
@@ -96,7 +98,8 @@ class SketchEdgeBase(Sketch, ABC):
     """
 
     def __init__(self, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot):
-        Sketch.__init__(self, edge, start_vertex, end_vertex)
+        Sketch.__init__(self)
+        self.add(edge, start_vertex, end_vertex)
         self._edge = edge
         self.start_vertex = start_vertex
         self.end_vertex = end_vertex
@@ -224,13 +227,13 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         self.arc = arc
 
     def set_radius(self, radius: float) -> Self:
-        # center = self.get_center()  # self.get_center()
-        # self.start_vertex.move_to(
-        #     center + vector.normalize(self.get_start() - center) * radius
-        # )
-        # self.end_vertex.move_to(
-        #     center + vector.normalize(self.get_end() - center) * radius
-        # )
+        center = self.get_center()
+        self.start_vertex.move_to(
+            center + vector.normalize(self.get_start() - center) * radius
+        )
+        self.end_vertex.move_to(
+            center + vector.normalize(self.get_end() - center) * radius
+        )
         SketchCircleBase.set_radius(self, radius)
         return self
 
@@ -283,7 +286,7 @@ class SketchFactory:
         self, center: vector.Point2d, radius: float, start_angle: float, angle: float
     ) -> SketchArc:
         # start_angle is typed as int, not float (for some reason...)
-        arc = mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color).move_to(center)  # type: ignore
+        arc = mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color, arc_center=center)  # type: ignore
         return SketchArc(
             arc,
             self._make_dot(arc.get_start()),
@@ -291,17 +294,13 @@ class SketchFactory:
             self._make_dot(center),
         )
 
-    def make_arc_from_points(
-        self,
-        center_point: vector.Point2d,
-        start_point: vector.Point2d,
-        end_point: vector.Point2d,
-    ) -> SketchArc:
-        return SketchArc(
-            mn.ArcBetweenPoints(
-                start_point, end_point, radius=vector.norm(start_point - center_point)
-            ),
-            self._make_dot(start_point),
-            self._make_dot(end_point),
-            self._make_dot(center_point),
-        )
+    # def make_arc_from_points(
+    #     self, start_point: vector.Point2d, end_point: vector.Point2d, radius: float
+    # ) -> SketchArc:
+    #     arc = mn.ArcBetweenPoints(start_point, end_point, radius=radius)
+    #     return SketchArc(
+    #         arc,
+    #         self._make_dot(start_point),
+    #         self._make_dot(end_point),
+    #         self._make_dot(arc.get),
+    #     )
