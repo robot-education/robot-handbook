@@ -156,7 +156,7 @@ class BoundaryConstraintScene(mn.Scene):
         circle, point = self.get_vars(line_end, "circle", "point")
         return (
             circle.center()
-            + vector.normalize(point - circle.center()) * circle.outer_radius()
+            + vector.direction(circle.center(), point) * circle.outer_radius()
         )
 
     def do_tangent_move(self, line_end: sketch.LineEnd) -> None:

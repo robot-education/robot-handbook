@@ -50,7 +50,7 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
 
         point = (
             circle.get_center()
-            + vector.direction(move_line.get_start(), circle.get_center())
+            + vector.direction(circle.get_center(), move_line.get_start())
             * circle.get_radius()
         )
 
@@ -106,6 +106,7 @@ def vh_common_line() -> Tuple[sketch.SketchLine, float]:
         ),
         math.radians(45),
     )
+
 
 class VerticalLineScene(sketch_scene.SketchScene):
     def construct(self) -> None:

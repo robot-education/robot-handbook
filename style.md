@@ -134,3 +134,4 @@ Sequence[float], np.ndarray, and sometimes Sequence[float] | np.ndarray are used
 mn.Color seems to be unhappy with literal strings from time to time
 np.float64 is returned by coords (somewhat arbitrarily)
 GrowFromCenter, GrowFromPoint colors typed as str, not Color and missing | None
+AnimationBuilders from .animate are not valid animations?
