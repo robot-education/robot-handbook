@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from typing import Any, Iterable, List
+from abc import ABC
+from typing import Any, Iterable
 import manim as mn
 
 from rc_lib.common_mobjects import sketch

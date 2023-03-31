@@ -1,5 +1,4 @@
 import manim as mn
-from typing import Tuple, List
 import enum
 import math
 import numpy as np
@@ -63,7 +62,7 @@ def color_categories(n_categories: int):
     return order[:n_categories]
 
 
-def _unit_interpolate_colors(colors: List[Color]):
+def _unit_interpolate_colors(colors: list[Color]):
     """
     Returns a function that, when given an float index 0 <= i <= 1, returns
     the interpolated color from the list.
@@ -82,7 +81,7 @@ def _unit_interpolate_colors(colors: List[Color]):
     return get_color
 
 
-def _rebind_scale(f, old_range: Tuple[float, float], new_range: Tuple[float, float]):
+def _rebind_scale(f, old_range: tuple[float, float], new_range: tuple[float, float]):
     """
     Rebinds a single-scalar input function so that it operates identically
     on a new interval.
@@ -118,7 +117,7 @@ def sequential_colors(range=(0, 1)):
     """
 
     # Viridis color scale
-    colors: List[Color] = [
+    colors: list[Color] = [
         "#440154",
         "#414487",
         "#2A788E",
@@ -144,7 +143,7 @@ def divergent_colors(range=(-1, 1)):
     """
 
     # Blue-Orange scale
-    colors: List[Color] = [
+    colors: list[Color] = [
         CategoricalPalette.BLUE,  # negative
         "#EAECCC",  # zero
         CategoricalPalette.RED,  # positive

@@ -1,5 +1,5 @@
 import manim as mn
-from typing import Callable, List, Self, Tuple
+from typing import Callable, Self
 
 from rc_lib.style import color
 from rc_lib.common_mobjects import sketch
@@ -24,7 +24,7 @@ class PlateCircle(mn.VGroup):
 
 def plate_circle_tangent_points(
     start: PlateCircle, end: PlateCircle
-) -> Tuple[vector.Point2d, vector.Point2d]:
+) -> tuple[vector.Point2d, vector.Point2d]:
     return tangent.circle_to_circle_tangent(
         start.center(), start.outer_radius(), end.center(), end.outer_radius()
     )
@@ -77,16 +77,16 @@ class PlateCircleFactory:
 class PlateGroup(mn.VGroup):
     def __init__(
         self,
-        entities: List[PlateCircle],
-        boundary_order: List[int],
+        entities: list[PlateCircle],
+        boundary_order: list[int],
         boundary_color: color.Color = color.FOREGROUND,
     ) -> None:
-        self._entities: List[PlateCircle] = entities
-        self._boundary: List[PlateCircle] = [self._entities[i] for i in boundary_order]
-        self._boundary_lines: List[mn.Line] = self._make_boundary_lines(boundary_color)
+        self._entities: list[PlateCircle] = entities
+        self._boundary: list[PlateCircle] = [self._entities[i] for i in boundary_order]
+        self._boundary_lines: list[mn.Line] = self._make_boundary_lines(boundary_color)
         super().__init__(*[*self._entities, *self._boundary_lines])
 
-    def _make_boundary_lines(self, color: color.Color) -> List[mn.Line]:
+    def _make_boundary_lines(self, color: color.Color) -> list[mn.Line]:
         return [
             plate_circle_tangent_line(self._boundary[i - 1], curr, color)
             for i, curr in enumerate(self._boundary)

@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple, cast
+from typing import Sequence, cast
 import math
 
 import manim as mn
@@ -12,7 +12,7 @@ sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_c
 
 
 def coincident_common_mobjects() -> (
-    Tuple[sketch.SketchCircle, sketch.SketchLine, sketch.SketchLine]
+    tuple[sketch.SketchCircle, sketch.SketchLine, sketch.SketchLine]
 ):
     return (
         sketch_factory.make_circle(vector.point_2d(-4.5, 0), 1.5),
@@ -99,7 +99,7 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
         )
 
 
-def vh_common_line() -> Tuple[sketch.SketchLine, float]:
+def vh_common_line() -> tuple[sketch.SketchLine, float]:
     return (
         sketch_factory.make_line(
             vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3)
@@ -441,7 +441,7 @@ class TangentCircleScene(sketch_scene.SketchScene):
 
 
 def concentric_common() -> (
-    Tuple[sketch.SketchCircle, sketch.SketchCircle, sketch.SketchArc]
+    tuple[sketch.SketchCircle, sketch.SketchCircle, sketch.SketchArc]
 ):
     return (
         sketch_factory.make_circle(mn.ORIGIN, 1.5),

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Any
+from typing import Any
 
 import manim as mn
 from rc_lib.style import color, animation
@@ -28,7 +28,7 @@ class IntakePlateScene(mn.Scene):
         middle_hole: vector.Point2d = vector.point_2d(-1.5, 0.25)
         back_hole: vector.Point2d = vector.point_2d(2.5, 1.5)
 
-        points: List[plate.PlateCircle] = [
+        points: list[plate.PlateCircle] = [
             medium_base(front_hole),
             medium_base(middle_hole),
             medium_base(back_hole),
@@ -37,7 +37,7 @@ class IntakePlateScene(mn.Scene):
             small_base((middle_hole + back_hole) / 2),
             small_base((front_hole + middle_hole) / 2),
         ]
-        boundary_order: List[int] = [1, 3, 4, 0]
+        boundary_order: list[int] = [1, 3, 4, 0]
         self._plate_group: plate.PlateGroup = plate.PlateGroup(
             points, boundary_order, boundary_color=boundary_color
         )
@@ -107,7 +107,7 @@ class BoundaryConstraintScene(mn.Scene):
         self._right: plate.PlateCircle = generator(vector.point_2d(6, -2))
         self.add(self._left, self._right)
 
-        self._tangent_points: Tuple[
+        self._tangent_points: tuple[
             vector.Point2d, vector.Point2d
         ] = plate.plate_circle_tangent_points(self._left, self._right)
 
@@ -120,7 +120,7 @@ class BoundaryConstraintScene(mn.Scene):
 
         title.reset()
 
-    def get_vars(self, line_end: sketch.LineEnd, *keys: str) -> List[Any]:
+    def get_vars(self, line_end: sketch.LineEnd, *keys: str) -> list[Any]:
         return [self._get_var(line_end, key) for key in keys]
 
     def _get_var(self, line_end: sketch.LineEnd, key: str) -> Any:

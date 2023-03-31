@@ -1,7 +1,7 @@
 """
     A collection of semantic aliases for type hinting used throughout the library.
 """
-from typing import cast
+from typing import Sequence, cast
 
 import manim as mn
 import numpy as np
@@ -22,6 +22,20 @@ Direction3d = np.ndarray
 
 # An angle in radians
 Angle = float
+
+
+def to_coords(value: np.ndarray) -> Sequence[float]:
+    """
+    Casts a point to a coordinate Sequence suitable for consumption by manim.
+    """
+    return cast(Sequence[float], value)
+
+
+def from_coords(value: Sequence[float]) -> np.ndarray:
+    """
+    Converts a coordinate Sequence from manim to a point.
+    """
+    return cast(np.ndarray, value)
 
 
 def norm(vector: Point | Vector) -> float:

@@ -2,7 +2,6 @@
 Style elements intrinsically linked with animation, such as timing.
 """
 import manim as mn
-import numpy as np
 from rc_lib.style import color
 from rc_lib.math_utils import vector
 
