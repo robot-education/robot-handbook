@@ -131,14 +131,14 @@ The midpoint constraint is used constrain points to lie along the center of a li
 
 :::{animation} MidpointLineScene.mp4
 :autoplay:
-Applying {{midpoint}} to points and lines
+Applying midpoint {{midpoint}} to points and lines
 :::
 
 * Three points - the middle point is centered between the other two points.
 
 :::{animation} MidpointPointScene.mp4
 :autoplay:
-Applying {{midpoint}} to points
+Applying midpoint {{midpoint}} to points
 :::
 
 :::{tip} The order of selection does not matter, only the relative position of the points prior to midpoint {{midpoint}} being added.
@@ -151,14 +151,14 @@ The tangent constraint is used to make lines tangent to a circle or arc. A line 
 
 :::{animation} TangentLineScene.mp4
 :autoplay:
-Applying {{tangent}} to lines and a circle
+Applying tangent {{tangent}} to lines and a circle
 :::
 
 * Two circles or arcs - The circles or arcs become tangent to one another.
 
 :::{animation} TangentCircleScene.mp4
 :autoplay:
-Applying {{tangent}} to circles and arcs
+Applying tangent {{tangent}} to circles and arcs
 :::
 
 ## {{concentric_title}}
@@ -167,14 +167,14 @@ The concentric constraint makes circular entities share the same center point. T
 
 :::{animation} ConcentricEdgeScene.mp4
 :autoplay:
-Applying {{concentric}} to circles and arcs
+Applying concentric {{concentric}} to circles and arcs
 :::
 
 * A point and a circle or arc - the point becomes coincident to the center of the circle or arc.
 
 :::{animation} ConcentricPointScene.mp4
 :autoplay:
-Applying {{concentric}} to points
+Applying concentric {{concentric}} to points
 :::
 
 <!-- * Two points - the points become coincident. -->

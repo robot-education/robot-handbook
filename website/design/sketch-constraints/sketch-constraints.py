@@ -32,13 +32,13 @@ class CoincidentPointToPointScene(sketch_scene.SketchScene):
         self.run_group(
             move_line.click_start(),
             circle.click_center(),
-            move_line.animate.set_position(circle.get_center(), sketch.LineEnd.START),
+            move_line.animate.move_start(circle.get_center()),
         )
 
         self.run_group(
             move_line.click_end(),
             line.click_end(),
-            move_line.animate.set_position(line.get_end(), sketch.LineEnd.END),
+            move_line.animate.move_end(line.get_end()),
         )
 
 
@@ -56,7 +56,7 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
         self.run_group(
             move_line.click_start(),
             circle.click(),
-            move_line.transform(point, sketch.LineEnd.START),
+            move_line.animate.move_point(point, sketch.LineEnd.START),
         )
 
         point = vector.project_to_line(
@@ -68,7 +68,7 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
         self.run_group(
             move_line.click_end(),
             line.click(),
-            move_line.transform(point, sketch.LineEnd.END),
+            move_line.animate.move_point(point, sketch.LineEnd.END),
         )
 
 
@@ -93,7 +93,7 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
             mn.Rotate(
                 self._start_line,
                 angle=-self._angle,
-                about_point=vector.to_coords(self._fixed_line.get_end()),
+                about_point=self._fixed_line.get_end(),
             ),
         )
 
@@ -147,20 +147,18 @@ class VerticalPointsScene(sketch_scene.SketchScene):
         self.run_group(
             self._move_line.click_start(),
             self._circle.click_center(),
-            self._move_line.animate.set_position(
+            self._move_line.animate.move_start(
                 vector.point_2d(
                     self._circle.get_center()[0], self._move_line.get_start()[1]
-                ),
-                sketch.LineEnd.START,
+                )
             ),
         )
 
         self.run_group(
             self._move_line.click_end(),
             self._line.click_end(),
-            self._move_line.animate.set_position(
-                vector.point_2d(self._line.get_end()[0], self._move_line.get_end()[1]),
-                sketch.LineEnd.END,
+            self._move_line.animate.move_end(
+                vector.point_2d(self._line.get_end()[0], self._move_line.get_end()[1])
             ),
         )
 
@@ -180,23 +178,21 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
         self.run_group(
             self._move_line.click_start(),
             self._line.click_end(),
-            self._move_line.animate.set_position(
+            self._move_line.animate.move_start(
                 vector.point_2d(
                     self._move_line.get_start()[0], self._line.get_end()[1]
-                ),
-                sketch.LineEnd.START,
+                )
             ),
         )
 
         self.run_group(
             self._move_line.click_end(),
             self._circle.click_center(),
-            self._move_line.animate.set_position(
+            self._move_line.animate.move_end(
                 vector.point_2d(
                     self._move_line.get_end()[0],
                     self._circle.get_center()[1],
-                ),
-                sketch.LineEnd.END,
+                )
             ),
         )
 
@@ -213,9 +209,7 @@ class ParallelScene(sketch_scene.SketchScene):
         self._mid_point = (start_point + end_point) / 2
         end_line = sketch_factory.make_line(start_point, end_point)
         self._angle = math.radians(16.26)
-        self._start_line = end_line.rotate(
-            -self._angle, about_point=vector.to_coords(self._mid_point)
-        )
+        self._start_line = end_line.rotate(-self._angle, about_point=self._mid_point)
 
     def construct(self) -> None:
         self.introduce(self._line, self._start_line)
@@ -225,7 +219,7 @@ class ParallelScene(sketch_scene.SketchScene):
             mn.Rotate(
                 self._start_line,
                 self._angle,
-                about_point=vector.to_coords(self._mid_point),
+                about_point=self._mid_point,
             ),
         )
 
@@ -245,16 +239,14 @@ class PerpendicularScene(sketch_scene.SketchScene):
         angle = math.radians(45)
 
         # move to start position
-        start_line = end_line.rotate(
-            -angle, about_point=vector.to_coords(rotation_point)
-        )
+        start_line = end_line.rotate(-angle, about_point=rotation_point)
 
         self.introduce(start_line, line)
         self.run_group(
             start_line.click(),
             line.click(),
             # rotate to end position
-            mn.Rotate(start_line, angle, about_point=vector.to_coords(rotation_point)),
+            mn.Rotate(start_line, angle, about_point=rotation_point),
         )
 
 
@@ -320,12 +312,12 @@ class MidpointLineScene(sketch_scene.SketchScene):
         self.run_group(
             middle.click_start(),
             top.click(),
-            middle.animate.set_position(top.line.get_midpoint(), sketch.LineEnd.START),
+            middle.animate.move_start(top.line.get_midpoint()),
         )
         self.run_group(
             middle.click_end(),
             bottom.click(),
-            middle.animate.set_position(bottom.line.get_midpoint(), sketch.LineEnd.END),
+            middle.animate.move_end(bottom.line.get_midpoint()),
         )
 
 
@@ -347,16 +339,16 @@ class MidpointPointScene(sketch_scene.SketchScene):
             line.click_start(),
             first_line.click_start(),
             circle.click_center(),
-            first_line.animate.set_position(
-                (line.get_start() + circle.get_center()) / 2, sketch.LineEnd.START
+            first_line.animate.move_start(
+                (line.get_start() + circle.get_center()) / 2
             ),
         )
         self.run_group(
             line.click_end(),
             first_line.click_end(),
             circle.click_center(),
-            first_line.animate.set_position(
-                (line.get_end() + circle.get_center()) / 2, sketch.LineEnd.END
+            first_line.animate.move_end(
+                (line.get_end() + circle.get_center()) / 2
             ),
         )
 
@@ -365,16 +357,16 @@ class MidpointPointScene(sketch_scene.SketchScene):
             line.click_start(),
             second_line.click_start(),
             line.click_end(),
-            second_line.animate.set_position(
-                line.line.get_midpoint(), sketch.LineEnd.START
+            second_line.animate.move_start(
+                line.line.get_midpoint()
             ),
         )
         self.run_group(
             first_line.click_start(),
             second_line.click_end(),
             first_line.click_end(),
-            second_line.animate.set_position(
-                first_line.line.get_midpoint(), sketch.LineEnd.END
+            second_line.animate.move_end(
+                first_line.line.get_midpoint()
             ),
         )
 
@@ -382,9 +374,7 @@ class MidpointPointScene(sketch_scene.SketchScene):
 def get_translation(
     line: sketch.SketchLine, circle: sketch.SketchCircle
 ) -> sketch.SketchLine:
-    projection: vector.Point2d = vector.from_coords(
-        line.line.get_projection(vector.to_coords(circle.get_center()))
-    )
+    projection: vector.Point2d = line.line.get_projection(circle.get_center())
     translation: vector.Vector2d = vector.direction(projection, circle.get_center()) * (
         vector.norm(circle.get_center() - projection) - circle.get_radius()
     )
@@ -417,8 +407,8 @@ class TangentLineScene(sketch_scene.SketchScene):
 
 
 def get_circle_translation(
-    base: sketch.SketchCircleBase, target: sketch.SketchCircle
-) -> sketch.SketchCircleBase:
+    base: sketch.SketchArcBase, target: sketch.SketchCircle
+) -> sketch.SketchArcBase:
     vec = target.get_center() - base.get_center()
     translation = vector.normalize(vec) * (
         vector.norm(vec) - base.get_radius() - target.get_radius()
@@ -427,7 +417,7 @@ def get_circle_translation(
 
 
 def tangent_circle_transform(
-    base: sketch.SketchCircleBase, target: sketch.SketchCircle
+    base: sketch.SketchArcBase, target: sketch.SketchCircle
 ) -> mn.Animation:
     return mn.Succession(
         base.click(),

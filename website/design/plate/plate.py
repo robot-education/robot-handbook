@@ -155,13 +155,13 @@ class BoundaryConstraintScene(mn.Scene):
     def do_coincident_move(self, line_end: sketch.LineEnd) -> None:
         self._do_clicks(line_end)
         new_point = self._coincident_point(line_end)
-        self.play(self._line.transform(new_point, line_end))
+        self.play(self._line.animate.move_point(new_point, line_end))
 
     def _coincident_point(self, line_end: sketch.LineEnd) -> vector.Point2d:
         circle, point = self.get_vars(line_end, "circle", "point")
         return (
-            circle.center()
-            + vector.direction(circle.center(), point) * circle.outer_radius()
+            circle.get_center()
+            + vector.direction(circle.get_center(), point) * circle.get_outer_radius()
         )
 
     def do_tangent_move(self, line_end: sketch.LineEnd) -> None:
@@ -172,12 +172,9 @@ class BoundaryConstraintScene(mn.Scene):
 
         angle = self._tangent_angle(line_end)
         self.play(
-            self._line.transform(
-                tangent_point,
-                line_end,
-                path_arc=angle,
-                part_arg_centers=[circle.center()],
-            )
+            self._line.animate(
+                path_arc=angle, path_arg_centers=[circle.get_center()]
+            ).move_point(tangent_point, line_end)
         )
 
     def _tangent_angle(self, line_end: sketch.LineEnd) -> float:
@@ -186,4 +183,4 @@ class BoundaryConstraintScene(mn.Scene):
         )
         return (
             1 if line_end == sketch.LineEnd.START else -1
-        ) * vector.angle_between_points(point, tangent_point, circle.center())
+        ) * vector.angle_between_points(point, tangent_point, circle.get_center())

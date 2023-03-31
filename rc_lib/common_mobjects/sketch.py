@@ -3,11 +3,12 @@ A module defining sketcher-like entities.
 The following convention is adopted - a vertex is a physical entity (usually a dot), 
 whereas a point is a piece of data.
 """
-from typing import cast, Sequence, Self
+from typing import Self
 from abc import ABC, abstractmethod
 import enum
 
 import manim as mn
+import numpy as np
 
 from rc_lib.math_utils import vector
 from rc_lib.style import color
@@ -44,55 +45,49 @@ class Sketch(mn.VGroup, ABC):
         raise NotImplementedError
 
 
-class SketchCircleBase(Sketch, ABC):
+class SketchArcBase(Sketch, ABC):
     # type as mn.Arc since a circle is just an arc
-    def __init__(self, circle: mn.Arc, center_vertex: mn.Dot):
-        Sketch.__init__(self)
-        self.add(circle, center_vertex)
-        self.circle = circle
+    def __init__(self, *, arc: mn.Arc, center_vertex: mn.Dot, **kwargs: mn.VMobject):
+        super().__init__(**kwargs)
+        self.arc = arc
         self.center_vertex = center_vertex
 
-        # setup updater to follow center vertex - circle's center is not well defined for arcs
-        # def circle_updater(circle: mn.Mobject) -> None:
-        #     circle.move_arc_center_to(self.get_center())
+        # setup updater to follow center vertex - arc's center is not well defined for arcs
+        def arc_updater(arc: mn.Mobject) -> None:
+            arc.move_arc_center_to(self.get_center())
 
-        # self.circle.add_updater(circle_updater)
-
-        # def center_updater(center_vertex: mn.Mobject) -> None:
-        #     center_vertex.move_to(self.get_center())
-
-        # self.center_vertex.add_updater(center_updater)
+        self.arc.add_updater(arc_updater)
 
     def get_center(self) -> vector.Point2d:
         """
-        Returns the center of the circle.
+        Returns the center of the arc.
         """
         return self.center_vertex.get_center()
 
     def get_radius(self) -> float:
-        return self.circle.radius
+        return self.arc.radius
 
     def set_radius(self, radius: float) -> Self:
-        self.circle.scale(radius / self.circle.radius, about_point=self.get_center())
+        self.arc.scale(radius / self.arc.radius, about_point=self.get_center())
         return self
 
     def click_center(self) -> mn.Animation:
         return click(self.center_vertex)
 
     def click(self) -> mn.Animation:
-        return click(self.circle)
+        return click(self.arc)
 
     @mn.override_animation(mn.Create)
     def _create_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
             mn.Create(self.center_vertex, run_time=0),
-            mn.GrowFromPoint(self.circle, self.get_center(), **kwargs),
+            mn.GrowFromPoint(self.arc, self.get_center(), **kwargs),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            animation.ShrinkToPoint(self.circle, self.get_center(), **kwargs),
+            animation.ShrinkToPoint(self.arc, self.get_center(), **kwargs),
             mn.Uncreate(self.center_vertex, run_time=0),
         )
 
@@ -107,37 +102,31 @@ class SketchEdgeBase(Sketch, ABC):
     A class defining Sketch entity which has an edge with two end vertices.
     """
 
-    def __init__(self, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot):
-        Sketch.__init__(self)
-        self.add(edge, start_vertex, end_vertex)
+    def __init__(
+        self, *, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot, **kwargs
+    ):
+        super().__init__(**kwargs)
         self._edge = edge
         self.start_vertex = start_vertex
         self.end_vertex = end_vertex
 
-        # def start_vertex_updater(vertex: mn.Mobject) -> None:
-        #     vertex.move_to(self._edge.get_start())
+        def update_edge(edge: mn.Mobject) -> None:
+            if not np.array_equal(self.get_start(), self.get_end()):
+                edge.put_start_and_end_on(self.get_start(), self.get_end())
 
-        # def end_vertex_updater(vertex: mn.Mobject) -> None:
-        #     vertex.move_to(self._edge.get_end())
-
-        # self.start_vertex.add_updater(start_vertex_updater)
-        # self.end_vertex.add_updater(end_vertex_updater)
+        self._edge.add_updater(update_edge)
 
     def get_vertex(self, line_end: LineEnd) -> mn.Dot:
         """
-        A function which provides programmatic access to start_vertex and end_vertex.
+        Provides programmatic access to start_vertex and end_vertex.
         """
         return self.start_vertex if line_end == LineEnd.START else self.end_vertex
 
     def get_point(self, line_end: LineEnd) -> vector.Point2d:
         """
-        A function which provides programmatic access to the line start and end points.
+        Provides programmatic access to the line start and end points.
         """
-        return (
-            self._edge.get_start()
-            if line_end == LineEnd.START
-            else self._edge.get_end()
-        )
+        return self.get_vertex(line_end).get_center()
 
     def get_start(self) -> vector.Point2d:
         """
@@ -165,29 +154,30 @@ class SketchEdgeBase(Sketch, ABC):
 
     @mn.override_animation(mn.Create)
     def _create_override(self, **kwargs) -> mn.Animation:
+        end = self.get_end()
         return mn.Succession(
             mn.Create(self.start_vertex, run_time=0),
-            mn.AnimationGroup(
-                self.end_vertex.move_to(self.get_start()).animate.move_to(
-                    self.get_end()
-                ),  # type: ignore
-                mn.Create(self._edge, **kwargs),
+            mn.Create(self._edge, run_time=0),
+            mn.prepare_animation(
+                self.end_vertex.move_to(self.get_start()).animate.move_to(end)
             ),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            mn.AnimationGroup(
-                mn.Uncreate(self._edge),
-                self.end_vertex.animate(remover=True).move_to(self.get_start()),  # type: ignore
+            mn.prepare_animation(
+                self.end_vertex.animate(remover=True).move_to(self.get_start())
             ),
+            mn.Uncreate(self._edge, run_time=0),
             mn.Uncreate(self.start_vertex, run_time=0),
         )
 
 
-class SketchCircle(SketchCircleBase):
-    pass
+class SketchCircle(SketchArcBase):
+    def __init__(self, circle: mn.Arc, center_vertex: mn.Dot):
+        super().__init__(arc=circle, center_vertex=center_vertex)
+        self.circle = circle
 
 
 class SketchPoint(Sketch):
@@ -204,29 +194,35 @@ class SketchPoint(Sketch):
 
 class SketchLine(SketchEdgeBase):
     def __init__(self, line: mn.Line, start_vertex: mn.Dot, end_vertex: mn.Dot) -> None:
-        super().__init__(line, start_vertex, end_vertex)
+        super().__init__(edge=line, start_vertex=start_vertex, end_vertex=end_vertex)
         self.line = line
 
-    def set_position(self, new_point: vector.Point2d, line_end: LineEnd) -> Self:
-        new_coords = cast(Sequence[float], new_point)
-        if line_end == LineEnd.START:
-            self.line.put_start_and_end_on(
-                new_coords, cast(Sequence[float], self.get_end())
-            )
-        else:
-            self.line.put_start_and_end_on(
-                cast(Sequence[float], self.get_start()), new_coords
-            )
-        self.get_vertex(line_end).move_to(new_point)
+
+    def move_point(self, point: vector.Point2d, line_end: LineEnd) -> Self:
+        self.get_vertex(line_end).move_to(point)
         return self
 
-    @mn.override_animate(set_position)
-    def _set_position_animation(
-        self, new_point: vector.Point2d, line_end: LineEnd, anim_args={}
+    def move_start(self, point: vector.Point2d) -> Self:
+        return self.move_point(point, LineEnd.START)
+
+    def move_end(self, point: vector.Point2d) -> Self:
+        return self.move_point(point, LineEnd.END)
+
+    @mn.override_animate(move_point)
+    def _move_point_override(
+        self, point: vector.Point2d, line_end: LineEnd, **anim_args
     ) -> mn.Animation:
         return mn.Transform(
-            self, self.copy().set_position(new_point, line_end), **anim_args
+            self.get_vertex(line_end), self.get_vertex(line_end).copy().move_to(point)
         )
+
+    @mn.override_animate(move_start)
+    def _move_start_override(self, point: vector.Point2d, **anim_args) -> mn.Animation:
+        return self._move_point_override( point, LineEnd.START)
+
+    @mn.override_animate(move_end)
+    def _move_end_override(self, point: vector.Point2d, **anim_args) -> mn.Animation:
+        return self._move_point_override( point, LineEnd.END)
 
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
@@ -234,19 +230,8 @@ class SketchLine(SketchEdgeBase):
     def get_direction(self) -> vector.Direction2d:
         return vector.normalize(self.get_end() - self.get_start())
 
-    def transform(
-        self, new_point: vector.Point2d, line_end: LineEnd, **kwargs
-    ) -> mn.Animation:
-        """
-        Transforms the line to the specified point.
-        **kwargs: kwargs to be passed in to transform.
-        """
-        return mn.Transform(
-            self, self.copy().set_position(new_point, line_end), **kwargs
-        )
 
-
-class SketchArc(SketchCircleBase, SketchEdgeBase):
+class SketchArc(SketchArcBase, SketchEdgeBase):
     def __init__(
         self,
         arc: mn.Arc,
@@ -254,9 +239,13 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         end_vertex: mn.Dot,
         center_vertex: mn.Dot,
     ) -> None:
-        SketchCircleBase.__init__(self, arc, center_vertex)
-        SketchEdgeBase.__init__(self, arc, start_vertex, end_vertex)
-        self.arc = arc
+        super().__init__(
+            arc=arc,
+            center_vertex=center_vertex,
+            edge=arc,
+            start_vertex=start_vertex,
+            end_vertex=end_vertex,
+        )
 
     def set_radius(self, radius: float) -> Self:
         center = self.get_center()
@@ -266,7 +255,7 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         self.end_vertex.move_to(
             center + vector.normalize(self.get_end() - center) * radius
         )
-        SketchCircleBase.set_radius(self, radius)
+        SketchArcBase.set_radius(self, radius)
         return self
 
     @mn.override_animation(mn.Create)
@@ -275,12 +264,16 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
             mn.Create(self.center_vertex, run_time=0),
             mn.AnimationGroup(
                 mn.GrowFromPoint(self.arc, self.get_center()),
-                self.start_vertex.move_to(self.get_center()).animate.move_to(
-                    self.get_start()
-                ),  # type: ignore
-                self.end_vertex.move_to(self.get_center()).animate.move_to(
-                    self.get_end()
-                ),  # type: ignore
+                mn.prepare_animation(
+                    self.start_vertex.move_to(self.get_center()).animate.move_to(
+                        self.get_start()
+                    )
+                ),
+                mn.prepare_animation(
+                    self.end_vertex.move_to(self.get_center()).animate.move_to(
+                        self.get_end()
+                    )
+                ),
             ),
         )
 
@@ -289,12 +282,12 @@ class SketchArc(SketchCircleBase, SketchEdgeBase):
         return mn.Succession(
             mn.AnimationGroup(
                 animation.ShrinkToPoint(self.arc, self.get_center()),
-                self.start_vertex.animate(remover=True).move_to(
-                    self.center()
-                ),  # type: ignore
-                self.end_vertex.animate(remover=True).move_to(
-                    self.get_center()
-                ),  # type: ignore
+                mn.prepare_animation(
+                    self.start_vertex.animate(remover=True).move_to(self.center())
+                ),
+                mn.prepare_animation(
+                    self.end_vertex.animate(remover=True).move_to(self.get_center())
+                ),
             ),
             mn.Uncreate(self.center_vertex, run_time=0),
         )
