@@ -121,9 +121,9 @@ class BoundaryConstraintScene(mn.Scene):
         title.reset()
 
     def get_vars(self, line_end: sketch.LineEnd, *keys: str) -> list[Any]:
-        return [self._get_var(line_end, key) for key in keys]
+        return [self.get_var(line_end, key) for key in keys]
 
-    def _get_var(self, line_end: sketch.LineEnd, key: str) -> Any:
+    def get_var(self, line_end: sketch.LineEnd, key: str) -> Any:
         if key == "tangent_point":
             return self._tangent_points[line_end]
         elif key == "point":
@@ -148,7 +148,7 @@ class BoundaryConstraintScene(mn.Scene):
         self.wait(animation.END_DELAY)
 
     def _do_clicks(self, line_end: sketch.LineEnd) -> None:
-        [circle] = self.get_vars(line_end, "circle")
+        circle = self.get_var(line_end, "circle")
         self.play(self._line.click_vertex(line_end))
         self.play(sketch.click(circle.outer_circle))
 

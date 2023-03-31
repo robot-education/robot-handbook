@@ -1,9 +1,11 @@
+from typing import TypeAlias
+
 import manim as mn
 import enum
 import math
 import numpy as np
 
-Color = str
+Color: TypeAlias = str
 
 
 class Palette(Color, enum.Enum):

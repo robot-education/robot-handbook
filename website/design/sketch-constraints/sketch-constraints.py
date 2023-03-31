@@ -1,4 +1,3 @@
-from typing import Sequence, cast
 import math
 
 import manim as mn
@@ -94,7 +93,7 @@ class CoincidentLineToLineScene(sketch_scene.SketchScene):
             mn.Rotate(
                 self._start_line,
                 angle=-self._angle,
-                about_point=cast(Sequence[float], self._fixed_line.get_end()),
+                about_point=vector.to_coords(self._fixed_line.get_end()),
             ),
         )
 
@@ -214,14 +213,20 @@ class ParallelScene(sketch_scene.SketchScene):
         self._mid_point = (start_point + end_point) / 2
         end_line = sketch_factory.make_line(start_point, end_point)
         self._angle = math.radians(16.26)
-        self._start_line = end_line.rotate(-self._angle, about_point=self._mid_point)  # type: ignore
+        self._start_line = end_line.rotate(
+            -self._angle, about_point=vector.to_coords(self._mid_point)
+        )
 
     def construct(self) -> None:
         self.introduce(self._line, self._start_line)
         self.run_group(
             self._start_line.click(),
             self._line.click(),
-            mn.Rotate(self._start_line, self._angle, about_point=self._mid_point),  # type: ignore
+            mn.Rotate(
+                self._start_line,
+                self._angle,
+                about_point=vector.to_coords(self._mid_point),
+            ),
         )
 
 
@@ -232,7 +237,7 @@ class PerpendicularScene(sketch_scene.SketchScene):
         )
         direction = line.get_direction()
         rotation_point = line.get_start() + direction * 2
-        perpendicular_direction = vector.direction_2d(-direction[1], direction[0])  # type: ignore
+        perpendicular_direction = vector.direction_2d(-direction[1], direction[0])
         end_line = sketch_factory.make_line(
             rotation_point + perpendicular_direction * 1,
             rotation_point + perpendicular_direction * 5.25,
@@ -240,14 +245,16 @@ class PerpendicularScene(sketch_scene.SketchScene):
         angle = math.radians(45)
 
         # move to start position
-        start_line = end_line.rotate(-angle, about_point=rotation_point)  # type: ignore
+        start_line = end_line.rotate(
+            -angle, about_point=vector.to_coords(rotation_point)
+        )
 
         self.introduce(start_line, line)
         self.run_group(
             start_line.click(),
             line.click(),
             # rotate to end position
-            mn.Rotate(start_line, angle, about_point=rotation_point),  # type: ignore
+            mn.Rotate(start_line, angle, about_point=vector.to_coords(rotation_point)),
         )
 
 
@@ -375,7 +382,9 @@ class MidpointPointScene(sketch_scene.SketchScene):
 def get_translation(
     line: sketch.SketchLine, circle: sketch.SketchCircle
 ) -> sketch.SketchLine:
-    projection: vector.Point2d = line.line.get_projection(circle.get_center())  # type: ignore
+    projection: vector.Point2d = vector.from_coords(
+        line.line.get_projection(vector.to_coords(circle.get_center()))
+    )
     translation: vector.Vector2d = vector.direction(projection, circle.get_center()) * (
         vector.norm(circle.get_center() - projection) - circle.get_radius()
     )

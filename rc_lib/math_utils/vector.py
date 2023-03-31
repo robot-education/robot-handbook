@@ -1,24 +1,25 @@
 """
     A collection of semantic aliases for type hinting used throughout the library.
 """
-from typing import Sequence, cast
+from typing import cast, TypeAlias
+from collections.abc import Sequence
 
 import manim as mn
 import numpy as np
 
-Vector = np.ndarray
+Vector: TypeAlias = np.ndarray
 # For compatability with manim, a 2d vector is defined as 3d vector with its third coordinate equal to zero.
-Vector2d = np.ndarray
-Vector3d = np.ndarray
+Vector2d: TypeAlias = np.ndarray
+Vector3d: TypeAlias = np.ndarray
 
-Point = np.ndarray
+Point: TypeAlias = np.ndarray
 # For compatability with manim, a 2d point is defined as a 3d point with its third coordinate equal to zero.
-Point2d = np.ndarray
-Point3d = np.ndarray
+Point2d: TypeAlias = np.ndarray
+Point3d: TypeAlias = np.ndarray
 
-Direction = np.ndarray
-Direction2d = np.ndarray
-Direction3d = np.ndarray
+Direction: TypeAlias = np.ndarray
+Direction2d: TypeAlias = np.ndarray
+Direction3d: TypeAlias = np.ndarray
 
 # An angle in radians
 Angle = float
