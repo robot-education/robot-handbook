@@ -1,4 +1,5 @@
 import math
+from typing import Iterable
 
 import manim as mn
 from rc_lib.style import color
@@ -179,9 +180,7 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
             self._move_line.click_start(),
             self._line.click_end(),
             self._move_line.animate.move_start(
-                vector.point_2d(
-                    self._move_line.get_start()[0], self._line.get_end()[1]
-                )
+                vector.point_2d(self._move_line.get_start()[0], self._line.get_end()[1])
             ),
         )
 
@@ -339,17 +338,13 @@ class MidpointPointScene(sketch_scene.SketchScene):
             line.click_start(),
             first_line.click_start(),
             circle.click_center(),
-            first_line.animate.move_start(
-                (line.get_start() + circle.get_center()) / 2
-            ),
+            first_line.animate.move_start((line.get_start() + circle.get_center()) / 2),
         )
         self.run_group(
             line.click_end(),
             first_line.click_end(),
             circle.click_center(),
-            first_line.animate.move_end(
-                (line.get_end() + circle.get_center()) / 2
-            ),
+            first_line.animate.move_end((line.get_end() + circle.get_center()) / 2),
         )
 
         self.introduce(second_line)
@@ -357,17 +352,13 @@ class MidpointPointScene(sketch_scene.SketchScene):
             line.click_start(),
             second_line.click_start(),
             line.click_end(),
-            second_line.animate.move_start(
-                line.line.get_midpoint()
-            ),
+            second_line.animate.move_start(line.line.get_midpoint()),
         )
         self.run_group(
             first_line.click_start(),
             second_line.click_end(),
             first_line.click_end(),
-            second_line.animate.move_end(
-                first_line.line.get_midpoint()
-            ),
+            second_line.animate.move_end(first_line.line.get_midpoint()),
         )
 
 
@@ -408,21 +399,20 @@ class TangentLineScene(sketch_scene.SketchScene):
 
 def get_circle_translation(
     base: sketch.SketchArcBase, target: sketch.SketchCircle
-) -> sketch.SketchArcBase:
+) -> vector.Vector2d:
     vec = target.get_center() - base.get_center()
-    translation = vector.normalize(vec) * (
+    return vector.normalize(vec) * (
         vector.norm(vec) - base.get_radius() - target.get_radius()
     )
-    return base.copy().shift(translation)
 
 
 def tangent_circle_transform(
     base: sketch.SketchArcBase, target: sketch.SketchCircle
-) -> mn.Animation:
-    return mn.Succession(
+) -> Iterable[mn.Animation]:
+    return (
         base.click(),
         target.click(),
-        mn.Transform(base, get_circle_translation(base, target)),
+        mn.prepare_animation(base.animate.shift(get_circle_translation(base, target))),
     )
 
 
@@ -435,8 +425,8 @@ class TangentCircleScene(sketch_scene.SketchScene):
         )
 
         self.introduce(circle, left, right)
-        self.run_group(tangent_circle_transform(left, circle))
-        self.run_group(tangent_circle_transform(right, circle))
+        self.run_group(*tangent_circle_transform(left, circle))
+        self.run_group(*tangent_circle_transform(right, circle))
 
 
 def concentric_common() -> (

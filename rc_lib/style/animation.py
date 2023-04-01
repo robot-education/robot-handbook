@@ -18,13 +18,7 @@ class ShrinkToPoint(mn.Transform):
     ) -> None:
         self.point = point
         self.point_color = point_color
-        super().__init__(
-            mobject,
-            remover=True,
-            introducer=False,
-            reverse_rate_function=True,
-            **kwargs
-        )
+        super().__init__(mobject, remover=True, reverse_rate_function=True, **kwargs)
 
     def create_target(self) -> mn.Mobject:
         return self.mobject
@@ -39,7 +33,6 @@ class ShrinkToPoint(mn.Transform):
 
 class ShrinkToCenter(ShrinkToPoint):
     """Remove an :class:`~.Mobject` by shrinking it to a point."""
-
     def __init__(
         self, mobject: mn.Mobject, point_color: color.Color | None = None, **kwargs
     ) -> None:
