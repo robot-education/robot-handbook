@@ -7,6 +7,7 @@ from rc_lib.style import animation
 
 
 class SketchScene(mn.Scene, ABC):
+    """A base class for a scene displaying a sketch."""
     CONSTRAINT_DELAY = 0.5
 
     def __init__(self, *args, **kwargs):
@@ -16,19 +17,19 @@ class SketchScene(mn.Scene, ABC):
         # self._child_construct = self.construct
         # self.construct = self._construct_sketch
 
-        self._static_mobjects: Iterable[sketch.Sketch] = []
+        self._static_mobjects: list[sketch.Sketch] = []
 
     def introduce(self, *mobjects: sketch.Sketch):
-        self._static_mobjects = mobjects
-
-        self.play(
-            mn.AnimationGroup(
-                *[mn.Create(mobject) for mobject in self._static_mobjects]
-            )
-        )
+        """Introduces mobjects to the scene by calling create.
+        
+        The mobjects are also scheduled for removal at the end of the scene.
+        """
+        self._static_mobjects.extend(mobjects)
+        self.play(mn.AnimationGroup(*[mn.Create(mobject) for mobject in mobjects]))
         self.wait(self.CONSTRAINT_DELAY)
 
     def run_group(self, *animation: mn.Animation | Any):
+        """Runs the given animations in succession with a short delay."""
         self.play(mn.Succession(*animation))
         self.wait(self.CONSTRAINT_DELAY)
 
