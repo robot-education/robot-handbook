@@ -1,4 +1,5 @@
 import numpy as np
+import manim as mn
 
 from typing import Callable, Any
 import abc
@@ -54,6 +55,45 @@ class EvolvedSystem(abc.ABC):
         if callable(getattr(subclass, "step", None)):
             return True
         return NotImplemented
+
+
+class EvolveSystem(mn.Animation):
+    """
+    Evolves the system using the real-time increments from the animation.
+
+    Play only forward: the underlying physical system can only be evolved in the
+    forward direction, and playing the animation modifies the state of the system.
+    May be played multiple times but the system will be different.
+    """
+
+    def __init__(self, system: EvolvedSystem, evolve_time: float, step_time=0.01):
+        """
+        Parameters:
+            system: the system evolved over the duration of the animation
+            evolve_time: the "physical" time the system will evolve for. Sets the
+                default run time of the animation, but is otherwise independent
+                from the actual screen time the animation receives.
+        """
+        super().__init__(None, run_time=evolve_time)
+        self.system = system
+        self.evolve_time = evolve_time
+        self.step_time = step_time
+        self.steps = 0
+
+    def begin(self) -> None:
+        self.steps = 0
+        super().begin()
+
+    def interpolate(self, alpha: float) -> None:
+        # need dt to evolve the system, get it from d_alpha and overall runtime
+        time = alpha * self.evolve_time
+        steps = round(time / self.step_time)
+
+        do_steps = steps - self.steps
+        self.steps = steps
+
+        for _ in range(do_steps):
+            self.system.step(self.step_time)
 
 
 class SingleBodyForces:

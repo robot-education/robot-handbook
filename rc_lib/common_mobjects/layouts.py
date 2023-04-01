@@ -134,9 +134,15 @@ class LinearLayout(containers.OrderedVGroup):
             this can be changed by passing in a different animation class.
     """
 
-    def __init__(self, *mobjects: mn.VMobject, direction=mn.DOWN):
+    def __init__(
+        self,
+        *mobjects: mn.VMobject,
+        direction=mn.DOWN,
+        root: None | vector.Point = None
+    ):
         super().__init__(*mobjects)
         self.set_direction(direction)
+        self.set_root(root)
 
     def set_direction(self, direction: vector.Vector2d) -> Self:
         """Sets the default direction for the layout.
@@ -147,6 +153,9 @@ class LinearLayout(containers.OrderedVGroup):
         """
         self.direction = direction
         return self
+
+    def set_root(self, root: None | vector.Point = None):
+        self.root = root
 
     def predict_arrangement(
         self,
@@ -179,7 +188,10 @@ class LinearLayout(containers.OrderedVGroup):
             direction = vector.normalize(direction)
 
         if root is None:
-            root = cast(vector.Point2d, self[0].get_center())
+            if self.root is None:
+                root = cast(vector.Point2d, self[0].get_center())
+            else:
+                root = self.root
 
         positions: List[vector.Point2d] = [root]
 
