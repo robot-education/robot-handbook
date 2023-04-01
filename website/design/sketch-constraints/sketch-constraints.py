@@ -1,3 +1,5 @@
+"""Animations showcasing various Onshape sketch constraints."""
+
 import math
 from typing import Iterable
 
@@ -8,12 +10,13 @@ from rc_lib.view_utils import sketch_scene
 from rc_lib.common_mobjects import sketch
 
 sketch_color = color.Palette.BLUE
-sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)  # type: ignore
+sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
 
 
 def coincident_common_mobjects() -> (
     tuple[sketch.SketchCircle, sketch.SketchLine, sketch.SketchLine]
 ):
+    """Returns mobjects common to coincident."""
     return (
         sketch_factory.make_circle(vector.point_2d(-4.5, 0), 1.5),
         sketch_factory.make_line(
@@ -25,7 +28,7 @@ def coincident_common_mobjects() -> (
     )
 
 
-class CoincidentPointToPointScene(sketch_scene.SketchScene):
+class CoincidentPointsScene(sketch_scene.SketchScene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
@@ -43,7 +46,7 @@ class CoincidentPointToPointScene(sketch_scene.SketchScene):
         )
 
 
-class CoincidentPointToLineScene(sketch_scene.SketchScene):
+class CoincidentPointLineScene(sketch_scene.SketchScene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
@@ -73,7 +76,7 @@ class CoincidentPointToLineScene(sketch_scene.SketchScene):
         )
 
 
-class CoincidentLineToLineScene(sketch_scene.SketchScene):
+class CoincidentLineScene(sketch_scene.SketchScene):
     def setup(self) -> None:
         start_point = vector.point_2d(-5.75, 2.5)
         middle_point = vector.point_2d(-1.15, 0.5)  # closest to the middle

@@ -23,19 +23,19 @@ myst:
 ---
 
 # Sketch Constraints
-This tutorial provides a visual guide to the behavior of various constraints. Although the constraint icons and shortcuts are for onshape, the selections and behaviors are generally applicable to all CAD software.
+This tutorial provides a visual guide to the behavior of various constraints. Although the constraint icons and shortcuts are for Onshape, the selections and behaviors are generally applicable to all CAD software.
 
 ## {{coincident_title}}
 The coincident constraint is used to make points touch other entities. The available modes are:
 * Two points - the points become touching.
-:::{animation} CoincidentPointToPointScene.mp4
+:::{animation} CoincidentPointsScene.mp4
 :autoplay:
 Applying {{coincident}} to points
 :::
 
 * A point and a line, circle or arc - the point becomes inline with the path of the line, circle, or arc.
 
-:::{animation} CoincidentPointToLineScene.mp4
+:::{animation} CoincidentPointLineScene.mp4
 :autoplay:
 Applying {{coincident}} to a point and a line or circle
 :::
@@ -45,7 +45,7 @@ Applying {{coincident}} to a point and a line or circle
 
 * [Two lines - the lines become inline with each other.]{#coincident-two-lines}
 
-:::{animation} CoincidentLineToLineScene.mp4
+:::{animation} CoincidentLineScene.mp4
 :autoplay:
 Applying {{coincident}} to lines
 :::

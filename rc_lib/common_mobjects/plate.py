@@ -2,7 +2,6 @@ import manim as mn
 from typing import Callable, Self
 
 from rc_lib.style import color
-from rc_lib.common_mobjects import sketch
 from rc_lib.math_utils import tangent, vector
 
 
