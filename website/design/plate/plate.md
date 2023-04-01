@@ -20,7 +20,7 @@ Redrawing the boundary of a plate
 :::
 
 ## Appendix
-Lines should be constrained to each circle using both a coincident and a tangent constraint.
+Lines should be constrained to each circle using a coincident {{coincident}} and a tangent {{tangent}} constraint.
 
 :::{animation} BoundaryConstraintScene.mp4
 Constraining a boundary line

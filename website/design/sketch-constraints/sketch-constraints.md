@@ -1,25 +1,15 @@
 ---
 myst:
     substitutions:
-        coincident_title: "![coincident](images/coincident.svg){.thumbnail} Coincident (i)"
-        vertical_title: "![vertical](images/vertical.svg){.thumbnail} Vertical (v)"
-        horizontal_title: "![horizontal](images/horizontal.svg){.thumbnail} Horizontal (h)"
-        parallel_title: "![parallel](images/parallel.svg){.thumbnail} Parallel (b)"
-        perpendicular_title: "![perpendicular](images/perpendicular.svg){.thumbnail} Perpendicular"
-        equal_title: "![equal](images/equal.svg){.thumbnail} Equal (e)"
-        midpoint_title: "![midpoint](images/midpoint.svg){.thumbnail} Midpoint"
-        tangent_title: "![tangent](images/tangent.svg){.thumbnail} Tangent (t)"
-        concentric_title: "![concentric](images/concentric.svg){.thumbnail} Concentric"
-
-        coincident: "![coincident](images/coincident.svg){.inline}"
-        vertical: "![vertical](images/vertical.svg){.inline}"
-        horizontal: "![horizontal](images/horizontal.svg){.inline}"
-        parallel: "![parallel](images/parallel.svg){.inline}"
-        perpendicular: "![perpendicular](images/perpendicular.svg){.inline}"
-        equal: "![equal](images/equal.svg){.inline}"
-        midpoint: "![midpoint](images/midpoint.svg){.inline}"
-        tangent: "![tangent](images/tangent.svg){.inline}"
-        concentric: "![concentric](images/concentric.svg){.inline}"
+        coincident_title: "![coincident](/design/images/coincident.svg){.thumbnail} Coincident (i)"
+        vertical_title: "![vertical](/design/images/vertical.svg){.thumbnail} Vertical (v)"
+        horizontal_title: "![horizontal](/design/images/horizontal.svg){.thumbnail} Horizontal (h)"
+        parallel_title: "![parallel](/design/images/parallel.svg){.thumbnail} Parallel (b)"
+        perpendicular_title: "![perpendicular](/design/images/perpendicular.svg){.thumbnail} Perpendicular"
+        equal_title: "![equal](/design/images/equal.svg){.thumbnail} Equal (e)"
+        midpoint_title: "![midpoint](/design/images/midpoint.svg){.thumbnail} Midpoint"
+        tangent_title: "![tangent](/design/images/tangent.svg){.thumbnail} Tangent (t)"
+        concentric_title: "![concentric](/design/images/concentric.svg){.thumbnail} Concentric"
 ---
 
 # Sketch Constraints
@@ -30,14 +20,14 @@ The coincident constraint is used to make points touch other entities. The avail
 * Two points - the points become touching.
 :::{animation} CoincidentPointsScene.mp4
 :autoplay:
-Applying {{coincident}} to points
+Applying coincident {{coincident}} to points
 :::
 
 * A point and a line, circle or arc - the point becomes inline with the path of the line, circle, or arc.
 
 :::{animation} CoincidentPointLineScene.mp4
 :autoplay:
-Applying {{coincident}} to a point and a line or circle
+Applying coincident {{coincident}} to a point and a line or circle
 :::
 
 :::{note} This mode treats arcs as circles and lines as infinite, so points are not required to lie within the physical limits of the edge.
@@ -47,7 +37,7 @@ Applying {{coincident}} to a point and a line or circle
 
 :::{animation} CoincidentLineScene.mp4
 :autoplay:
-Applying {{coincident}} to lines
+Applying coincident {{coincident}} to lines
 :::
 
 ## {{vertical_title}}
@@ -56,14 +46,14 @@ The vertical constraint is used to make lines or pairs of points vertical relati
 
 :::{animation} VerticalLineScene.mp4
 :autoplay:
-Applying {{vertical}} to a line
+Applying vertical {{vertical}} to a line
 :::
 
 * Two points - the points become vertically inline with each other.
 
 :::{animation} VerticalPointsScene.mp4
 :autoplay:
-Applying {{vertical}} to two points
+Applying vertical {{vertical}} to two points
 :::
 
 ## {{horizontal_title}}
@@ -72,14 +62,14 @@ The vertical constraint is used to make lines or pairs of points horizontal rela
 
 :::{animation} HorizontalLineScene.mp4
 :autoplay:
-Applying {{horizontal}} to a line
+Applying horizontal {{horizontal}} to a line
 :::
 
 * Two points - the points become horizontally inline with each other.
 
 :::{animation} HorizontalPointsScene.mp4
 :autoplay:
-Applying {{horizontal}} to two points
+Applying horizontal {{horizontal}} to two points
 :::
 
 ## {{parallel_title}}
@@ -88,7 +78,7 @@ The parallel constraint is used to make lines parallel to each other, meaning th
 
 :::{animation} ParallelScene.mp4
 :autoplay:
-Applying {{parallel}} to two lines
+Applying parallel {{parallel}} to two lines
 :::
 
 
@@ -102,7 +92,7 @@ The perpendicular constraint is used to make lines perpendicular to each other, 
 
 :::{animation} PerpendicularScene.mp4
 :autoplay:
-Applying {{perpendicular}} to two lines
+Applying perpendicular {{perpendicular}} to two lines
 :::
 
 
@@ -112,14 +102,14 @@ The equal constraint is used to constrain the lengths of lines or the radius of 
 
 :::{animation} EqualLineScene.mp4
 :autoplay:
-Applying {{equal}} to lines
+Applying equal {{equal}} to lines
 :::
 
 * Two circles or arcs - the radius of each circle or arc becomes the same.
 
 :::{animation} EqualCircleScene.mp4
 :autoplay:
-Applying {{equal}} to circles and arcs
+Applying equal {{equal}} to circles and arcs
 :::
 
 :::{tip} Equal {{equal}} may be applied to multiple entities at once by preselecting multiple entities before clicking {{equal}}.

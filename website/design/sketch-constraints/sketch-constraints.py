@@ -6,7 +6,7 @@ from typing import Iterable
 import manim as mn
 from rc_lib.style import color
 from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_scene
+from rc_lib.design import sketch, sketch_scene, sketch_utils
 
 sketch_color = color.Palette.BLUE
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
@@ -33,14 +33,14 @@ class CoincidentPointsScene(sketch_scene.SketchScene):
         self.introduce(circle, line, move_line)
 
         self.run_group(
-            move_line.click_start(),
-            circle.click_center(),
+            sketch_utils.Click(move_line.start_vertex),
+            sketch_utils.Click(circle.center_vertex),
             move_line.animate.move_start(circle.get_center()),
         )
 
         self.run_group(
-            move_line.click_end(),
-            line.click_end(),
+            sketch_utils.Click(move_line.end_vertex),
+            sketch_utils.Click(line.end_vertex),
             move_line.animate.move_end(line.get_end()),
         )
 
@@ -57,9 +57,9 @@ class CoincidentPointLineScene(sketch_scene.SketchScene):
         )
 
         self.run_group(
-            move_line.click_start(),
-            circle.click(),
-            move_line.animate.move_point(point, sketch.LineEnd.START),
+            sketch_utils.Click(move_line.start_vertex),
+            sketch_utils.Click(circle.circle),
+            move_line.animate.move_start(point),
         )
 
         point = vector.project_to_line(
@@ -69,34 +69,33 @@ class CoincidentPointLineScene(sketch_scene.SketchScene):
         )
 
         self.run_group(
-            move_line.click_end(),
-            line.click(),
-            move_line.animate.move_point(point, sketch.LineEnd.END),
+            sketch_utils.Click(move_line.end_vertex),
+            sketch_utils.Click(line.line),
+            move_line.animate.move_end(point),
         )
 
 
 class CoincidentLineScene(sketch_scene.SketchScene):
-    def setup(self) -> None:
+    def construct(self) -> None:
         start_point = vector.point_2d(-5.75, 2.5)
         middle_point = vector.point_2d(-1.15, 0.5)  # closest to the middle
-        self._fixed_line = sketch_factory.make_line(start_point, middle_point)
+        fixed_line = sketch_factory.make_line(start_point, middle_point)
 
-        slope = self._fixed_line.get_direction()
-        self._angle = math.radians(38)
-        self._start_line = sketch_factory.make_line(
-            middle_point + mn.rotate_vector(slope * 2, self._angle),
-            middle_point + mn.rotate_vector(slope * 7.5, self._angle),
+        slope = fixed_line.get_direction()
+        angle = math.radians(38)
+        start_line = sketch_factory.make_line(
+            middle_point + mn.rotate_vector(slope * 2, angle),
+            middle_point + mn.rotate_vector(slope * 7.5, angle),
         )
-        self.introduce(self._fixed_line, self._start_line)
 
-    def construct(self) -> None:
+        self.introduce(fixed_line, start_line)
         self.run_group(
-            self._start_line.click(),
-            self._fixed_line.click(),
+            sketch_utils.Click(start_line.line),
+            sketch_utils.Click(fixed_line.line),
             mn.Rotate(
-                self._start_line,
-                angle=-self._angle,
-                about_point=self._fixed_line.get_end(),
+                start_line,
+                angle=-angle,
+                about_point=fixed_line.get_end(),
             ),
         )
 
@@ -118,7 +117,7 @@ class VerticalLineScene(sketch_scene.SketchScene):
         self.introduce(start_line)
 
         self.run_group(
-            start_line.click(),
+            sketch_utils.Click(start_line.line),
             mn.Rotate(start_line, angle=angle),
         )
 
@@ -130,98 +129,90 @@ class HorizontalLineScene(sketch_scene.SketchScene):
         self.introduce(start_line)
 
         self.run_group(
-            start_line.click(),
+            sketch_utils.Click(start_line.line),
             mn.Rotate(start_line, angle=angle),
         )
 
 
 class VerticalPointsScene(sketch_scene.SketchScene):
-    def setup(self) -> None:
-        self._circle = sketch_factory.make_circle(vector.point_2d(-4, 1.5), 1.5)
-        self._line = sketch_factory.make_line(
+    def construct(self) -> None:
+        circle = sketch_factory.make_circle(vector.point_2d(-4, 1.5), 1.5)
+        line = sketch_factory.make_line(
             vector.point_2d(0, 2.5), vector.point_2d(5.5, 1.5)
         )
-        self._move_line = sketch_factory.make_line(
+        move_line = sketch_factory.make_line(
             vector.point_2d(-5.5, -2.5), vector.point_2d(3.5, -1.5)
         )
-        self.introduce(self._circle, self._line, self._move_line)
 
-    def construct(self) -> None:
+        self.introduce(circle, line, move_line)
+
         self.run_group(
-            self._move_line.click_start(),
-            self._circle.click_center(),
-            self._move_line.animate.move_start(
-                vector.point_2d(
-                    self._circle.get_center()[0], self._move_line.get_start()[1]
-                )
+            sketch_utils.Click(move_line.start_vertex),
+            sketch_utils.Click(circle.center_vertex),
+            move_line.animate.move_start(
+                vector.point_2d(circle.get_center()[0], move_line.get_start()[1])
             ),
         )
 
         self.run_group(
-            self._move_line.click_end(),
-            self._line.click_end(),
-            self._move_line.animate.move_end(
-                vector.point_2d(self._line.get_end()[0], self._move_line.get_end()[1])
+            sketch_utils.Click(move_line.end_vertex),
+            sketch_utils.Click(line.end_vertex),
+            move_line.animate.move_end(
+                vector.point_2d(line.get_end()[0], move_line.get_end()[1])
             ),
         )
 
 
 class HorizontalPointsScene(sketch_scene.SketchScene):
-    def setup(self) -> None:
-        self._circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
-        self._line = sketch_factory.make_line(
+    def construct(self) -> None:
+        circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
+        line = sketch_factory.make_line(
             vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5)
         )
-        self._move_line = sketch_factory.make_line(
+        move_line = sketch_factory.make_line(
             vector.point_2d(2, -1.5), vector.point_2d(4.5, 3)
         )
-        self.introduce(self._circle, self._line, self._move_line)
+        self.introduce(circle, line, move_line)
 
-    def construct(self) -> None:
         self.run_group(
-            self._move_line.click_start(),
-            self._line.click_end(),
-            self._move_line.animate.move_start(
-                vector.point_2d(self._move_line.get_start()[0], self._line.get_end()[1])
+            sketch_utils.Click(move_line.start_vertex),
+            sketch_utils.Click(line.end_vertex),
+            move_line.animate.move_start(
+                vector.point_2d(move_line.get_start()[0], line.get_end()[1])
             ),
         )
 
         self.run_group(
-            self._move_line.click_end(),
-            self._circle.click_center(),
-            self._move_line.animate.move_end(
+            sketch_utils.Click(move_line.end_vertex),
+            sketch_utils.Click(circle.center_vertex),
+            move_line.animate.move_end(
                 vector.point_2d(
-                    self._move_line.get_end()[0],
-                    self._circle.get_center()[1],
+                    move_line.get_end()[0],
+                    circle.get_center()[1],
                 )
             ),
         )
 
 
 class ParallelScene(sketch_scene.SketchScene):
-    def setup(self) -> None:
-        self._line = sketch_factory.make_line(
+    def construct(self) -> None:
+        line = sketch_factory.make_line(
             vector.point_2d(-6, -3), vector.point_2d(6, 0.5)
         )
-        direction = self._line.get_direction()
+        direction = line.get_direction()
 
         end_point = vector.point_2d(5, 3)
         start_point = end_point - direction * 10.5
-        self._mid_point = (start_point + end_point) / 2
-        end_line = sketch_factory.make_line(start_point, end_point)
-        self._angle = math.radians(16.26)
-        self._start_line = end_line.rotate(-self._angle, about_point=self._mid_point)
+        angle = math.radians(16.26)
+        start_line = sketch_factory.make_line(start_point, end_point).rotate(
+            -angle, about_point=line.line.get_midpoint() # type: ignore
+        )
 
-    def construct(self) -> None:
-        self.introduce(self._line, self._start_line)
+        self.introduce(line, start_line)
         self.run_group(
-            self._start_line.click(),
-            self._line.click(),
-            mn.Rotate(
-                self._start_line,
-                self._angle,
-                about_point=self._mid_point,
-            ),
+            sketch_utils.Click(start_line.line),
+            sketch_utils.Click(line.line),
+            start_line.animate.rotate(angle, about_point=line.line.get_midpoint()),
         )
 
 
@@ -244,8 +235,8 @@ class PerpendicularScene(sketch_scene.SketchScene):
 
         self.introduce(start_line, line)
         self.run_group(
-            start_line.click(),
-            line.click(),
+            sketch_utils.Click(start_line.line),
+            sketch_utils.Click(line.line),
             # rotate to end position
             mn.Rotate(start_line, angle, about_point=rotation_point),
         )
@@ -274,14 +265,14 @@ class EqualLineScene(sketch_scene.SketchScene):
 
         self.introduce(base, first, second)
         self.run_group(
-            base.click(),
-            first.click(),
+            sketch_utils.Click(base.line),
+            sketch_utils.Click(first.line),
             mn.Transform(first, centered_line(first, length)),
         )
 
         self.run_group(
-            base.click(),
-            second.click(),
+            sketch_utils.Click(base.line),
+            sketch_utils.Click(second.line),
             mn.Transform(second, centered_line(second, length)),
         )
 
@@ -295,8 +286,16 @@ class EqualCircleScene(sketch_scene.SketchScene):
         )
 
         self.introduce(base, arc, circle)
-        self.run_group(base.click(), circle.click(), circle.animate.set_radius(1.5))
-        self.run_group(base.click(), arc.click(), arc.animate.set_radius(1.5))
+        self.run_group(
+            sketch_utils.Click(base.circle),
+            sketch_utils.Click(circle.circle),
+            circle.animate.set_radius(1.5),
+        )
+        self.run_group(
+            sketch_utils.Click(base.circle),
+            sketch_utils.Click(arc.arc),
+            arc.animate.set_radius(1.5),
+        )
 
 
 class MidpointLineScene(sketch_scene.SketchScene):
@@ -311,13 +310,13 @@ class MidpointLineScene(sketch_scene.SketchScene):
 
         self.introduce(top, bottom, middle)
         self.run_group(
-            middle.click_start(),
-            top.click(),
+            sketch_utils.Click(middle.start_vertex),
+            sketch_utils.Click(top.line),
             middle.animate.move_start(top.line.get_midpoint()),
         )
         self.run_group(
-            middle.click_end(),
-            bottom.click(),
+            sketch_utils.Click(middle.end_vertex),
+            sketch_utils.Click(bottom.line),
             middle.animate.move_end(bottom.line.get_midpoint()),
         )
 
@@ -337,29 +336,29 @@ class MidpointPointScene(sketch_scene.SketchScene):
 
         self.introduce(line, circle, first_line)
         self.run_group(
-            line.click_start(),
-            first_line.click_start(),
-            circle.click_center(),
+            sketch_utils.Click(line.start_vertex),
+            sketch_utils.Click(first_line.start_vertex),
+            sketch_utils.Click(circle.center_vertex),
             first_line.animate.move_start((line.get_start() + circle.get_center()) / 2),
         )
         self.run_group(
-            line.click_end(),
-            first_line.click_end(),
-            circle.click_center(),
+            sketch_utils.Click(line.end_vertex),
+            sketch_utils.Click(first_line.end_vertex),
+            sketch_utils.Click(circle.center_vertex),
             first_line.animate.move_end((line.get_end() + circle.get_center()) / 2),
         )
 
         self.introduce(second_line)
         self.run_group(
-            line.click_start(),
-            second_line.click_start(),
-            line.click_end(),
+            sketch_utils.Click(line.start_vertex),
+            sketch_utils.Click(second_line.start_vertex),
+            sketch_utils.Click(line.end_vertex),
             second_line.animate.move_start(line.line.get_midpoint()),
         )
         self.run_group(
-            first_line.click_start(),
-            second_line.click_end(),
-            first_line.click_end(),
+            sketch_utils.Click(first_line.start_vertex),
+            sketch_utils.Click(second_line.end_vertex),
+            sketch_utils.Click(first_line.end_vertex),
             second_line.animate.move_end(first_line.line.get_midpoint()),
         )
 
@@ -380,7 +379,9 @@ def tangent_transform(
     line: sketch.SketchLine, circle: sketch.SketchCircle
 ) -> mn.Animation:
     return mn.Succession(
-        line.click(), circle.click(), mn.Transform(line, get_translation(line, circle))
+        sketch_utils.Click(line.line),
+        sketch_utils.Click(circle.circle),
+        mn.Transform(line, get_translation(line, circle)),
     )
 
 
@@ -412,8 +413,8 @@ def tangent_circle_transform(
     base: sketch.SketchArcBase, target: sketch.SketchCircle
 ) -> Iterable[mn.Animation]:
     return (
-        base.click(),
-        target.click(),
+        sketch_utils.Click(base._arc),
+        sketch_utils.Click(target.circle),
         mn.prepare_animation(base.animate.shift(get_circle_translation(base, target))),
     )
 
@@ -449,10 +450,14 @@ class ConcentricEdgeScene(sketch_scene.SketchScene):
         self.introduce(circle, left, right)
         # move to origin using shift
         self.run_group(
-            left.click(), circle.click(), left.animate.shift(-left.get_center())
+            sketch_utils.Click(left.circle),
+            sketch_utils.Click(circle.circle),
+            left.animate.shift(-left.get_center()),
         )
         self.run_group(
-            right.click(), circle.click(), right.animate.shift(-right.get_center())
+            sketch_utils.Click(right.arc),
+            sketch_utils.Click(circle.circle),
+            right.animate.shift(-right.get_center()),
         )
 
 
@@ -463,11 +468,13 @@ class ConcentricPointScene(sketch_scene.SketchScene):
 
         # move to origin using shift
         self.run_group(
-            left.click_center(), circle.click(), left.animate.shift(-left.get_center())
+            sketch_utils.Click(left.center_vertex),
+            sketch_utils.Click(circle.circle),
+            left.animate.shift(-left.get_center()),
         )
 
         self.run_group(
-            right.click_center(),
-            circle.click(),
+            sketch_utils.Click(right.center_vertex),
+            sketch_utils.Click(circle.circle),
             right.animate.shift(-right.get_center()),
         )

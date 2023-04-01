@@ -9,6 +9,8 @@ END_DELAY = 2.5
 
 
 class ShrinkToPoint(mn.Transform):
+    """Removes a mobject by shrinking it to point."""
+
     def __init__(
         self,
         mobject: mn.Mobject,
@@ -32,7 +34,8 @@ class ShrinkToPoint(mn.Transform):
 
 
 class ShrinkToCenter(ShrinkToPoint):
-    """Remove an :class:`~.Mobject` by shrinking it to a point."""
+    """Remove a mobject by shrinking it to its center."""
+
     def __init__(
         self, mobject: mn.Mobject, point_color: color.Color | None = None, **kwargs
     ) -> None:

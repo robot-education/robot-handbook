@@ -5,7 +5,7 @@ import manim as mn
 from rc_lib.style import color, animation
 from rc_lib.math_utils import vector
 from rc_lib.view_utils import title_sequence
-from rc_lib.design import plate, sketch
+from rc_lib.design import plate, sketch, sketch_utils
 
 inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE
@@ -150,8 +150,8 @@ class BoundaryConstraintScene(mn.Scene):
 
     def _do_clicks(self, line_end: sketch.LineEnd) -> None:
         circle = self.get_var(line_end, "circle")
-        self.play(self._line.click_vertex(line_end))
-        self.play(sketch.click(circle.outer_circle))
+        self.play(sketch_utils.Click(self._line.get_vertex(line_end)))
+        self.play(sketch_utils.Click(circle.outer_circle))
 
     def do_coincident_move(self, line_end: sketch.LineEnd) -> None:
         self._do_clicks(line_end)
@@ -168,8 +168,8 @@ class BoundaryConstraintScene(mn.Scene):
     def do_tangent_move(self, line_end: sketch.LineEnd) -> None:
         circle, tangent_point = self.get_vars(line_end, "circle", "tangent_point")
 
-        self.play(self._line.click())
-        self.play(sketch.click(circle.outer_circle))
+        self.play(sketch_utils.Click(self._line.line))
+        self.play(sketch_utils.Click(circle.outer_circle))
 
         angle = self._tangent_angle(line_end)
         self.play(

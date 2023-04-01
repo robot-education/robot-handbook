@@ -11,26 +11,9 @@ from rc_lib.math_utils import vector
 from rc_lib.style import color
 from rc_lib.style import animation
 
-z_index = 100
-
-
-def click(mobject: mn.VMobject) -> mn.Animation:
-    """Animates clicking a mobject."""
-    global z_index
-    target = mobject.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
-    mobject.set_z_index(
-        z_index
-    )  # set z_index to make highlight go over the top (a bit suss)
-    z_index += 1
-    return mn.Transform(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
-
 
 class Sketch(mn.VGroup, ABC):
     """An abstract base class for Sketch entities."""
-
-    @abstractmethod
-    def click(self) -> mn.Animation:
-        raise NotImplementedError
 
     def _create_override(self, **kwargs) -> mn.Animation:
         raise NotImplementedError
@@ -62,12 +45,6 @@ class SketchArcBase(Sketch, ABC):
     def set_radius(self, radius: float) -> Self:
         self._arc.scale(radius / self._arc.radius, about_point=self.get_center())
         return self
-
-    def click_center(self) -> mn.Animation:
-        return click(self.center_vertex)
-
-    def click(self) -> mn.Animation:
-        return click(self._arc)
 
 
 class LineEnd(enum.IntEnum):
@@ -108,18 +85,6 @@ class SketchEdgeBase(Sketch, ABC):
         """Returns the end point of the line."""
         return self.get_point(LineEnd.END)
 
-    def click_vertex(self, line_end: LineEnd) -> mn.Animation:
-        return click(self.get_vertex(line_end))
-
-    def click_start(self) -> mn.Animation:
-        return self.click_vertex(LineEnd.START)
-
-    def click_end(self) -> mn.Animation:
-        return self.click_vertex(LineEnd.END)
-
-    def click(self) -> mn.Animation:
-        return click(self._edge)
-
 
 class SketchPoint(Sketch):
     """Defines a singlar Sketch vertex."""
@@ -130,9 +95,6 @@ class SketchPoint(Sketch):
 
     def get_point(self) -> vector.Vector2d:
         return self.get_center()
-
-    def click(self) -> mn.Animation:
-        return click(self.vertex)
 
 
 class SketchCircle(SketchArcBase):
