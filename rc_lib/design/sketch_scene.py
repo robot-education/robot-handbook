@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Any, Iterable
 import manim as mn
 
-from rc_lib.common_mobjects import sketch
+from rc_lib.design import sketch
 from rc_lib.style import animation
 
 

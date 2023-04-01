@@ -6,8 +6,7 @@ from typing import Iterable
 import manim as mn
 from rc_lib.style import color
 from rc_lib.math_utils import vector
-from rc_lib.view_utils import sketch_scene
-from rc_lib.common_mobjects import sketch
+from rc_lib.design import sketch, sketch_scene
 
 sketch_color = color.Palette.BLUE
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)

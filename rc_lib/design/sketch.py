@@ -1,4 +1,4 @@
-"""A module defining entities which look like Onshape sketch entities.
+"""Defines entities which look like Onshape sketch entities.
 """
 
 from typing import Self
