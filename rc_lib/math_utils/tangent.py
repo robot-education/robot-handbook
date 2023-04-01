@@ -1,12 +1,10 @@
 # import math
-from typing import List, Tuple
-
 from rc_lib.math_utils import vector
 
 
 def circle_to_circle_tangent(
     center1: vector.Point2d, radius1: float, center2: vector.Point2d, radius2: float
-) -> Tuple[vector.Point2d, vector.Point2d]:
+) -> tuple[vector.Point2d, vector.Point2d]:
     """
     Returns the outer tangent line between two circles.
     The tangent is such that it is on the (left) outside of 1 and 2 when they are arranged in clockwise fashion.

@@ -1,5 +1,5 @@
 import manim as mn
-from typing import Callable, List, Self, Tuple
+from typing import Callable, Self
 
 from rc_lib.style import color
 from rc_lib.math_utils import tangent, vector
@@ -11,28 +11,35 @@ class PlateCircle(mn.VGroup):
         self.inner_circle: mn.Circle = inner_circle
         self.outer_circle: mn.Circle = outer_circle
 
-    def center(self) -> vector.Point2d:
+    def get_center(self) -> vector.Point2d:
         return self.inner_circle.get_center()
 
-    def inner_radius(self) -> float:
-        return self.inner_circle.width / 2
+    def get_inner_radius(self) -> float:
+        return self.inner_circle.radius
 
-    def outer_radius(self) -> float:
-        return self.outer_circle.width / 2
+    def get_outer_radius(self) -> float:
+        return self.outer_circle.radius
 
 
 def plate_circle_tangent_points(
     start: PlateCircle, end: PlateCircle
-) -> Tuple[vector.Point2d, vector.Point2d]:
+) -> tuple[vector.Point2d, vector.Point2d]:
     return tangent.circle_to_circle_tangent(
-        start.center(), start.outer_radius(), end.center(), end.outer_radius()
+        start.get_center(),
+        start.get_outer_radius(),
+        end.get_center(),
+        end.get_outer_radius(),
     )
 
 
 def plate_circle_tangent_line(
-    start: PlateCircle, end: PlateCircle, color: color.Color = color.FOREGROUND
+    start: PlateCircle, end: PlateCircle, color: color.Color
 ) -> mn.Line:
     return mn.Line(*plate_circle_tangent_points(start, end), color=color)
+    # return sketch_factory.make_line(*plate_circle_tangent_points(start, end))
+
+
+PlateCircleGenerator = Callable[[vector.Point2d], PlateCircle]
 
 
 class PlateCircleFactory:
@@ -48,19 +55,17 @@ class PlateCircleFactory:
         self._outer_color = color
         return self
 
-    def make_generator(
-        self, radius: float, offset: float
-    ) -> Callable[[vector.Point2d], PlateCircle]:
+    def make_generator(self, radius: float, offset: float) -> PlateCircleGenerator:
         """
         Returns a generator function which may be used to create points of the given size.
         The generator function takes a location as an argument.
         """
 
-        def generator(location: vector.Point2d) -> PlateCircle:
+        def generator(point: vector.Point2d) -> PlateCircle:
             return PlateCircle(
                 mn.Circle(radius, color=self._inner_color),
                 mn.Circle(radius + offset, color=self._outer_color),
-            ).move_to(location)
+            ).move_to(point)
 
         return generator
 
@@ -74,36 +79,32 @@ class PlateCircleFactory:
 class PlateGroup(mn.VGroup):
     def __init__(
         self,
-        entities: List[PlateCircle],
-        boundary_order: List[int],
+        entities: list[PlateCircle],
+        boundary_order: list[int],
         boundary_color: color.Color = color.FOREGROUND,
     ) -> None:
-        self._entities: List[PlateCircle] = entities
-        self._boundary: List[PlateCircle] = [self._entities[i] for i in boundary_order]
-        self._boundary_lines: List[mn.Line] = self._make_boundary_lines(boundary_color)
+        self._entities: list[PlateCircle] = entities
+        self._boundary: list[PlateCircle] = [self._entities[i] for i in boundary_order]
+        self._boundary_lines: list[mn.Line] = self._make_boundary_lines(boundary_color)
         super().__init__(*[*self._entities, *self._boundary_lines])
 
-    def _make_boundary_lines(self, color: color.Color) -> List[mn.Line]:
+    def _make_boundary_lines(self, color: color.Color) -> list[mn.Line]:
         return [
-            plate_circle_tangent_line(self._boundary[i - 1], curr, color=color)
+            plate_circle_tangent_line(self._boundary[i - 1], curr, color)
             for i, curr in enumerate(self._boundary)
         ]
 
-    def draw_inner_circles(self, lag_ratio: float = 1, **kwargs) -> mn.Animation:
-        return mn.AnimationGroup(
-            *[mn.GrowFromCenter(x.inner_circle) for x in self._entities],
-            lag_ratio=lag_ratio,
-            **kwargs
+    def draw_inner_circles(self) -> mn.Animation:
+        return mn.Succession(
+            *[mn.GrowFromCenter(x.inner_circle) for x in self._entities], lag_ratio=0.75
         )
 
-    def draw_outer_circles(self, lag_ratio: float = 1, **kwargs) -> mn.Animation:
-        return mn.AnimationGroup(
-            *[mn.GrowFromCenter(x.outer_circle) for x in self._entities],
-            lag_ratio=lag_ratio,
-            **kwargs
+    def draw_outer_circles(self) -> mn.Animation:
+        return mn.Succession(
+            *[mn.GrowFromCenter(x.outer_circle) for x in self._entities], lag_ratio=0.75
         )
 
-    def draw_boundary(self, lag_ratio: float = 1, **kwargs) -> mn.Animation:
-        return mn.AnimationGroup(
-            *[mn.Create(x) for x in self._boundary_lines], lag_ratio=lag_ratio, **kwargs
+    def draw_boundary(self) -> mn.Animation:
+        return mn.Succession(
+            *[mn.Create(line) for line in self._boundary_lines], lag_ratio=1
         )

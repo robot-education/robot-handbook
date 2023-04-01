@@ -12,13 +12,13 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("/video_extension"))
+sys.path.append(os.path.abspath("/video_extension"))
 
 # -- Project information -----------------------------------------------------
 
 project = "Robot Concepts"
-copyright = "2023, Alex Kempen, Egan Johnson"
-author = "Alex Kempen, Egan Johnson"
+copyright = "2023, Alex Kempen and Egan Johnson"
+author = "Alex Kempen and Egan Johnson"
 
 # The full version, including alpha/beta/rc tags
 release = "1.0.0"
@@ -28,11 +28,11 @@ release = "1.0.0"
 
 extensions = [
     "sphinx_rtd_theme",
-    "sphinx.ext.autosectionlabel",
+    # "sphinx.ext.autosectionlabel",
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
     "myst_parser",
-    "video_extension.video",
+    "video_extension.animation",
 ]
 
 myst_enable_extensions = [
@@ -41,6 +41,10 @@ myst_enable_extensions = [
     "dollarmath",  # Parse $2 = 2$ and $$2 = 2$$
     "substitution",  # Enables substituions here and at the top of files
     "colon_fence",  # Enables directives using ::: and md-figure directive
+    "attrs_inline",
+    "substitution",
+    "attrs_block",
+    "attrs_inline",
 ]
 
 # autosectionlabel_prefix_document = True
@@ -61,4 +65,18 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ["_style"]
+
+html_css_files = ["custom.css"]
+
+myst_substitutions = {
+    "coincident": "![coincident](/design/images/coincident.svg){.inline}",
+    "vertical": "![vertical](/design/images/vertical.svg){.inline}",
+    "horizontal": "![horizontal](/design/images/horizontal.svg){.inline}",
+    "parallel": "![parallel](/design/images/parallel.svg){.inline}",
+    "perpendicular": "![perpendicular](/design/images/perpendicular.svg){.inline}",
+    "equal": "![equal](/design/images/equal.svg){.inline}",
+    "midpoint": "![midpoint](/design/images/midpoint.svg){.inline}",
+    "tangent": "![tangent](/design/images/tangent.svg){.inline}",
+    "concentric": "![concentric](/design/images/concentric.svg){.inline}",
+}

@@ -19,9 +19,12 @@
     ],
     "cSpell.words": [
         "atleast",
+        "autopictureinpicture",
+        "disablepictureinpicture",
         "Egan",
         "eganj",
         "finfo",
+        "imgpath",
         "interp",
         "ipynb",
         "Kempen",
@@ -32,7 +35,9 @@
         "Mobjects",
         "ndarray",
         "nocontrols",
+        "onshape",
         "opengl",
+        "refid",
         "reservee",
         "submobjects",
         "unannotate",
@@ -41,6 +46,9 @@
         "vmobject",
         "vmobjects",
         "webm"
+    ],
+    "cSpell.flagWords": [
+        "coincentric"
     ],
     "python.analysis.extraPaths": [
         "rc_lib"

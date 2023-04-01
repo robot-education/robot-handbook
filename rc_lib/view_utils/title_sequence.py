@@ -33,7 +33,7 @@ class TitleSequence:
             return mn.Transform(self._first, text, run_time=0.75)
 
     def _make_text(self, title: str, color: color.Color) -> mn.Text:
-        prefix = str(self._number) + ": " if self._add_numbers else ""
+        prefix = str(self._number) + ". " if self._add_numbers else ""
         return mn.Text(
             prefix + title, font_size=text.FontSize.LARGE, color=color
         ).to_corner(mn.UP + mn.LEFT)
