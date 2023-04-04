@@ -86,27 +86,32 @@ class SketchEdgeBase(Sketch, ABC):
         return self.get_point(LineEnd.END)
 
 
-class SketchPoint(mn.Dot):
+class Point(mn.Dot):
     """Defines a singlar Sketch vertex."""
 
     def __init__(self, dot: mn.Dot) -> None:
+        super().__init__()
         self.become(dot)
 
-    def make_updater(self) -> Callable[[mn.Mobject], None]:
-        """Constructs an updater function which causes a given mobject to follow this point."""
+    # def make_updater(self) -> Callable[[mn.Mobject], None]:
+    #     """Constructs an updater function which causes a given mobject to follow this point."""
 
-        def updater(mobject: mn.Mobject):
-            mobject.move_to(self.get_center())
+    #     def updater(mobject: mn.Mobject):
+    #         mobject.move_to(self.get_center())
 
-        return updater
+    #     return updater
 
     def follow(self, point_function: Callable[[], vector.Point2d]) -> None:
         """Adds an updater function which causes this point to track the specified input."""
 
-        def tracker(mobject: mn.Mobject):
-            self.move_to(point_function())
+        def updater(mobject: mn.Mobject):
+            mobject.move_to(point_function())
 
-        self.add_updater(tracker)
+        self.add_updater(updater)
+
+
+def make_sketch_point(point: vector.Point2d) -> Point:
+    return Point(mn.Dot(point))
 
 
 class SketchCircle(SketchArcBase):
@@ -181,17 +186,13 @@ class SketchLine(SketchEdgeBase):
         )
 
 
-class SketchArc(mn.Arc):
+class Arc(mn.Arc):
     """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
-    def __init__(
-        self,
-        arc: mn.Arc
-        # start: mn.Dot,
-        # end: mn.Dot,
-        # center: mn.Dot
-    ) -> None:
+    def __init__(self, arc: mn.Arc) -> None:
+        super().__init__()
         self.become(arc)
+
         self.start = make_sketch_point(self.get_start())
         self.end = make_sketch_point(self.get_end())
         # center is already a function...
@@ -199,15 +200,10 @@ class SketchArc(mn.Arc):
 
         self.end.follow(self.get_start)
         self.start.follow(self.get_end)
-        self.add_updater(self.middle.make_updater())
+        self.middle.follow(self.get_arc_center)
 
-    def move_to(self, point: vector.Point2d) -> Self:
-        self.middle.move_to(point)
-        return self
-
-    def shift(self, vector: vector.Vector2d) -> Self:
-        self.middle.shift(vector)
-        return self
+    def get_center(self) -> vector.Point2d:
+        return self.middle.get_center()
 
     def set_radius(self, radius: float) -> Self:
         self.scale(radius / self.radius, about_point=self.get_center())
@@ -216,24 +212,17 @@ class SketchArc(mn.Arc):
     @mn.override_animation(mn.Create)
     def _create_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            mn.Create(self.middle, run_time=0),
-            mn.Create(self.start, run_time=0),
-            mn.Create(self.end, run_time=0),
+            mn.Create(mn.VGroup(self.middle, self.start, self.end), run_time=0),
             mn.GrowFromCenter(self),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self, **kwargs) -> mn.Animation:
+        # uncreating start and end breaks the updaters?
         return mn.Succession(
             animation.ShrinkToCenter(self),
-            mn.Uncreate(self.middle, run_time=0),
-            mn.Uncreate(self.start, run_time=0),
-            mn.Uncreate(self.end, run_time=0),
+            mn.Uncreate(mn.VGroup(self.middle, self.start, self.end), run_time=0),
         )
-
-
-def make_sketch_point(point: vector.Point2d) -> SketchPoint:
-    return SketchPoint(mn.Dot(point))
 
 
 class SketchFactory:
@@ -246,8 +235,8 @@ class SketchFactory:
         self._color = color
         return self
 
-    def make_point(self, point: vector.Point2d) -> SketchPoint:
-        return SketchPoint(self._make_dot(point))
+    # def make_point(self, point: vector.Point2d) -> Point:
+    #     return Point(self._make_dot(point))
 
     def make_line(
         self, start_point: vector.Point2d, end_point: vector.Point2d
@@ -268,7 +257,7 @@ class SketchFactory:
 
     def make_arc(
         self, center: vector.Point2d, radius: float, start_angle: float, angle: float
-    ) -> SketchArc:
+    ) -> Arc:
         # start_angle is typed incorrectly as int
         arc = mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color, arc_center=center)  # type: ignore
-        return SketchArc(arc)
+        return Arc(arc)

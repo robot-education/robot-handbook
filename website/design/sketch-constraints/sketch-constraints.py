@@ -4,10 +4,9 @@ import math
 from typing import Iterable
 
 import manim as mn
-from design import scene
 from rc_lib.style import color
 from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_utils
+from rc_lib.design import sketch, sketch_utils, scene
 
 sketch_color = color.Palette.BLUE
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
@@ -294,7 +293,7 @@ class EqualCircleScene(scene.SketchScene):
         )
         self.run_group(
             sketch_utils.Click(base.circle),
-            sketch_utils.Click(arc.arc),
+            sketch_utils.Click(arc),
             arc.animate.set_radius(1.5),
         )
 
@@ -430,12 +429,10 @@ class TangentCircleScene(scene.SketchScene):
 
         self.introduce(circle, left, right)
         self.run_group(*tangent_circle_transform(left, circle))
-        self.run_group(*tangent_circle_transform(right, circle))
+        # self.run_group(*tangent_circle_transform(right, circle))
 
 
-def concentric_common() -> (
-    tuple[sketch.SketchCircle, sketch.SketchCircle, sketch.SketchArc]
-):
+def concentric_common() -> tuple[sketch.SketchCircle, sketch.SketchCircle, sketch.Arc]:
     return (
         sketch_factory.make_circle(mn.ORIGIN, 1.5),
         sketch_factory.make_circle(vector.point_2d(-4, 0), 2),
@@ -456,7 +453,7 @@ class ConcentricEdgeScene(scene.SketchScene):
             left.animate.shift(-left.get_center()),
         )
         self.run_group(
-            sketch_utils.Click(right.arc),
+            sketch_utils.Click(right),
             sketch_utils.Click(circle.circle),
             right.animate.shift(-right.get_center()),
         )
@@ -475,7 +472,7 @@ class ConcentricPointScene(scene.SketchScene):
         )
 
         self.run_group(
-            sketch_utils.Click(right.center_vertex),
+            sketch_utils.Click(right.middle),
             sketch_utils.Click(circle.circle),
             right.animate.shift(-right.get_center()),
         )

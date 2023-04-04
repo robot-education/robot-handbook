@@ -135,3 +135,5 @@ mn.Color seems to be unhappy with literal strings from time to time
 np.float64 is returned by coords (somewhat arbitrarily)
 GrowFromCenter, GrowFromPoint colors typed as str, not Color and missing | None
 AnimationBuilders from .animate are not valid animations?
+GrowFromCenter should probably expose introducer (like Create and Uncreate do)
+Is there a use for an Add and Delete Animation?
