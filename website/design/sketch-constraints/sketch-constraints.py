@@ -4,9 +4,10 @@ import math
 from typing import Iterable
 
 import manim as mn
+from design import scene
 from rc_lib.style import color
 from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_scene, sketch_utils
+from rc_lib.design import sketch, sketch_utils
 
 sketch_color = color.Palette.BLUE
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
@@ -27,7 +28,7 @@ def coincident_common_mobjects() -> (
     )
 
 
-class CoincidentPointsScene(sketch_scene.SketchScene):
+class CoincidentPointsScene(scene.SketchScene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
@@ -45,7 +46,7 @@ class CoincidentPointsScene(sketch_scene.SketchScene):
         )
 
 
-class CoincidentPointLineScene(sketch_scene.SketchScene):
+class CoincidentPointLineScene(scene.SketchScene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
@@ -75,7 +76,7 @@ class CoincidentPointLineScene(sketch_scene.SketchScene):
         )
 
 
-class CoincidentLineScene(sketch_scene.SketchScene):
+class CoincidentLineScene(scene.SketchScene):
     def construct(self) -> None:
         start_point = vector.point_2d(-5.75, 2.5)
         middle_point = vector.point_2d(-1.15, 0.5)  # closest to the middle
@@ -109,7 +110,7 @@ def vh_common_line() -> tuple[sketch.SketchLine, float]:
     )
 
 
-class VerticalLineScene(sketch_scene.SketchScene):
+class VerticalLineScene(scene.SketchScene):
     def construct(self) -> None:
         start_line, angle = vh_common_line()
         angle = math.radians(90) - angle
@@ -122,7 +123,7 @@ class VerticalLineScene(sketch_scene.SketchScene):
         )
 
 
-class HorizontalLineScene(sketch_scene.SketchScene):
+class HorizontalLineScene(scene.SketchScene):
     def construct(self) -> None:
         start_line, angle = vh_common_line()
         angle = -angle
@@ -134,7 +135,7 @@ class HorizontalLineScene(sketch_scene.SketchScene):
         )
 
 
-class VerticalPointsScene(sketch_scene.SketchScene):
+class VerticalPointsScene(scene.SketchScene):
     def construct(self) -> None:
         circle = sketch_factory.make_circle(vector.point_2d(-4, 1.5), 1.5)
         line = sketch_factory.make_line(
@@ -163,7 +164,7 @@ class VerticalPointsScene(sketch_scene.SketchScene):
         )
 
 
-class HorizontalPointsScene(sketch_scene.SketchScene):
+class HorizontalPointsScene(scene.SketchScene):
     def construct(self) -> None:
         circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
         line = sketch_factory.make_line(
@@ -194,7 +195,7 @@ class HorizontalPointsScene(sketch_scene.SketchScene):
         )
 
 
-class ParallelScene(sketch_scene.SketchScene):
+class ParallelScene(scene.SketchScene):
     def construct(self) -> None:
         line = sketch_factory.make_line(
             vector.point_2d(-6, -3), vector.point_2d(6, 0.5)
@@ -205,7 +206,7 @@ class ParallelScene(sketch_scene.SketchScene):
         start_point = end_point - direction * 10.5
         angle = math.radians(16.26)
         start_line = sketch_factory.make_line(start_point, end_point).rotate(
-            -angle, about_point=line.line.get_midpoint() # type: ignore
+            -angle, about_point=line.line.get_midpoint()  # type: ignore
         )
 
         self.introduce(line, start_line)
@@ -216,7 +217,7 @@ class ParallelScene(sketch_scene.SketchScene):
         )
 
 
-class PerpendicularScene(sketch_scene.SketchScene):
+class PerpendicularScene(scene.SketchScene):
     def construct(self) -> None:
         line = sketch_factory.make_line(
             vector.point_2d(-5, -2.75), vector.point_2d(5.5, 0.5)
@@ -249,7 +250,7 @@ def centered_line(line: sketch.SketchLine, length: float) -> sketch.SketchLine:
     return sketch_factory.make_line(center - offset, center + offset)
 
 
-class EqualLineScene(sketch_scene.SketchScene):
+class EqualLineScene(scene.SketchScene):
     def construct(self) -> None:
         base = sketch_factory.make_line(
             vector.point_2d(-5.5, -1.5), vector.point_2d(-1.25, 2)
@@ -277,7 +278,7 @@ class EqualLineScene(sketch_scene.SketchScene):
         )
 
 
-class EqualCircleScene(sketch_scene.SketchScene):
+class EqualCircleScene(scene.SketchScene):
     def construct(self) -> None:
         base = sketch_factory.make_circle(vector.point_2d(0, -1.5), 1.5)
         circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1), 2)
@@ -298,7 +299,7 @@ class EqualCircleScene(sketch_scene.SketchScene):
         )
 
 
-class MidpointLineScene(sketch_scene.SketchScene):
+class MidpointLineScene(scene.SketchScene):
     def construct(self) -> None:
         top = sketch_factory.make_line(vector.point_2d(-6, 3), vector.point_2d(6, 1.25))
         bottom = sketch_factory.make_line(
@@ -321,7 +322,7 @@ class MidpointLineScene(sketch_scene.SketchScene):
         )
 
 
-class MidpointPointScene(sketch_scene.SketchScene):
+class MidpointPointScene(scene.SketchScene):
     def construct(self) -> None:
         line = sketch_factory.make_line(
             vector.point_2d(-6, 5 / 2), vector.point_2d(-6, -5 / 2)
@@ -385,7 +386,7 @@ def tangent_transform(
     )
 
 
-class TangentLineScene(sketch_scene.SketchScene):
+class TangentLineScene(scene.SketchScene):
     def construct(self) -> None:
         circle = sketch_factory.make_circle(mn.ORIGIN, 1.5)
         left = sketch_factory.make_line(
@@ -419,7 +420,7 @@ def tangent_circle_transform(
     )
 
 
-class TangentCircleScene(sketch_scene.SketchScene):
+class TangentCircleScene(scene.SketchScene):
     def construct(self) -> None:
         circle = sketch_factory.make_circle(mn.ORIGIN, 1.5)
         left = sketch_factory.make_circle(vector.point_2d(-4, 1), 1.5)
@@ -444,7 +445,7 @@ def concentric_common() -> (
     )
 
 
-class ConcentricEdgeScene(sketch_scene.SketchScene):
+class ConcentricEdgeScene(scene.SketchScene):
     def construct(self) -> None:
         circle, left, right = concentric_common()
         self.introduce(circle, left, right)
@@ -461,7 +462,7 @@ class ConcentricEdgeScene(sketch_scene.SketchScene):
         )
 
 
-class ConcentricPointScene(sketch_scene.SketchScene):
+class ConcentricPointScene(scene.SketchScene):
     def construct(self) -> None:
         circle, left, right = concentric_common()
         self.introduce(circle, left, right)

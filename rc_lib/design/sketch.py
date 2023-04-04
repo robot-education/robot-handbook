@@ -1,8 +1,8 @@
 """Defines entities which look like Onshape sketch entities.
 """
 
-from typing import Self
-from abc import ABC, abstractmethod
+from typing import Callable, Self
+from abc import ABC
 import enum
 
 import manim as mn
@@ -86,15 +86,27 @@ class SketchEdgeBase(Sketch, ABC):
         return self.get_point(LineEnd.END)
 
 
-class SketchPoint(Sketch):
+class SketchPoint(mn.Dot):
     """Defines a singlar Sketch vertex."""
 
-    def __init__(self, vertex: mn.Dot) -> None:
-        self.vertex = vertex
-        super().__init__(self.get_point)
+    def __init__(self, dot: mn.Dot) -> None:
+        self.become(dot)
 
-    def get_point(self) -> vector.Vector2d:
-        return self.get_center()
+    def make_updater(self) -> Callable[[mn.Mobject], None]:
+        """Constructs an updater function which causes a given mobject to follow this point."""
+
+        def updater(mobject: mn.Mobject):
+            mobject.move_to(self.get_center())
+
+        return updater
+
+    def follow(self, point_function: Callable[[], vector.Point2d]) -> None:
+        """Adds an updater function which causes this point to track the specified input."""
+
+        def tracker(mobject: mn.Mobject):
+            self.move_to(point_function())
+
+        self.add_updater(tracker)
 
 
 class SketchCircle(SketchArcBase):
@@ -169,71 +181,59 @@ class SketchLine(SketchEdgeBase):
         )
 
 
-class SketchArc(SketchArcBase, SketchEdgeBase):
+class SketchArc(mn.Arc):
     """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
     def __init__(
         self,
-        arc: mn.Arc,
-        start_vertex: mn.Dot,
-        end_vertex: mn.Dot,
-        center_vertex: mn.Dot,
+        arc: mn.Arc
+        # start: mn.Dot,
+        # end: mn.Dot,
+        # center: mn.Dot
     ) -> None:
-        super().__init__(
-            arc=arc,
-            center_vertex=center_vertex,
-            edge=arc,
-            start_vertex=start_vertex,
-            end_vertex=end_vertex,
-        )
-        self.arc = arc
+        self.become(arc)
+        self.start = make_sketch_point(self.get_start())
+        self.end = make_sketch_point(self.get_end())
+        # center is already a function...
+        self.middle = make_sketch_point(self.get_arc_center())
+
+        self.end.follow(self.get_start)
+        self.start.follow(self.get_end)
+        self.add_updater(self.middle.make_updater())
+
+    def move_to(self, point: vector.Point2d) -> Self:
+        self.middle.move_to(point)
+        return self
+
+    def shift(self, vector: vector.Vector2d) -> Self:
+        self.middle.shift(vector)
+        return self
 
     def set_radius(self, radius: float) -> Self:
-        distance = radius - self.get_radius()
-        self.start_vertex.shift(
-            vector.direction(self.get_center(), self.get_start()) * distance
-        )
-        self.end_vertex.shift(
-            vector.direction(self.get_center(), self.get_end()) * distance
-        )
-        super().set_radius(radius)
+        self.scale(radius / self.radius, about_point=self.get_center())
         return self
 
     @mn.override_animation(mn.Create)
     def _create_override(self, **kwargs) -> mn.Animation:
-        start_point = self.get_start()
-        end_point = self.get_end()
         return mn.Succession(
-            mn.Create(self.center_vertex, run_time=0),
-            mn.AnimationGroup(
-                mn.GrowFromPoint(self.arc, self.get_center()),
-                mn.prepare_animation(
-                    self.start_vertex.move_to(self.get_center()).animate.move_to(
-                        start_point
-                    )
-                ),
-                mn.prepare_animation(
-                    self.end_vertex.move_to(self.get_center()).animate.move_to(
-                        end_point
-                    )
-                ),
-            ),
+            mn.Create(self.middle, run_time=0),
+            mn.Create(self.start, run_time=0),
+            mn.Create(self.end, run_time=0),
+            mn.GrowFromCenter(self),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self, **kwargs) -> mn.Animation:
         return mn.Succession(
-            mn.AnimationGroup(
-                animation.ShrinkToPoint(self.arc, self.get_center()),
-                mn.prepare_animation(
-                    self.start_vertex.animate(remover=True).move_to(self.get_center())
-                ),
-                mn.prepare_animation(
-                    self.end_vertex.animate(remover=True).move_to(self.get_center())
-                ),
-            ),
-            mn.Uncreate(self.center_vertex, run_time=0),
+            animation.ShrinkToCenter(self),
+            mn.Uncreate(self.middle, run_time=0),
+            mn.Uncreate(self.start, run_time=0),
+            mn.Uncreate(self.end, run_time=0),
         )
+
+
+def make_sketch_point(point: vector.Point2d) -> SketchPoint:
+    return SketchPoint(mn.Dot(point))
 
 
 class SketchFactory:
@@ -271,9 +271,4 @@ class SketchFactory:
     ) -> SketchArc:
         # start_angle is typed incorrectly as int
         arc = mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color, arc_center=center)  # type: ignore
-        return SketchArc(
-            arc,
-            self._make_dot(arc.get_start()),
-            self._make_dot(arc.get_end()),
-            self._make_dot(center),
-        )
+        return SketchArc(arc)
