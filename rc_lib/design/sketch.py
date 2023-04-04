@@ -218,10 +218,11 @@ class Arc(mn.Arc):
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self, **kwargs) -> mn.Animation:
-        # uncreating start and end breaks the updaters?
         return mn.Succession(
             animation.ShrinkToCenter(self),
-            mn.Uncreate(mn.VGroup(self.middle, self.start, self.end), run_time=0),
+            mn.Uncreate(self.middle, run_time=0),
+            mn.Create(self.start, reverse_rate_function=True, remover=True, run_time=0),
+            mn.Create(self.end, reverse_rate_function=True, remover=True, run_time=0),
         )
 
 

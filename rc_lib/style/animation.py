@@ -16,13 +16,11 @@ class ShrinkToPoint(mn.Transform):
         mobject: mn.Mobject,
         point: vector.Point2d,
         point_color: color.Color | None = None,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.point = point
         self.point_color = point_color
-        super().__init__(
-            mobject, remover=True, reverse_rate_function=True, **kwargs
-        )  # reverse_rate_function=True
+        super().__init__(mobject, remover=True, reverse_rate_function=True, **kwargs)
 
     def create_target(self) -> mn.Mobject:
         return self.mobject

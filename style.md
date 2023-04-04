@@ -137,3 +137,6 @@ GrowFromCenter, GrowFromPoint colors typed as str, not Color and missing | None
 AnimationBuilders from .animate are not valid animations?
 GrowFromCenter should probably expose introducer (like Create and Uncreate do)
 Is there a use for an Add and Delete Animation?
+
+Remover animations break updaters, even when used after normal animations in a Succession. However, this behavior goes
+away if introducer is set to be true.
