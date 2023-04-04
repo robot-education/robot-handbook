@@ -130,13 +130,19 @@ The following admonitions should not be used:
 
 ### Manim Bugs
 mn.Arc's start_angle is typed as int, not float
-Sequence[float], np.ndarray, and sometimes Sequence[float] | np.ndarray are used somewhat interchangably
+
+Sequence[float], np.ndarray, and sometimes Sequence[float] | np.ndarray are used somewhat interchangably.
+This leads to annoying behaviors like line.put_start_and_end_on not being compatible with line.get_start
+
 mn.Color seems to be unhappy with literal strings from time to time
 np.float64 is returned by coords (somewhat arbitrarily)
 GrowFromCenter, GrowFromPoint colors typed as str, not Color and missing | None
 AnimationBuilders from .animate are not valid animations?
 GrowFromCenter should probably expose introducer (like Create and Uncreate do)
+
 Is there a use for an Add and Delete Animation?
 
 Remover animations break updaters, even when used after normal animations in a Succession. However, this behavior goes
 away if introducer is set to be true.
+
+"animation" is spelled "animnation" in add_animation_override docs

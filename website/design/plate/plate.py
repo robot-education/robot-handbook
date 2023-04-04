@@ -115,7 +115,7 @@ class BoundaryConstraintScene(mn.Scene):
         left_start_point = self._tangent_points[0] + vector.point_2d(1.75, 0.75)
         right_start_point = self._tangent_points[1] + vector.point_2d(-2, 0.5)
 
-        self._line: sketch.SketchLine = sketch_factory.make_line(
+        self._line: sketch.Line = sketch_factory.make_line(
             left_start_point, right_start_point
         )
 
