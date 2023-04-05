@@ -1,5 +1,7 @@
 """
 A build script which can be used to compile animations and build the website.
+
+Fuzzy matching is used to enable quickly specifying targets in the website folder.
 """
 import inspect
 import os
@@ -102,26 +104,6 @@ def get_scene_names(file_path: pathlib.Path) -> list[str]:
     ]
 
 
-# def get_python_file_paths(path: str | None = None) -> list[str]:
-#     if path is not None:
-#         path = os.path.join(source_path, path)
-#     else:
-#         path = source_path
-
-#     file_paths = []
-#     for dir_path, _, file_names in os.walk(path):
-#         file_paths.extend(
-#             [os.path.join(dir_path, file_name) for file_name in file_names]
-#         )
-
-#     return [
-#         file_path
-#         for file_path in file_paths
-#         if os.path.splitext(file_path)[1] == ".py"
-#         and file_path != "{}/conf.py".format(source_path)
-#     ]
-
-
 def move_output(quality: str, file_path: pathlib.Path, scene_name: str) -> None:
     """Moves produced files from media to the appropriate location in website."""
     quality_folder = quality_folder_lookup[quality]
@@ -150,14 +132,32 @@ def get_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="whether to build production versions of animations",
     )
+
     parser.add_argument(
+        "-m",
+        "--make",
+        action="store_true",
+        help="whether to make the website after building",
+    )
+
+    description = """
+    Inputs to the builder. All inputs are parsed using a fuzzy matcher which enables (often aggressive) abbreviations.
+    The fuzzer works by comparing tokens in the input with target tokens. 
+    Token splits are determined using capital letters, slashes, and underscores, and the word "scene" is ignored.
+    So, to match a scene like "CoincidentLineScene", "coinLi" is probably sufficient, but "coinli" and "COINLI" will likely
+    fail due to to many (or to few) tokens.
+    """
+
+    group = parser.add_argument_group("inputs", description)
+
+    group.add_argument(
         "-f",
         "--file",
         nargs="*",
         default=None,
         help="python files to build",
     )
-    parser.add_argument(
+    group.add_argument(
         "-p",
         "--path",
         nargs="*",
@@ -166,27 +166,21 @@ def get_arg_parser() -> argparse.ArgumentParser:
             source_path
         ),
     )
-    parser.add_argument(
+    group.add_argument(
         "-s",
         "--scene",
         nargs="*",
         help="a list of scenes to render",
     )
-    parser.add_argument(
-        "-m",
-        "--make",
-        action="store_true",
-        help="whether to make the website after building",
-    )
     return parser
 
 
 def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
-    parsed_targets = dict([(target, split_capital_case(target)) for target in targets])
+    parsed_targets = dict([(target, split_tokens(target)) for target in targets])
 
     matches = []
     for value in values:
-        parsed_value = split_capital_case(value)
+        parsed_value = split_tokens(value)
         _, score, target_name = process.extractOne(  # type: ignore
             parsed_value, parsed_targets, scorer=fuzz.token_sort_ratio  # type: ignore
         )
@@ -199,14 +193,15 @@ def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
     return matches
 
 
-def split_capital_case(input: str) -> str:
-    parsed = re.search("[^A-Z/]*", input)
+def split_tokens(input: str) -> str:
+    parsed = re.search("[^A-Z/_]*", input)
     matches: list[str] = []
     if parsed is not None:
         matches.append(parsed.group(0))
 
-    end = re.findall("[A-Z/][^A-Z]*", input)
+    end = re.findall("[A-Z/_][^A-Z/_]*", input)
     matches.extend(end)
+    # ignore presence of scene
     if matches[-1].lower() == "scene":
         matches.pop()
     return " ".join(matches)
