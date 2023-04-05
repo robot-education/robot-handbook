@@ -1,7 +1,9 @@
 # Plate
-Plates are common components on many robots. Plates can be easily cut from sheets using a router or laser.
 
 ## Introduction
+Flat plates are common structural components on many robots. 
+
+## Modeling
 The basic process for modeling a plate is demonstrated in the following animation.
 
 :::{animation} IntakePlateScene.mp4
@@ -20,8 +22,13 @@ Redrawing the boundary of a plate
 :::
 
 ## Appendix
+### Constraints
 Lines should be constrained to each circle using a coincident {{coincident}} and a tangent {{tangent}} constraint.
 
 :::{animation} BoundaryConstraintScene.mp4
 Constraining a boundary line
 :::
+
+Circles which are the same radius should be constrained together using equal {{equal}} constraints.
+
+<!-- ### Additional Examples -->

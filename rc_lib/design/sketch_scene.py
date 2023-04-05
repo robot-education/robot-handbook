@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Iterable
+from typing import Any
 import manim as mn
 
 from rc_lib.design import sketch

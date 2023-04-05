@@ -11,7 +11,6 @@ inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE
 
 plate_factory: plate.PlateCircleFactory = plate.PlateCircleFactory()
-plate_factory.set_inner_color(inner_color).set_outer_color(boundary_color)
 
 sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(boundary_color)
 
@@ -128,7 +127,11 @@ class BoundaryConstraintScene(mn.Scene):
         if key == "tangent_point":
             return self._tangent_points[line_end]
         elif key == "point":
-            return self._line.get_point(line_end)
+            return (
+                self._line.get_start()
+                if line_end == sketch.LineEnd.START
+                else self._line.get_end()
+            )
         elif key == "circle":
             return self._left if line_end == sketch.LineEnd.START else self._right
         else:
@@ -136,7 +139,7 @@ class BoundaryConstraintScene(mn.Scene):
 
     def construct(self):
         self.play(title.next("Create line"))
-        self.play(mn.Create(self._line))
+        self.play(self._line.create())
 
         self.play(title.next("Add coincident constraints"))
         self.do_coincident_move(sketch.LineEnd.START)
@@ -150,13 +153,24 @@ class BoundaryConstraintScene(mn.Scene):
 
     def _do_clicks(self, line_end: sketch.LineEnd) -> None:
         circle = self.get_var(line_end, "circle")
-        self.play(sketch_utils.Click(self._line.get_vertex(line_end)))
+        self.play(
+            sketch_utils.Click(
+                self._line.start if line_end == sketch.LineEnd.START else self._line.end
+            )
+        )
         self.play(sketch_utils.Click(circle.outer_circle))
 
     def do_coincident_move(self, line_end: sketch.LineEnd) -> None:
         self._do_clicks(line_end)
         new_point = self._coincident_point(line_end)
-        self.play(self._line.animate.move_point(new_point, line_end))
+
+        base = self._line.animate
+        move_func = None
+        if line_end == sketch.LineEnd.START:
+            move_func = base.move_start
+        else:
+            move_func = base.move_end
+        self.play(move_func(new_point))
 
     def _coincident_point(self, line_end: sketch.LineEnd) -> vector.Point2d:
         circle, point = self.get_vars(line_end, "circle", "point")
@@ -168,15 +182,19 @@ class BoundaryConstraintScene(mn.Scene):
     def do_tangent_move(self, line_end: sketch.LineEnd) -> None:
         circle, tangent_point = self.get_vars(line_end, "circle", "tangent_point")
 
-        self.play(sketch_utils.Click(self._line.line))
+        self.play(sketch_utils.Click(self._line))
         self.play(sketch_utils.Click(circle.outer_circle))
 
         angle = self._tangent_angle(line_end)
-        self.play(
-            self._line.animate(
-                path_arc=angle, path_arg_centers=[circle.get_center()]
-            ).move_point(tangent_point, line_end)
+        base = self._line.animate(
+            path_arc=angle, path_arg_centers=[circle.get_center()]
         )
+        move_func = None
+        if line_end == sketch.LineEnd.START:
+            move_func = base.move_start
+        else:
+            move_func = base.move_end
+        self.play(move_func(tangent_point))
 
     def _tangent_angle(self, line_end: sketch.LineEnd) -> float:
         point, tangent_point, circle = self.get_vars(

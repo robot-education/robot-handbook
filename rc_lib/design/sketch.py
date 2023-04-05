@@ -55,8 +55,15 @@ class Circle(mn.Circle, Sketch):
     def __init__(self, circle: mn.Circle):
         super().__init__()
         self.become(circle)
+        self.radius = circle.radius
+
         self.middle = make_point(self.get_center())
         self.middle.follow(self.get_center)
+
+    def set_radius(self, radius: float) -> Self:
+        self.scale(radius / self.radius)
+        self.radius = radius
+        return self
 
     def create(self) -> mn.Animation:
         return mn.Succession(
@@ -91,18 +98,12 @@ class Line(mn.Line, Sketch):
     def get_direction(self) -> vector.Direction2d:
         return vector.normalize(self.get_end() - self.get_start())
 
-    def move_point(self, point: vector.Point2d, line_end: LineEnd) -> Self:
-        if line_end == LineEnd.START:
-            self.put_start_and_end_on(point, self.get_end())  # type: ignore
-        else:
-            self.put_start_and_end_on(self.get_start(), point)  # type: ignore
-        return self
-
     def move_start(self, point: vector.Point2d) -> Self:
+        return self.put_start_and_end_on(point, self.get_end())  # type: ignore
         return self.move_point(point, LineEnd.START)
 
     def move_end(self, point: vector.Point2d) -> Self:
-        return self.move_point(point, LineEnd.END)
+        return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
     def create(self) -> mn.Animation:
         return mn.Succession(
@@ -123,6 +124,7 @@ class Arc(mn.Arc, Sketch):
     def __init__(self, arc: mn.Arc) -> None:
         super().__init__()
         self.become(arc)
+        self.radius = arc.radius
 
         self.start = make_point(self.get_start())
         self.end = make_point(self.get_end())
@@ -137,7 +139,7 @@ class Arc(mn.Arc, Sketch):
         return self.middle.get_center()
 
     def set_radius(self, radius: float) -> Self:
-        self.scale(radius / self.radius, about_point=self.get_center())
+        self.scale(radius / self.radius)
         self.radius = radius
         return self
 
