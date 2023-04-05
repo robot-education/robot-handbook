@@ -1,6 +1,7 @@
 """
 A build script which can be used to compile animations and build the website.
 """
+from ctypes import cast
 import inspect
 import os
 import subprocess
@@ -8,6 +9,7 @@ import argparse
 import sys
 import pathlib
 import importlib
+import re
 
 from thefuzz import process, fuzz
 
@@ -175,6 +177,30 @@ def get_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
+    parsed_targets = dict([(target, split_capital_case(target)) for target in targets])
+
+    matches = []
+    for value in values:
+        parsed_value = split_capital_case(value)
+        _, score, target_name = process.extractOne(  # type: ignore
+            parsed_value, parsed_targets, scorer=fuzz.token_sort_ratio  # type: ignore
+        )
+        if score < 95:
+            print("Found {} for input {} (score: {})".format(target_name, value, score))
+        # print("Inputs:", parsed_targets)
+        # print("Query:", parsed_value)
+        matches.append(target_name)
+    return matches
+
+
+def split_capital_case(input: str) -> str:
+    matches = re.findall("[A-Z][^A-Z]*", input)
+    if matches[-1] == "Scene":
+        matches.pop()
+    return " ".join(matches)
+
+
 def main():
     args = get_arg_parser().parse_args()
 
@@ -188,34 +214,15 @@ def main():
             pass
 
     if args.file is not None:
-        target_names = [target_path.name for target_path in target_paths]
-        matches = []
-        for file_name in args.file:
-            match, score = process.extractOne(  # type: ignore
-                file_name, target_names, scorer=fuzz.partial_ratio  # type: ignore
-            )
-            print(
-                "Found {} for input file {} (score: {})".format(match, file_name, score)
-            )
-            matches.append(match)
-        target_paths = [
-            target_path for target_path in target_paths if target_path.name in matches
-        ]
+        # we use a dict so we can split names into sequences
+        target_names = [path.name for path in target_paths]
+        results = fuzzy_search(target_names, args.file)
+        target_paths = [path for path in target_paths if path.name in results]
 
     scenes = get_all_scenes(target_paths)
     if args.scene is not None:
-        result = {}
-        for scene_name in args.scene:
-            match, score = process.extractOne(  # type: ignore
-                scene_name, scenes.keys(), scorer=fuzz.partial_ratio  # type: ignore
-            )
-            print(
-                "Found {} for input scene {} (score: {})".format(
-                    match, scene_name, score
-                )
-            )
-            result[match] = scenes[match]
-        scenes = result
+        results = fuzzy_search(list(scenes.keys()), args.scene)
+        scenes = dict([(k, v) for k, v in scenes.items() if k in results])
 
     for scene_name, file_path in scenes.items():
         manim_command = (
