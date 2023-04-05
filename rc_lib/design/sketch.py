@@ -12,11 +12,6 @@ from rc_lib.style import color
 from rc_lib.style import animation
 
 
-class LineEnd(enum.IntEnum):
-    """An enum defining the start and end of a line (or other edge)."""
-
-    START = 0
-    END = 1
 
 
 class SketchState(color.Color, enum.Enum):
@@ -55,9 +50,15 @@ class Point(mn.Dot, Sketch):
 
         self.add_updater(updater)
 
+    def create(self) -> mn.Animation:
+        return mn.Create(self, run_time=0)
+
+    def uncreate(self) -> mn.Animation:
+        return mn.Create(self, reverse_rate_function=True, remover=True, run_time=0)
+
 
 def make_point(point: vector.Point2d) -> Point:
-    return Point(mn.Dot(point, color=color.Palette.BLUE))
+    return Point(mn.Dot(point, color=SketchState.NORMAL))
 
 
 class Circle(mn.Circle, Sketch):
@@ -82,12 +83,7 @@ class Circle(mn.Circle, Sketch):
         )
 
     def uncreate(self) -> mn.Animation:
-        return mn.Succession(
-            animation.ShrinkToCenter(self),
-            mn.Create(
-                self.middle, reverse_rate_function=True, remover=True, run_time=0
-            ),
-        )
+        return mn.Succession(animation.ShrinkToCenter(self), self.middle.uncreate())
 
 
 class Line(mn.Line, Sketch):
@@ -111,21 +107,17 @@ class Line(mn.Line, Sketch):
 
     def move_start(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(point, self.get_end())  # type: ignore
-        return self.move_point(point, LineEnd.START)
+        # return self.move_point(point, LineEnd.START)
 
     def move_end(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
     def create(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Create(mn.VGroup(self.start, self.end), run_time=0), mn.Create(self)
-        )
+        return mn.Succession(self.start.create(), self.end.create(), mn.Create(self))
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
-            mn.Uncreate(self),
-            mn.Create(self.start, reverse_rate_function=True, remover=True, run_time=0),
-            mn.Create(self.end, reverse_rate_function=True, remover=True, run_time=0),
+            mn.Uncreate(self), self.start.uncreate(), self.end.uncreate()
         )
 
 
@@ -163,9 +155,9 @@ class Arc(mn.Arc, Sketch):
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
             animation.ShrinkToCenter(self),
-            mn.Uncreate(self.middle, run_time=0),
-            mn.Create(self.start, reverse_rate_function=True, remover=True, run_time=0),
-            mn.Create(self.end, reverse_rate_function=True, remover=True, run_time=0),
+            self.middle.uncreate(),
+            self.start.uncreate(),
+            self.end.uncreate(),
         )
 
 

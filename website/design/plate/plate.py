@@ -120,20 +120,20 @@ class BoundaryConstraintScene(mn.Scene):
 
         title.reset()
 
-    def get_vars(self, line_end: sketch.LineEnd, *keys: str) -> list[Any]:
+    def get_vars(self, line_end: sketch_utils.LineEnd, *keys: str) -> list[Any]:
         return [self.get_var(line_end, key) for key in keys]
 
-    def get_var(self, line_end: sketch.LineEnd, key: str) -> Any:
+    def get_var(self, line_end: sketch_utils.LineEnd, key: str) -> Any:
         if key == "tangent_point":
             return self._tangent_points[line_end]
         elif key == "point":
             return (
                 self._line.get_start()
-                if line_end == sketch.LineEnd.START
+                if line_end == sketch_utils.LineEnd.START
                 else self._line.get_end()
             )
         elif key == "circle":
-            return self._left if line_end == sketch.LineEnd.START else self._right
+            return self._left if line_end == sketch_utils.LineEnd.START else self._right
         else:
             raise ValueError("Could not fetch var coresponding to key")
 
@@ -142,44 +142,46 @@ class BoundaryConstraintScene(mn.Scene):
         self.play(self._line.create())
 
         self.play(title.next("Add coincident constraints"))
-        self.do_coincident_move(sketch.LineEnd.START)
-        self.do_coincident_move(sketch.LineEnd.END)
+        self.do_coincident_move(sketch_utils.LineEnd.START)
+        self.do_coincident_move(sketch_utils.LineEnd.END)
 
         self.play(title.next("Add tangent constraints"))
-        self.do_tangent_move(sketch.LineEnd.START)
-        self.do_tangent_move(sketch.LineEnd.END)
+        self.do_tangent_move(sketch_utils.LineEnd.START)
+        self.do_tangent_move(sketch_utils.LineEnd.END)
 
         self.wait(animation.END_DELAY)
 
-    def _do_clicks(self, line_end: sketch.LineEnd) -> None:
+    def _do_clicks(self, line_end: sketch_utils.LineEnd) -> None:
         circle = self.get_var(line_end, "circle")
         self.play(
             sketch_utils.Click(
-                self._line.start if line_end == sketch.LineEnd.START else self._line.end
+                self._line.start
+                if line_end == sketch_utils.LineEnd.START
+                else self._line.end
             )
         )
         self.play(sketch_utils.Click(circle.outer_circle))
 
-    def do_coincident_move(self, line_end: sketch.LineEnd) -> None:
+    def do_coincident_move(self, line_end: sketch_utils.LineEnd) -> None:
         self._do_clicks(line_end)
         new_point = self._coincident_point(line_end)
 
         base = self._line.animate
         move_func = None
-        if line_end == sketch.LineEnd.START:
+        if line_end == sketch_utils.LineEnd.START:
             move_func = base.move_start
         else:
             move_func = base.move_end
         self.play(move_func(new_point))
 
-    def _coincident_point(self, line_end: sketch.LineEnd) -> vector.Point2d:
+    def _coincident_point(self, line_end: sketch_utils.LineEnd) -> vector.Point2d:
         circle, point = self.get_vars(line_end, "circle", "point")
         return (
             circle.get_center()
             + vector.direction(circle.get_center(), point) * circle.get_outer_radius()
         )
 
-    def do_tangent_move(self, line_end: sketch.LineEnd) -> None:
+    def do_tangent_move(self, line_end: sketch_utils.LineEnd) -> None:
         circle, tangent_point = self.get_vars(line_end, "circle", "tangent_point")
 
         self.play(sketch_utils.Click(self._line))
@@ -190,16 +192,16 @@ class BoundaryConstraintScene(mn.Scene):
             path_arc=angle, path_arg_centers=[circle.get_center()]
         )
         move_func = None
-        if line_end == sketch.LineEnd.START:
+        if line_end == sketch_utils.LineEnd.START:
             move_func = base.move_start
         else:
             move_func = base.move_end
         self.play(move_func(tangent_point))
 
-    def _tangent_angle(self, line_end: sketch.LineEnd) -> float:
+    def _tangent_angle(self, line_end: sketch_utils.LineEnd) -> float:
         point, tangent_point, circle = self.get_vars(
             line_end, "point", "tangent_point", "circle"
         )
         return (
-            1 if line_end == sketch.LineEnd.START else -1
+            1 if line_end == sketch_utils.LineEnd.START else -1
         ) * vector.angle_between_points(point, tangent_point, circle.get_center())
