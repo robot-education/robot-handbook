@@ -186,6 +186,7 @@ def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
         _, score, target_name = process.extractOne(  # type: ignore
             parsed_value, parsed_targets, scorer=fuzz.token_sort_ratio  # type: ignore
         )
+
         if score < 95:
             print("Found {} for input {} (score: {})".format(target_name, value, score))
         # print("Inputs:", parsed_targets)
@@ -195,8 +196,14 @@ def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
 
 
 def split_capital_case(input: str) -> str:
-    matches = re.findall("[A-Z][^A-Z]*", input)
-    if matches[-1] == "Scene":
+    parsed = re.search("[^A-Z]*", input)
+    matches: list[str] = []
+    if parsed is not None:
+        matches.append(parsed.group(0))
+
+    end = re.findall("[A-Z][^A-Z]*", input)
+    matches.extend(end)
+    if matches[-1].lower() == "scene":
         matches.pop()
     return " ".join(matches)
 
