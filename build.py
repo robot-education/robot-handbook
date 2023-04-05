@@ -3,12 +3,13 @@ A build script which can be used to compile animations and build the website.
 """
 import inspect
 import os
+import pathlib
 import subprocess
 import argparse
 import sys
 import importlib
 
-import fuzzywuzzy as fuzz
+from fuzzywuzzy import process, fuzz
 
 # prevent manim from printing
 sys.stdout = open(os.devnull, "w")
@@ -16,8 +17,6 @@ import manim as mn
 
 sys.stdout = sys.__stdout__
 
-source_path = "website"
-quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
 
 """
 The process for parsing files, paths, and sources is as follows.
@@ -49,52 +48,47 @@ We collect scenes and map them to file names
 We can then fuzz around our requirements as needed.
 """
 
+source_path = pathlib.Path("website")
 
-def get_all_file_paths() -> dict[str, str]:
-    """Searches source_path for all potential files. Returns a mapping of file names to paths."""
-    return {}
-
-
-def get_all_paths() -> list[str]:
-    """Searches source_path for all possible file paths. Returns a list of paths."""
-    return []
+quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
 
 
-def get_all_scenes() -> dict[str, str]:
-    """Searches source_path for all possible scenes. Returns a mapping of scenes to paths."""
-    return {}
-
-
-def get_python_file_paths(path: str | None = None) -> list[str]:
-    if path is not None:
-        path = os.path.join(source_path, path)
-    else:
-        path = source_path
-
-    file_paths = []
-    for dir_path, _, file_names in os.walk(path):
-        file_paths.extend(
-            [os.path.join(dir_path, file_name) for file_name in file_names]
-        )
-
+def get_all_file_paths() -> list[pathlib.Path]:
+    """Searches source_path for all potential files. Returns a mapping of file names to their paths."""
     return [
         file_path
-        for file_path in file_paths
-        if os.path.splitext(file_path)[1] == ".py"
-        and file_path != "{}/conf.py".format(source_path)
+        for file_path in source_path.glob("**/*.py")
+        if file_path.name != "conf.py"
     ]
 
 
-def get_path(file_name: str) -> str | None:
-    for dir_path, _, file_names in os.walk(source_path):
-        if file_name in file_names:
-            return os.path.join(dir_path, file_name)
-    return None
+def get_all_paths() -> list[pathlib.Path]:
+    """Searches source_path for all possible paths, including sub-paths, and returns them.
+
+    This function is used to collect paths for matching with the -p option.
+    The paths include paths to all files.
+    """
+    return [path for path in source_path.glob("**") if path.name != "conf.py"]
 
 
-def get_animation_names(file_path: str) -> list[str]:
-    file_path = file_path.replace("/", ".").removesuffix(".py")
-    module = importlib.import_module(file_path)
+def get_all_scenes(file_paths: list[pathlib.Path]) -> dict[str, pathlib.Path]:
+    """Searches source_path for all possible scenes.
+
+    Returns a mapping of scenes to their files.
+    Duplicate scenes and files are not explicitly handled.
+    """
+    return dict(
+        [
+            (scene_name, file_path)
+            for file_path in file_paths
+            for scene_name in get_scene_names(file_path)
+        ]
+    )
+
+
+def get_scene_names(file_path: pathlib.Path) -> list[str]:
+    module_path = str(file_path).replace("/", ".").removesuffix(".py")
+    module = importlib.import_module(module_path)
     return [
         name
         for name, cls in module.__dict__.items()
@@ -102,22 +96,43 @@ def get_animation_names(file_path: str) -> list[str]:
     ]
 
 
-def move_output(quality: str, file_path: str, animations: list[str]) -> None:
+# def get_python_file_paths(path: str | None = None) -> list[str]:
+#     if path is not None:
+#         path = os.path.join(source_path, path)
+#     else:
+#         path = source_path
+
+#     file_paths = []
+#     for dir_path, _, file_names in os.walk(path):
+#         file_paths.extend(
+#             [os.path.join(dir_path, file_name) for file_name in file_names]
+#         )
+
+#     return [
+#         file_path
+#         for file_path in file_paths
+#         if os.path.splitext(file_path)[1] == ".py"
+#         and file_path != "{}/conf.py".format(source_path)
+#     ]
+
+
+def move_output(quality: str, file_path: pathlib.Path, scene_name: str) -> None:
     """Moves produced files from media to the appropriate location in website."""
     quality_folder = quality_folder_lookup[quality]
+
     path, sub_folder = os.path.split(file_path)
 
     # -p suppresses errors
     subprocess.run("mkdir -p {}/media".format(path), shell=True)
 
-    for animation in animations:
-        move_command = "mv media/videos/{sub_folder}/{quality_folder}/{animation}.mp4 {path}/media/.".format(
-            sub_folder=sub_folder.removesuffix(".py"),
-            animation=animation,
-            quality_folder=quality_folder,
-            path=path,
-        )
-        subprocess.run(move_command, shell=True)
+    # for scene in scenes:
+    move_command = "mv media/videos/{sub_folder}/{quality_folder}/{scene_name}.mp4 {path}/media/.".format(
+        sub_folder=sub_folder.removesuffix(".py"),
+        scene_name=scene_name,
+        quality_folder=quality_folder,
+        path=path,
+    )
+    subprocess.run(move_command, shell=True)
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
@@ -165,54 +180,58 @@ def main():
 
     quality = "h" if args.production else "l"
 
-    file_paths = []
-    if args.file is None and args.path is None:
-        file_paths = get_python_file_paths()
-
-    # paths are harvested without fuzzy matching, as that's tricky to do
+    target_paths = get_all_file_paths()
     if args.path is not None:
+        all_paths = get_all_paths()
         for path in args.path:
-            file_paths.extend(get_python_file_paths(path=path))
+            # filter target_paths based on paths in args.path
+            pass
 
-    # file_paths is now a list of desired search paths
-
-    # look for files
     if args.file is not None:
+        target_names = [target_path.name for target_path in target_paths]
+        matches = []
         for file_name in args.file:
-            file_path = get_path(file_name)
-            if file_path is None:
-                raise ValueError(
-                    'Failed to find the specified file "{}" in "/{}". Aborting.'.format(
-                        file_name, file_path
-                    )
+            match, score = process.extractOne(  # type: ignore
+                file_name, target_names, scorer=fuzz.partial_ratio  # type: ignore
+            )
+            print(
+                "Found {} for input file {} (score: {})".format(match, file_name, score)
+            )
+            matches.append(match)
+        target_paths = [
+            target_path for target_path in target_paths if target_path.name in matches
+        ]
+
+    scenes = get_all_scenes(target_paths)
+    if args.scene is not None:
+        result = {}
+        for scene_name in args.scene:
+            match, score = process.extractOne(  # type: ignore
+                scene_name, scenes.keys(), scorer=fuzz.partial_ratio  # type: ignore
+            )
+            print(
+                "Found {} for input scene {} (score: {})".format(
+                    match, scene_name, score
                 )
-            file_paths.append(file_path)
+            )
+            result[match] = scenes[match]
+        scenes = result
 
-    all_scene_names = []
-    for file_path in file_paths:
-        scene_names = get_animation_names(file_path)
-        all_scene_names.extend(scene_names)
-
-        # look for scenes
-        if args.scene is not None:
-            scene_names = [name for name in all_scene_names if name in args.scene]
-            if scene_names == []:
-                continue
-
+    for scene_name, file_path in scenes.items():
         manim_command = (
-            "manim render -v ERROR -q{quality} {file_path} {animation_names}".format(
+            "manim render -v ERROR -q{quality} {file_path} {scene_names}".format(
                 quality=quality,
                 file_path=file_path,
-                animation_names=" ".join(scene_names),
+                scene_names=scene_name,  # " ".join(scene_names),
             )
         )
 
-        print("Rendering {}".format(file_path))
+        print("Rendering {} - {}".format(file_path, scene_name))
         subprocess.run(manim_command, shell=True)
-        move_output(quality, file_path, scene_names)
+        move_output(quality, file_path, scene_name)
 
-        if args.make:
-            subprocess.run("make html", shell=True)
+    if args.make:
+        subprocess.run("make html", shell=True)
 
 
 if __name__ == "__main__":
