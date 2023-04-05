@@ -90,9 +90,7 @@ class VideoBuilder(html_builders.StandaloneHTMLBuilder):
 
 class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
     def _get_src_path(self, src: str) -> str:
-        return (
-            pathlib.Path(self.builder.imgpath) / pathlib.Path(src).parts[-1]
-        ).as_posix()
+        return str(pathlib.PurePath(self.builder.imgpath) / pathlib.PurePath(src).name)
 
     def visit_source(self, node: source) -> None:
         src_path = self._get_src_path(node["src"])

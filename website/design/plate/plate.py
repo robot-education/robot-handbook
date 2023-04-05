@@ -12,7 +12,7 @@ boundary_color: color.Color = color.Palette.BLUE
 
 plate_factory: plate.PlateCircleFactory = plate.PlateCircleFactory()
 
-sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(boundary_color)
+sketch_factory: sketch.SketchFactory = sketch.SketchFactory()
 
 title: title_sequence.TitleSequence = title_sequence.TitleSequence(
     default_color=boundary_color

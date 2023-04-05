@@ -91,7 +91,7 @@ class Animation(sphinx_docutils.SphinxDirective):
             path = "media" / path
         else:
             logger.warning('Animations may omit the "media" folder in their path')
-        return docutils_directives.uri(path.as_posix())
+        return docutils_directives.uri(str(path))
 
     def _add_caption(self, figure_node: nodes.figure) -> nodes.Node:
         """

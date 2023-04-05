@@ -4,12 +4,10 @@ import math
 from typing import Iterable
 
 import manim as mn
-from rc_lib.style import color
 from rc_lib.math_utils import vector
 from rc_lib.design import sketch, sketch_utils, sketch_scene
 
-sketch_color = color.Palette.BLUE
-sketch_factory: sketch.SketchFactory = sketch.SketchFactory().set_color(sketch_color)
+sketch_factory: sketch.SketchFactory = sketch.SketchFactory()
 
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:

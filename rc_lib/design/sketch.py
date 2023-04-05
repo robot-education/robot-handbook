@@ -12,19 +12,16 @@ from rc_lib.style import color
 from rc_lib.style import animation
 
 
-
-
 class SketchState(color.Color, enum.Enum):
-    NORMAL = color.Palette.BLUE
-    CONSTRAINED = color.Palette.BLACK
-    ERROR = color.Palette.RED
+    NORMAL = color.Palette.BLUE.value
+    CONSTRAINED = color.Palette.BLACK.value
+    ERROR = color.Palette.RED.value
 
 
 class Sketch(mn.VMobject, abc.ABC):
     """An abstract base class for Sketch entities."""
 
-    def __init__(self):
-        self.state = SketchState.NORMAL
+    state = SketchState.NORMAL
 
     @abc.abstractmethod
     def create(self) -> mn.Animation:
@@ -164,12 +161,7 @@ class Arc(mn.Arc, Sketch):
 class SketchFactory:
     """A factory for Sketch objects."""
 
-    def __init__(self) -> None:
-        self._color = color.FOREGROUND
-
-    def set_color(self, color: color.Color) -> Self:
-        self._color = color
-        return self
+    _color = SketchState.NORMAL
 
     def make_line(self, start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
         return Line(mn.Line(start_point, end_point, color=self._color))
