@@ -1,7 +1,6 @@
 """
 A build script which can be used to compile animations and build the website.
 """
-from ctypes import cast
 import inspect
 import os
 import subprocess
@@ -12,6 +11,7 @@ import importlib
 import re
 
 from thefuzz import process, fuzz
+import numpy as np
 
 # prevent manim from printing
 sys.stdout = open(os.devnull, "w")
@@ -54,13 +54,13 @@ source_path = pathlib.Path("website")
 
 quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
 
+exclude_folders = ["__pycache__", "media", "_style"]
 
-def get_all_file_paths() -> list[pathlib.Path]:
+
+def get_all_file_paths(base: pathlib.Path) -> list[pathlib.Path]:
     """Searches source_path for all potential files. Returns a mapping of file names to their paths."""
     return [
-        file_path
-        for file_path in source_path.glob("**/*.py")
-        if file_path.name != "conf.py"
+        file_path for file_path in base.glob("**/*.py") if file_path.name != "conf.py"
     ]
 
 
@@ -70,7 +70,11 @@ def get_all_paths() -> list[pathlib.Path]:
     This function is used to collect paths for matching with the -p option.
     The paths include paths to all files.
     """
-    return [path for path in source_path.glob("**") if path.name != "conf.py"]
+    return [
+        pathlib.Path(*path.parts[1:])
+        for path in source_path.glob("**")
+        if path.name not in exclude_folders
+    ]
 
 
 def get_all_scenes(file_paths: list[pathlib.Path]) -> dict[str, pathlib.Path]:
@@ -196,12 +200,12 @@ def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
 
 
 def split_capital_case(input: str) -> str:
-    parsed = re.search("[^A-Z]*", input)
+    parsed = re.search("[^A-Z/]*", input)
     matches: list[str] = []
     if parsed is not None:
         matches.append(parsed.group(0))
 
-    end = re.findall("[A-Z][^A-Z]*", input)
+    end = re.findall("[A-Z/][^A-Z]*", input)
     matches.extend(end)
     if matches[-1].lower() == "scene":
         matches.pop()
@@ -213,12 +217,18 @@ def main():
 
     quality = "h" if args.production else "l"
 
-    target_paths = get_all_file_paths()
+    target_paths = []
     if args.path is not None:
         all_paths = get_all_paths()
-        for path in args.path:
-            # filter target_paths based on paths in args.path
-            pass
+        all_path_strs = [str(path) for path in all_paths]
+        results = fuzzy_search(all_path_strs, args.path)
+        file_path_lists = [
+            get_all_file_paths(source_path / pathlib.Path(path)) for path in results
+        ]
+        target_paths = [item for sublist in file_path_lists for item in sublist]
+
+    else:
+        target_paths = get_all_file_paths(source_path)
 
     if args.file is not None:
         # we use a dict so we can split names into sequences
