@@ -2,7 +2,7 @@
 """
 
 from typing import Callable, Self, cast
-from abc import ABC
+import abc
 import enum
 
 import manim as mn
@@ -19,14 +19,25 @@ class LineEnd(enum.IntEnum):
     END = 1
 
 
-class Sketch(mn.VMobject, ABC):
+class SketchState(color.Color, enum.Enum):
+    NORMAL = color.Palette.BLUE
+    CONSTRAINED = color.Palette.BLACK
+    ERROR = color.Palette.RED
+
+
+class Sketch(mn.VMobject, abc.ABC):
     """An abstract base class for Sketch entities."""
 
-    def create(self) -> mn.Animation:
-        return mn.Create(self)
+    def __init__(self):
+        self.state = SketchState.NORMAL
 
-    def _uncreate_override(self) -> mn.Animation:
-        return mn.Create(self)
+    @abc.abstractmethod
+    def create(self) -> mn.Animation:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def uncreate(self) -> mn.Animation:
+        raise NotImplementedError
 
 
 class Point(mn.Dot, Sketch):
