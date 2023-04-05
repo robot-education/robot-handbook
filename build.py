@@ -3,13 +3,13 @@ A build script which can be used to compile animations and build the website.
 """
 import inspect
 import os
-import pathlib
 import subprocess
 import argparse
 import sys
+import pathlib
 import importlib
 
-from fuzzywuzzy import process, fuzz
+from thefuzz import process, fuzz
 
 # prevent manim from printing
 sys.stdout = open(os.devnull, "w")
