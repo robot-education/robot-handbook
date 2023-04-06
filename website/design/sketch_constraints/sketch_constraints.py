@@ -7,19 +7,13 @@ import manim as mn
 from rc_lib.math_utils import vector
 from rc_lib.design import sketch, sketch_utils, sketch_scene
 
-sketch_factory: sketch.SketchFactory = sketch.SketchFactory()
-
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:
     """Returns mobjects common to coincident."""
     return (
-        sketch_factory.make_circle(vector.point_2d(-4.5, 0), 1.5),
-        sketch_factory.make_line(
-            vector.point_2d(5.25, 4 / 2), vector.point_2d(5.25, -4 / 2)
-        ),
-        sketch_factory.make_line(
-            vector.point_2d(-1.75, 0.75), vector.point_2d(4.25, -1)
-        ),
+        sketch.make_circle(vector.point_2d(-4.5, 0), 1.5),
+        sketch.make_line(vector.point_2d(5.25, 4 / 2), vector.point_2d(5.25, -4 / 2)),
+        sketch.make_line(vector.point_2d(-1.75, 0.75), vector.point_2d(4.25, -1)),
     )
 
 
@@ -75,11 +69,11 @@ class CoincidentLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         start_point = vector.point_2d(-5.75, 2.5)
         middle_point = vector.point_2d(-1.15, 0.5)  # closest to the middle
-        fixed_line = sketch_factory.make_line(start_point, middle_point)
+        fixed_line = sketch.make_line(start_point, middle_point)
 
         slope = fixed_line.get_direction()
         angle = math.radians(38)
-        start_line = sketch_factory.make_line(
+        start_line = sketch.make_line(
             middle_point + mn.rotate_vector(slope * 2, angle),
             middle_point + mn.rotate_vector(slope * 7.5, angle),
         )
@@ -94,9 +88,7 @@ class CoincidentLineScene(sketch_scene.Scene):
 
 def vh_common_line() -> tuple[sketch.Line, float]:
     return (
-        sketch_factory.make_line(
-            vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3)
-        ),
+        sketch.make_line(vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3)),
         math.radians(45),
     )
 
@@ -128,11 +120,9 @@ class HorizontalLineScene(sketch_scene.Scene):
 
 class VerticalPointsScene(sketch_scene.Scene):
     def construct(self) -> None:
-        circle = sketch_factory.make_circle(vector.point_2d(-4, 1.5), 1.5)
-        line = sketch_factory.make_line(
-            vector.point_2d(0, 2.5), vector.point_2d(5.5, 1.5)
-        )
-        move_line = sketch_factory.make_line(
+        circle = sketch.make_circle(vector.point_2d(-4, 1.5), 1.5)
+        line = sketch.make_line(vector.point_2d(0, 2.5), vector.point_2d(5.5, 1.5))
+        move_line = sketch.make_line(
             vector.point_2d(-5.5, -2.5), vector.point_2d(3.5, -1.5)
         )
 
@@ -157,13 +147,9 @@ class VerticalPointsScene(sketch_scene.Scene):
 
 class HorizontalPointsScene(sketch_scene.Scene):
     def construct(self) -> None:
-        circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
-        line = sketch_factory.make_line(
-            vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5)
-        )
-        move_line = sketch_factory.make_line(
-            vector.point_2d(2, -1.5), vector.point_2d(4.5, 3)
-        )
+        circle = sketch.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
+        line = sketch.make_line(vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5))
+        move_line = sketch.make_line(vector.point_2d(2, -1.5), vector.point_2d(4.5, 3))
         self.introduce(circle, line, move_line)
 
         self.run_group(
@@ -188,15 +174,13 @@ class HorizontalPointsScene(sketch_scene.Scene):
 
 class ParallelScene(sketch_scene.Scene):
     def construct(self) -> None:
-        line = sketch_factory.make_line(
-            vector.point_2d(-6, -3), vector.point_2d(6, 0.5)
-        )
+        line = sketch.make_line(vector.point_2d(-6, -3), vector.point_2d(6, 0.5))
         direction = line.get_direction()
 
         end_point = vector.point_2d(5, 3)
         start_point = end_point - direction * 10.5
         angle = math.radians(16.26)
-        start_line = sketch_factory.make_line(start_point, end_point).rotate(
+        start_line = sketch.make_line(start_point, end_point).rotate(
             -angle, about_point=line.get_midpoint()  # type: ignore
         )
 
@@ -210,15 +194,13 @@ class ParallelScene(sketch_scene.Scene):
 
 class PerpendicularScene(sketch_scene.Scene):
     def construct(self) -> None:
-        line = sketch_factory.make_line(
-            vector.point_2d(-5, -2.75), vector.point_2d(5.5, 0.5)
-        )
+        line = sketch.make_line(vector.point_2d(-5, -2.75), vector.point_2d(5.5, 0.5))
         direction = line.get_direction()
         rotation_point = line.get_start() + direction * 2
         perpendicular_direction = vector.direction_2d(-direction[1], direction[0])
 
         angle = math.radians(45)
-        start_line = sketch_factory.make_line(
+        start_line = sketch.make_line(
             rotation_point + perpendicular_direction * 1,
             rotation_point + perpendicular_direction * 5.25,
         ).rotate(-angle, about_point=rotation_point)
@@ -236,20 +218,14 @@ def centered_line(line: sketch.Line, length: float) -> sketch.Line:
     """Returns a line centered on the given line with the specified length."""
     center = line.get_midpoint()
     offset = line.get_direction() * length / 2
-    return sketch_factory.make_line(center - offset, center + offset)
+    return sketch.make_line(center - offset, center + offset)
 
 
 class EqualLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        base = sketch_factory.make_line(
-            vector.point_2d(-5.5, -1.5), vector.point_2d(-1.25, 2)
-        )
-        first = sketch_factory.make_line(
-            vector.point_2d(-5, -3), vector.point_2d(5, -1)
-        )
-        second = sketch_factory.make_line(
-            vector.point_2d(-0.5, 2.75), vector.point_2d(6, 0.5)
-        )
+        base = sketch.make_line(vector.point_2d(-5.5, -1.5), vector.point_2d(-1.25, 2))
+        first = sketch.make_line(vector.point_2d(-5, -3), vector.point_2d(5, -1))
+        second = sketch.make_line(vector.point_2d(-0.5, 2.75), vector.point_2d(6, 0.5))
 
         length = base.get_length()
 
@@ -271,9 +247,9 @@ class EqualLineScene(sketch_scene.Scene):
 
 class EqualCircleScene(sketch_scene.Scene):
     def construct(self) -> None:
-        base = sketch_factory.make_circle(vector.point_2d(0, -1.5), 1.5)
-        circle = sketch_factory.make_circle(vector.point_2d(-3.5, 1), 2)
-        arc = sketch_factory.make_arc(
+        base = sketch.make_circle(vector.point_2d(0, -1.5), 1.5)
+        circle = sketch.make_circle(vector.point_2d(-3.5, 1), 2)
+        arc = sketch.make_arc(
             vector.point_2d(3.5, 1), 2, math.radians(90), math.radians(-225)
         )
 
@@ -292,13 +268,9 @@ class EqualCircleScene(sketch_scene.Scene):
 
 class MidpointLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        top = sketch_factory.make_line(vector.point_2d(-6, 3), vector.point_2d(6, 1.25))
-        bottom = sketch_factory.make_line(
-            vector.point_2d(-6, -3), vector.point_2d(6, -1.25)
-        )
-        middle = sketch_factory.make_line(
-            vector.point_2d(-1, 1.5), vector.point_2d(1, -1.5)
-        )
+        top = sketch.make_line(vector.point_2d(-6, 3), vector.point_2d(6, 1.25))
+        bottom = sketch.make_line(vector.point_2d(-6, -3), vector.point_2d(6, -1.25))
+        middle = sketch.make_line(vector.point_2d(-1, 1.5), vector.point_2d(1, -1.5))
 
         self.introduce(top, bottom, middle)
         self.run_group(
@@ -315,14 +287,10 @@ class MidpointLineScene(sketch_scene.Scene):
 
 class MidpointPointScene(sketch_scene.Scene):
     def construct(self) -> None:
-        line = sketch_factory.make_line(
-            vector.point_2d(-6, 5 / 2), vector.point_2d(-6, -5 / 2)
-        )
-        circle = sketch_factory.make_circle(vector.point_2d(4.5, 0), 1.5)
-        first_line = sketch_factory.make_line(
-            vector.point_2d(-1.5, 2), vector.point_2d(0, -2)
-        )
-        second_line = sketch_factory.make_line(
+        line = sketch.make_line(vector.point_2d(-6, 5 / 2), vector.point_2d(-6, -5 / 2))
+        circle = sketch.make_circle(vector.point_2d(4.5, 0), 1.5)
+        first_line = sketch.make_line(vector.point_2d(-1.5, 2), vector.point_2d(0, -2))
+        second_line = sketch.make_line(
             vector.point_2d(-5.25, -0.5), vector.point_2d(-1.5, 0.5)
         )
 
@@ -360,7 +328,7 @@ def get_translation(line: sketch.Line, circle: sketch.Circle) -> sketch.Line:
     translation: vector.Vector2d = vector.direction(projection, circle.get_center()) * (
         vector.norm(circle.get_center() - projection) - circle.radius
     )
-    return sketch_factory.make_line(
+    return sketch.make_line(
         line.get_start() + translation, line.get_end() + translation
     )
 
@@ -375,13 +343,9 @@ def tangent_transform(line: sketch.Line, circle: sketch.Circle) -> mn.Animation:
 
 class TangentLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        circle = sketch_factory.make_circle(mn.ORIGIN, 1.5)
-        left = sketch_factory.make_line(
-            vector.point_2d(-6, 0), vector.point_2d(0, 2.75)
-        )
-        right = sketch_factory.make_line(
-            vector.point_2d(2, -2.5), vector.point_2d(6, -2)
-        )
+        circle = sketch.make_circle(mn.ORIGIN, 1.5)
+        left = sketch.make_line(vector.point_2d(-6, 0), vector.point_2d(0, 2.75))
+        right = sketch.make_line(vector.point_2d(2, -2.5), vector.point_2d(6, -2))
 
         self.introduce(circle, left, right)
         self.run_group(tangent_transform(left, circle))
@@ -407,9 +371,9 @@ def tangent_circle_transform(
 
 class TangentCircleScene(sketch_scene.Scene):
     def construct(self) -> None:
-        circle = sketch_factory.make_circle(mn.ORIGIN, 1.5)
-        left = sketch_factory.make_circle(vector.point_2d(-4, 1), 1.5)
-        right = sketch_factory.make_arc(
+        circle = sketch.make_circle(mn.ORIGIN, 1.5)
+        left = sketch.make_circle(vector.point_2d(-4, 1), 1.5)
+        right = sketch.make_arc(
             vector.point_2d(6, -1.125), 3.5, math.radians(105), math.radians(75)
         )
 
@@ -420,11 +384,9 @@ class TangentCircleScene(sketch_scene.Scene):
 
 def concentric_common() -> tuple[sketch.Circle, sketch.Circle, sketch.Arc]:
     return (
-        sketch_factory.make_circle(mn.ORIGIN, 1.5),
-        sketch_factory.make_circle(vector.point_2d(-4, 0), 2),
-        sketch_factory.make_arc(
-            vector.point_2d(3, 0), 3, math.radians(70), math.radians(-140)
-        ),
+        sketch.make_circle(mn.ORIGIN, 1.5),
+        sketch.make_circle(vector.point_2d(-4, 0), 2),
+        sketch.make_arc(vector.point_2d(3, 0), 3, math.radians(70), math.radians(-140)),
     )
 
 

@@ -1,7 +1,7 @@
 """Defines entities which look like Onshape sketch entities.
 """
 
-from typing import Callable, Self, cast
+from typing import Callable, Self
 import abc
 import enum
 
@@ -53,10 +53,6 @@ class Point(mn.Dot, Base):
         return mn.Create(self, reverse_rate_function=True, remover=True, run_time=0)
 
 
-def make_point(point: vector.Point2d) -> Point:
-    return Point(mn.Dot(point, color=SketchState.NORMAL))
-
-
 class Circle(mn.Circle, Base):
     """Defines a Sketch circle with a vertex at its center."""
 
@@ -64,9 +60,12 @@ class Circle(mn.Circle, Base):
         super().__init__()
         self.become(circle)
         self.radius = circle.radius
-
-        self.middle = make_point(self.get_center())
+        self.middle = _make_point()
         self.middle.follow(self.get_center)
+
+        # def circle_updater(mobject: mn.Mobject) -> None:
+        #     mobject.move_to(self.middle.get_center())
+        # self.add_updater(circle_updater)
 
     def set_radius(self, radius: float) -> Self:
         self.scale(radius / self.radius)
@@ -88,12 +87,15 @@ class Line(mn.Line, Base):
     def __init__(self, line: mn.Line) -> None:
         super().__init__()
         self.become(line)
-        self.start = make_point(self.get_start())
-        # instantiate end at start so it plays correctly
-        self.end = make_point(self.get_end())
+        self.start = _make_point()
+        self.end = _make_point()
 
         self.start.follow(self.get_start)
         self.end.follow(self.get_end)
+
+        # def line_updater(mobject: mn.Mobject) -> None:
+        #     mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
+        # self.add_updater(line_updater)
 
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
@@ -103,10 +105,13 @@ class Line(mn.Line, Base):
 
     def move_start(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(point, self.get_end())  # type: ignore
-        # return self.move_point(point, LineEnd.START)
+        # self.start.move_to(point)
+        # return self
 
     def move_end(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
+        # self.end.move_to(point)
+        # return self
 
     def create(self) -> mn.Animation:
         return mn.Succession(self.start.create(), self.end.create(), mn.Create(self))
@@ -125,10 +130,10 @@ class Arc(mn.Arc, Base):
         self.become(arc)
         self.radius = arc.radius
 
-        self.start = make_point(self.get_start())
-        self.end = make_point(self.get_end())
-        # center is already a function...
-        self.middle = make_point(self.get_arc_center())
+        self.start = _make_point()
+        self.end = _make_point()
+        # center is already a function, so middle instead
+        self.middle = _make_point()
 
         self.start.follow(self.get_start)
         self.end.follow(self.get_end)
@@ -157,21 +162,22 @@ class Arc(mn.Arc, Base):
         )
 
 
-class SketchFactory:
-    """A factory for Sketch objects."""
+def _make_point() -> Point:
+    return Point(mn.Dot(mn.ORIGIN, color=SketchState.NORMAL))
 
-    _color = SketchState.NORMAL
 
-    def make_line(self, start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
-        return Line(mn.Line(start_point, end_point, color=self._color))
+def make_line(start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
+    return Line(mn.Line(start_point, end_point, color=SketchState.NORMAL))
 
-    def make_circle(self, center: vector.Point2d, radius: float) -> Circle:
-        return Circle(mn.Circle(radius, color=self._color).move_to(center))
 
-    def make_arc(
-        self, center: vector.Point2d, radius: float, start_angle: float, angle: float
-    ) -> Arc:
-        return Arc(
-            # start_angle is typed incorrectly as int
-            mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color, arc_center=center)  # type: ignore
-        )
+def make_circle(center: vector.Point2d, radius: float) -> Circle:
+    return Circle(mn.Circle(radius, color=SketchState.NORMAL).move_to(center))
+
+
+def make_arc(
+    center: vector.Point2d, radius: float, start_angle: float, angle: float
+) -> Arc:
+    return Arc(
+        # start_angle is typed incorrectly as int
+        mn.Arc(radius, start_angle=start_angle, angle=angle, color=SketchState.NORMAL, arc_center=center)  # type: ignore
+    )

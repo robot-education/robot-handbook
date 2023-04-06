@@ -3,6 +3,7 @@ from typing import Callable, Self
 
 from rc_lib.style import color
 from rc_lib.math_utils import tangent, vector
+from rc_lib.design import sketch
 
 
 class PlateCircle(mn.VGroup):
@@ -32,11 +33,8 @@ def plate_circle_tangent_points(
     )
 
 
-def plate_circle_tangent_line(
-    start: PlateCircle, end: PlateCircle, color: color.Color
-) -> mn.Line:
-    return mn.Line(*plate_circle_tangent_points(start, end), color=color)
-    # return sketch_factory.make_line(*plate_circle_tangent_points(start, end))
+def plate_circle_tangent_line(start: PlateCircle, end: PlateCircle) -> sketch.Line:
+    return sketch.make_line(*plate_circle_tangent_points(start, end))
 
 
 PlateCircleGenerator = Callable[[vector.Point2d], PlateCircle]
@@ -81,16 +79,16 @@ class PlateGroup(mn.VGroup):
         self,
         entities: list[PlateCircle],
         boundary_order: list[int],
-        boundary_color: color.Color = color.FOREGROUND,
+        # boundary_color: color.Color = color.FOREGROUND,
     ) -> None:
         self._entities: list[PlateCircle] = entities
         self._boundary: list[PlateCircle] = [self._entities[i] for i in boundary_order]
-        self._boundary_lines: list[mn.Line] = self._make_boundary_lines(boundary_color)
+        self._boundary_lines: list[sketch.Line] = self._make_boundary_lines()
         super().__init__(*[*self._entities, *self._boundary_lines])
 
-    def _make_boundary_lines(self, color: color.Color) -> list[mn.Line]:
+    def _make_boundary_lines(self) -> list[sketch.Line]:
         return [
-            plate_circle_tangent_line(self._boundary[i - 1], curr, color)
+            plate_circle_tangent_line(self._boundary[i - 1], curr)
             for i, curr in enumerate(self._boundary)
         ]
 
@@ -106,5 +104,5 @@ class PlateGroup(mn.VGroup):
 
     def draw_boundary(self) -> mn.Animation:
         return mn.Succession(
-            *[mn.Create(line) for line in self._boundary_lines], lag_ratio=1
+            *[line.create() for line in self._boundary_lines], lag_ratio=1
         )

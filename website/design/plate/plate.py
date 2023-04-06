@@ -11,8 +11,7 @@ inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE
 
 plate_factory: plate.PlateCircleFactory = plate.PlateCircleFactory()
-
-sketch_factory: sketch.SketchFactory = sketch.SketchFactory()
+plate_factory.set_inner_color(inner_color).set_outer_color(boundary_color)
 
 title: title_sequence.TitleSequence = title_sequence.TitleSequence(
     default_color=boundary_color
@@ -38,9 +37,7 @@ class IntakePlateScene(mn.Scene):
             small_base((front_hole + middle_hole) / 2),
         ]
         boundary_order: list[int] = [1, 3, 4, 0]
-        self._plate_group: plate.PlateGroup = plate.PlateGroup(
-            points, boundary_order, boundary_color=boundary_color
-        )
+        self._plate_group: plate.PlateGroup = plate.PlateGroup(points, boundary_order)
         title.reset()
 
     def construct(self):
@@ -68,11 +65,16 @@ class BoundaryRedrawScene(mn.Scene):
             1, 0.75, vector.point_2d(0, -0.75)
         )
 
-        self._line = plate.plate_circle_tangent_line(
-            self._left, self._right, color.Palette.RED
-        )
+        self._line = plate.plate_circle_tangent_line(self._left, self._right)
 
-        self.add(self._left, self._right, self._line, self._middle.inner_circle)
+        self.add(
+            self._left,
+            self._right,
+            self._line,
+            self._line.start,
+            self._line.end,
+            self._middle.inner_circle,
+        )
         title.reset()
 
     def construct(self):
@@ -80,22 +82,10 @@ class BoundaryRedrawScene(mn.Scene):
         self.play(mn.GrowFromCenter(self._middle.outer_circle))
 
         self.play(title.next("Redraw boundary"))
-        self.play(mn.Uncreate(self._line))
+        self.play(self._line.uncreate())
         self.wait(0.5)
-        self.play(
-            mn.Create(
-                plate.plate_circle_tangent_line(
-                    self._left, self._middle, boundary_color
-                )
-            )
-        )
-        self.play(
-            mn.Create(
-                plate.plate_circle_tangent_line(
-                    self._middle, self._right, boundary_color
-                )
-            )
-        )
+        self.play(plate.plate_circle_tangent_line(self._left, self._middle).create())
+        self.play(plate.plate_circle_tangent_line(self._middle, self._right).create())
 
         self.wait(animation.END_DELAY)
 
@@ -114,9 +104,7 @@ class BoundaryConstraintScene(mn.Scene):
         left_start_point = self._tangent_points[0] + vector.point_2d(1.75, 0.75)
         right_start_point = self._tangent_points[1] + vector.point_2d(-2, 0.5)
 
-        self._line: sketch.Line = sketch_factory.make_line(
-            left_start_point, right_start_point
-        )
+        self._line: sketch.Line = sketch.make_line(left_start_point, right_start_point)
 
         title.reset()
 
