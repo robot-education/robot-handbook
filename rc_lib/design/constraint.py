@@ -1,34 +1,56 @@
+from types import UnionType
 import manim as mn
 from rc_lib.design import sketch, sketch_utils
+from rc_lib.math_utils import vector
 
 
-class Coincident(mn.Succession):
-    """Performs an animation which constrains base to target using a coincident constraint.
+def get_key(base: sketch.Base, key: str | None) -> sketch.Base:
+    match key:
+        case None:
+            return base
+        case "middle":
+            throw_if_not(base, sketch.Circle | sketch.Arc)
+        case "start":
+            throw_if_not(base, sketch.Line | sketch.Arc)
+        case "end":
+            throw_if_not(base, sketch.Line | sketch.Arc)
+        case _:
+            raise KeyError("The key is not valid for any entity.")
 
-    Implementation is complicated by the need to bring parent mobjects along for the ride.
-    This creates a two-way dependency unless we specify so that points always drive their parents,
-    which is tricky for some arcs.
-
-    Even without updaters, implementation is challenging; we'd likely need to pass the move method or
-    take the parent plus the actual child being moved.
-
-    Also, how do we allow certain combinations but not others, like line and line point? Runtime checks
-    plus common sense?
-    """
-
-    def __init__(self, base: sketch.Point | sketch.Line, target: sketch.Base):
-        if isinstance(base, sketch.Point):
-            # how to move to target? Need a parent method or something?
-            pass
-
-        super().__init__(sketch_utils.Click(base), sketch_utils.Click(target))
+    return getattr(base, key)
 
 
-# class CoincidentPoint(mn.Succession):
-#     def __init__(self, base: sketch.Point, target: sketch.Base):
-#         pass
+def throw_if_not(base: sketch.Base, type: type[sketch.Base] | UnionType) -> None:
+    if not isinstance(base, type):
+        raise KeyError("The key did not correspond to a point in sketch.Base")
 
 
-# class CoincidentLine(mn.Succession):
-#     def __init__(self, base: sketch.Line, target: sketch.Base):
-#         pass
+class PointCoincident(mn.Succession):
+    """Performs an animation which constrains a point to a target using a coincident constraint."""
+
+    def __init__(self, base: sketch.Line, base_key: str, target: sketch.Base):
+        base_element = get_key(base, base_key)
+        target_point = self._get_target(target, base_element.get_center())
+
+        animation = base.animate
+        if base_key == "start":
+            animation.move_start(target_point)
+        else:
+            animation.move_end(target_point)
+
+        super().__init__(
+            sketch_utils.Click(base_element),
+            sketch_utils.Click(target),
+            mn.prepare_animation(animation),
+        )
+
+    def _get_target(self, target: sketch.Base, point: vector.Point2d) -> vector.Point2d:
+        if isinstance(target, sketch.Circle | sketch.Arc):
+            return (
+                target.get_center()
+                + (vector.direction(target.get_center(), point) * target.radius)
+            )
+        elif isinstance(target, sketch.Line):
+            return target.get_projection(point)
+        elif isinstance(target, sketch.Point):
+            return target.get_center()

@@ -5,11 +5,11 @@ from typing import Iterable
 
 import manim as mn
 from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_utils, sketch_scene
+from rc_lib.design import sketch, sketch_utils, sketch_scene, constraint
 
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:
-    """Returns mobjects common to coincident."""
+    """Returns mobjects common to coincident point scenes."""
     return (
         sketch.make_circle(vector.point_2d(-4.5, 0), 1.5),
         sketch.make_line(vector.point_2d(5.25, 4 / 2), vector.point_2d(5.25, -4 / 2)),
@@ -21,48 +21,16 @@ class CoincidentPointsScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
-
-        self.run_group(
-            sketch_utils.Click(move_line.start),
-            sketch_utils.Click(circle.middle),
-            move_line.animate.move_start(circle.get_center()),
-        )
-
-        self.run_group(
-            sketch_utils.Click(move_line.end),
-            sketch_utils.Click(line.end),
-            move_line.animate.move_end(line.get_end()),
-        )
+        self.run_group(constraint.PointCoincident(move_line, "start", circle.middle))
+        self.run_group(constraint.PointCoincident(move_line, "end", line.end))
 
 
 class CoincidentPointLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
-
-        point = (
-            circle.get_center()
-            + vector.direction(circle.get_center(), move_line.get_start())
-            * circle.radius
-        )
-
-        self.run_group(
-            sketch_utils.Click(move_line.start),
-            sketch_utils.Click(circle),
-            move_line.animate.move_start(point),
-        )
-
-        point = vector.project_to_line(
-            move_line.get_end(),
-            line.get_start(),
-            line.get_end(),
-        )
-
-        self.run_group(
-            sketch_utils.Click(move_line.end),
-            sketch_utils.Click(line),
-            move_line.animate.move_end(point),
-        )
+        self.run_group(constraint.PointCoincident(move_line, "start", circle))
+        self.run_group(constraint.PointCoincident(move_line, "end", line))
 
 
 class CoincidentLineScene(sketch_scene.Scene):
