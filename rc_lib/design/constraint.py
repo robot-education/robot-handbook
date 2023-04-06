@@ -17,16 +17,18 @@ class Coincident(mn.Succession):
     """
 
     def __init__(self, base: sketch.Point | sketch.Line, target: sketch.Base):
-        # base_type = sketch_utils.classify(base)
-        # target_type = sketch_utils.classify(target)
-
-        # match base_type:
-        #     case sketch_utils.SketchType.POINT:
-        #         pass
-        #     case sketch_utils.SketchType.POINT:
-        #         pass
         if isinstance(base, sketch.Point):
-            # how to move to target? Need a parent method or something
+            # how to move to target? Need a parent method or something?
             pass
 
         super().__init__(sketch_utils.Click(base), sketch_utils.Click(target))
+
+
+# class CoincidentPoint(mn.Succession):
+#     def __init__(self, base: sketch.Point, target: sketch.Base):
+#         pass
+
+
+# class CoincidentLine(mn.Succession):
+#     def __init__(self, base: sketch.Line, target: sketch.Base):
+#         pass

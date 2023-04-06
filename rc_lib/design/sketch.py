@@ -45,6 +45,7 @@ class Point(mn.Dot, Base):
             mobject.move_to(point_function())
 
         self.add_updater(updater)
+        updater(self)
 
     def create(self) -> mn.Animation:
         return mn.Create(self, run_time=0)
@@ -58,9 +59,12 @@ class Circle(mn.Circle, Base):
 
     def __init__(self, circle: mn.Circle):
         super().__init__()
+
         self.become(circle)
         self.radius = circle.radius
+
         self.middle = _make_point()
+        # self.submobjects.append(self.middle)
         self.middle.follow(self.get_center)
 
         # def circle_updater(mobject: mn.Mobject) -> None:
@@ -73,9 +77,7 @@ class Circle(mn.Circle, Base):
         return self
 
     def create(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Create(self.middle, run_time=0), mn.GrowFromCenter(self)
-        )
+        return mn.Succession(self.middle.create(), mn.GrowFromCenter(self))
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(animation.ShrinkToCenter(self), self.middle.uncreate())
@@ -89,6 +91,7 @@ class Line(mn.Line, Base):
         self.become(line)
         self.start = _make_point()
         self.end = _make_point()
+        # self.submobjects.extend([self.start, self.end])
 
         self.start.follow(self.get_start)
         self.end.follow(self.get_end)
@@ -114,11 +117,15 @@ class Line(mn.Line, Base):
         # return self
 
     def create(self) -> mn.Animation:
-        return mn.Succession(self.start.create(), self.end.create(), mn.Create(self))
+        return mn.Succession(
+            *[point.create() for point in [self.start, self.end]],
+            mn.Create(self),
+        )
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
-            mn.Uncreate(self), self.start.uncreate(), self.end.uncreate()
+            mn.Uncreate(self),
+            *[point.uncreate() for point in [self.start, self.end]],
         )
 
 
@@ -135,6 +142,8 @@ class Arc(mn.Arc, Base):
         # center is already a function, so middle instead
         self.middle = _make_point()
 
+        # self.submobjects.extend([self.start, self.middle, self.end])
+
         self.start.follow(self.get_start)
         self.end.follow(self.get_end)
         self.middle.follow(self.get_arc_center)
@@ -149,16 +158,14 @@ class Arc(mn.Arc, Base):
 
     def create(self) -> mn.Animation:
         return mn.Succession(
-            mn.Create(mn.VGroup(self.middle, self.start, self.end), run_time=0),
+            *[point.create() for point in [self.start, self.middle, self.end]],
             mn.GrowFromCenter(self),
         )
 
     def uncreate(self) -> mn.Animation:
         return mn.Succession(
             animation.ShrinkToCenter(self),
-            self.middle.uncreate(),
-            self.start.uncreate(),
-            self.end.uncreate(),
+            *[point.uncreate() for point in [self.start, self.middle, self.end]],
         )
 
 
