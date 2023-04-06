@@ -105,10 +105,6 @@ class Line(mn.Line, Base):
         self.start = _make_point().follow(self.get_start)
         self.end = _make_point().follow(self.get_end)
 
-        # def line_updater(mobject: mn.Mobject) -> None:
-        #     mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
-        # self.add_updater(line_updater)
-
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
 
@@ -122,8 +118,6 @@ class Line(mn.Line, Base):
 
     def move_end(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
-        # self.end.move_to(point)
-        # return self
 
     def create(self) -> mn.Animation:
         return mn.Succession(
@@ -150,8 +144,6 @@ class Arc(mn.Arc, Base):
         self.end = _make_point().follow(self.get_end)
         # center is already used
         self.middle = _make_point().follow(self.get_arc_center)
-
-        # self.submobjects.extend([self.start, self.middle, self.end])
 
     def get_center(self) -> vector.Point2d:
         return self.middle.get_center()
