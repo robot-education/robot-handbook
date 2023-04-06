@@ -75,8 +75,7 @@ def direction_3d(x: float, y: float, z: float) -> Direction3d:
 
 
 def angle_between_vectors(x1: Vector, x2: Vector) -> Angle:
-    # mn.angle_between_vectors is incorrectly typed as np.ndarray, not float
-    return mn.angle_between_vectors(x1, x2)  # type: ignore
+    return mn.angle_between_vectors(x1, x2)
 
 
 def angle_between_points(start: Point, end: Point, center: Point) -> Angle:
