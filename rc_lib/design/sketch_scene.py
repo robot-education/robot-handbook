@@ -18,9 +18,9 @@ class Scene(mn.Scene, ABC):
         # self._child_construct = self.construct
         # self.construct = self._construct_sketch
 
-        self._static_mobjects: list[sketch.Sketch] = []
+        self._static_mobjects: list[sketch.Base] = []
 
-    def introduce(self, *mobjects: sketch.Sketch):
+    def introduce(self, *mobjects: sketch.Base):
         """Introduces mobjects to the scene by calling create.
 
         The mobjects are also scheduled for removal at the end of the scene.

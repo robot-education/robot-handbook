@@ -8,8 +8,7 @@ import enum
 import manim as mn
 
 from rc_lib.math_utils import vector
-from rc_lib.style import color
-from rc_lib.style import animation
+from rc_lib.style import color, animation
 
 
 class SketchState(color.Color, enum.Enum):
@@ -18,7 +17,7 @@ class SketchState(color.Color, enum.Enum):
     ERROR = color.Palette.RED.value
 
 
-class Sketch(mn.VMobject, abc.ABC):
+class Base(mn.VMobject, abc.ABC):
     """An abstract base class for Sketch entities."""
 
     state = SketchState.NORMAL
@@ -32,7 +31,7 @@ class Sketch(mn.VMobject, abc.ABC):
         raise NotImplementedError
 
 
-class Point(mn.Dot, Sketch):
+class Point(mn.Dot, Base):
     """Defines a singlar Sketch vertex."""
 
     def __init__(self, dot: mn.Dot) -> None:
@@ -58,7 +57,7 @@ def make_point(point: vector.Point2d) -> Point:
     return Point(mn.Dot(point, color=SketchState.NORMAL))
 
 
-class Circle(mn.Circle, Sketch):
+class Circle(mn.Circle, Base):
     """Defines a Sketch circle with a vertex at its center."""
 
     def __init__(self, circle: mn.Circle):
@@ -83,7 +82,7 @@ class Circle(mn.Circle, Sketch):
         return mn.Succession(animation.ShrinkToCenter(self), self.middle.uncreate())
 
 
-class Line(mn.Line, Sketch):
+class Line(mn.Line, Base):
     """Defines a Sketch line segment vertices at each end."""
 
     def __init__(self, line: mn.Line) -> None:
@@ -118,7 +117,7 @@ class Line(mn.Line, Sketch):
         )
 
 
-class Arc(mn.Arc, Sketch):
+class Arc(mn.Arc, Base):
     """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
     def __init__(self, arc: mn.Arc) -> None:

@@ -2,6 +2,26 @@ import enum
 
 import manim as mn
 from rc_lib.style import color
+from rc_lib.design import sketch
+
+
+class SketchType(enum.IntEnum):
+    POINT = 0
+    LINE = 1
+    CIRCLE = 2
+    ARC = 3
+
+
+def classify(base: sketch.Base) -> SketchType:
+    if isinstance(base, sketch.Line):
+        return SketchType.POINT
+    elif isinstance(base, sketch.Line):
+        return SketchType.POINT
+    elif isinstance(base, sketch.Circle):
+        return SketchType.CIRCLE
+    elif isinstance(base, sketch.Arc):
+        return SketchType.ARC
+    raise NotImplementedError
 
 
 class Click(mn.Succession):
