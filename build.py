@@ -13,7 +13,6 @@ import importlib
 import re
 
 from thefuzz import process, fuzz
-import numpy as np
 
 # prevent manim from printing
 sys.stdout = open(os.devnull, "w")
@@ -21,36 +20,6 @@ import manim as mn
 
 sys.stdout = sys.__stdout__
 
-
-"""
-The process for parsing files, paths, and sources is as follows.
-
-The user specifies a path like this:
-level1/level2/level3
-or this:
-level1/
-
-files:
-end.py
-
-scenes:
-MyScene OtherScene
-
-The output is the path to the file.
-We collect all scenes and call manim build on them.
-We're fine determining a list of scenes per file.
-
-To handle each possible type of input, we begin by collecting all possible paths (which do not end in paths).
-fuzzy matching paths requires collecting each level in the process - false, we simply collect all possible paths
-and get the best one for the given input.
-We tokenize around slashes and do not use a sort ratio matcher.
-
-We collect paths
-We collect file names and map them to paths
-We collect scenes and map them to file names
-
-We can then fuzz around our requirements as needed.
-"""
 
 source_path = pathlib.Path("website")
 
