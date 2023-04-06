@@ -38,7 +38,7 @@ class Point(mn.Dot, Base):
         super().__init__()
         self.become(dot)
 
-    def follow(self, point_function: Callable[[], vector.Point2d]) -> None:
+    def follow(self, point_function: Callable[[], vector.Point2d]) -> Self:
         """Adds an updater function which causes this point to track the specified input."""
 
         def updater(mobject: mn.Mobject):
@@ -46,6 +46,8 @@ class Point(mn.Dot, Base):
 
         self.add_updater(updater)
         updater(self)
+
+        return self
 
     def create(self) -> mn.Animation:
         return mn.Create(self, run_time=0)
@@ -58,23 +60,34 @@ class Circle(mn.Circle, Base):
     """Defines a Sketch circle with a vertex at its center."""
 
     def __init__(self, circle: mn.Circle):
+        # self.middle = _make_point()
         super().__init__()
-
         self.become(circle)
         self.radius = circle.radius
 
-        self.middle = _make_point()
-        # self.submobjects.append(self.middle)
-        self.middle.follow(self.get_center)
+        # center is already used
+        self.middle = _make_point().follow(self.get_center)
 
         # def circle_updater(mobject: mn.Mobject) -> None:
-        #     mobject.move_to(self.middle.get_center())
+        #     self.move_to(self.middle.get_center())
+
         # self.add_updater(circle_updater)
+
+    # def get_center(self) -> vector.Point2d:
+    #     return self.middle.get_center()
 
     def set_radius(self, radius: float) -> Self:
         self.scale(radius / self.radius)
         self.radius = radius
         return self
+
+    # def move_to(self, point: vector.Point2d) -> Self:
+    #     self.middle.move_to(point)
+    #     return self
+
+    # def shift(self, vector: vector.Vector2d) -> Self:
+    #     self.middle.shift(vector)
+    #     return self
 
     def create(self) -> mn.Animation:
         return mn.Succession(self.middle.create(), mn.GrowFromCenter(self))
@@ -89,12 +102,8 @@ class Line(mn.Line, Base):
     def __init__(self, line: mn.Line) -> None:
         super().__init__()
         self.become(line)
-        self.start = _make_point()
-        self.end = _make_point()
-        # self.submobjects.extend([self.start, self.end])
-
-        self.start.follow(self.get_start)
-        self.end.follow(self.get_end)
+        self.start = _make_point().follow(self.get_start)
+        self.end = _make_point().follow(self.get_end)
 
         # def line_updater(mobject: mn.Mobject) -> None:
         #     mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
@@ -137,16 +146,12 @@ class Arc(mn.Arc, Base):
         self.become(arc)
         self.radius = arc.radius
 
-        self.start = _make_point()
-        self.end = _make_point()
-        # center is already a function, so middle instead
-        self.middle = _make_point()
+        self.start = _make_point().follow(self.get_start)
+        self.end = _make_point().follow(self.get_end)
+        # center is already used
+        self.middle = _make_point().follow(self.get_arc_center)
 
         # self.submobjects.extend([self.start, self.middle, self.end])
-
-        self.start.follow(self.get_start)
-        self.end.follow(self.get_end)
-        self.middle.follow(self.get_arc_center)
 
     def get_center(self) -> vector.Point2d:
         return self.middle.get_center()
@@ -169,8 +174,8 @@ class Arc(mn.Arc, Base):
         )
 
 
-def _make_point() -> Point:
-    return Point(mn.Dot(mn.ORIGIN, color=SketchState.NORMAL))
+def _make_point(point: vector.Point2d = mn.ORIGIN) -> Point:
+    return Point(mn.Dot(point, color=SketchState.NORMAL))
 
 
 def make_line(start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
