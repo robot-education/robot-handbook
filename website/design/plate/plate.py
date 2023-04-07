@@ -23,9 +23,9 @@ class IntakePlateScene(mn.Scene):
         small_base: plate.PlateCircleGenerator = plate_factory.make_generator(0.15, 0.2)
         medium_base: plate.PlateCircleGenerator = plate_factory.make_generator(0.4, 0.2)
 
-        front_hole: vector.Point2d = vector.point_2d(-4, -3)
-        middle_hole: vector.Point2d = vector.point_2d(-1.5, 0.25)
-        back_hole: vector.Point2d = vector.point_2d(2.5, 1.5)
+        front_hole = vector.point_2d(-4, -3)
+        middle_hole = vector.point_2d(-1.5, 0.25)
+        back_hole = vector.point_2d(2.5, 1.5)
 
         points: list[plate.PlateCircle] = [
             medium_base(front_hole),

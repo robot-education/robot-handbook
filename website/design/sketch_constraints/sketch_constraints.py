@@ -21,16 +21,18 @@ class CoincidentPointsScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
-        self.run_group(constraint.PointCoincident(move_line, "start", circle.middle))
-        self.run_group(constraint.PointCoincident(move_line, "end", line.end))
+        self.run_group(
+            constraint.Coincident(move_line, circle.middle, base_key="start")
+        )
+        self.run_group(constraint.Coincident(move_line, line.end, base_key="end"))
 
 
 class CoincidentPointLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
-        self.run_group(constraint.PointCoincident(move_line, "start", circle))
-        self.run_group(constraint.PointCoincident(move_line, "end", line))
+        self.run_group(constraint.Coincident(move_line, circle, base_key="start"))
+        self.run_group(constraint.Coincident(move_line, line, base_key="end"))
 
 
 class CoincidentLineScene(sketch_scene.Scene):
@@ -95,22 +97,10 @@ class VerticalPointsScene(sketch_scene.Scene):
         )
 
         self.introduce(circle, line, move_line)
-
         self.run_group(
-            sketch_utils.Click(move_line.start),
-            sketch_utils.Click(circle.middle),
-            move_line.animate.move_start(
-                vector.point_2d(circle.get_center()[0], move_line.get_start()[1])
-            ),
+            constraint.VerticalPoint(move_line, circle.middle, base_key="start")
         )
-
-        self.run_group(
-            sketch_utils.Click(move_line.end),
-            sketch_utils.Click(line.end),
-            move_line.animate.move_end(
-                vector.point_2d(line.get_end()[0], move_line.get_end()[1])
-            ),
-        )
+        self.run_group(constraint.VerticalPoint(move_line, line.end, base_key="end"))
 
 
 class HorizontalPointsScene(sketch_scene.Scene):
@@ -119,24 +109,11 @@ class HorizontalPointsScene(sketch_scene.Scene):
         line = sketch.make_line(vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5))
         move_line = sketch.make_line(vector.point_2d(2, -1.5), vector.point_2d(4.5, 3))
         self.introduce(circle, line, move_line)
-
         self.run_group(
-            sketch_utils.Click(move_line.start),
-            sketch_utils.Click(line.end),
-            move_line.animate.move_start(
-                vector.point_2d(move_line.get_start()[0], line.get_end()[1])
-            ),
+            constraint.HorizontalPoint(move_line, line.end, base_key="start")
         )
-
         self.run_group(
-            sketch_utils.Click(move_line.end),
-            sketch_utils.Click(circle.middle),
-            move_line.animate.move_end(
-                vector.point_2d(
-                    move_line.get_end()[0],
-                    circle.get_center()[1],
-                )
-            ),
+            constraint.HorizontalPoint(move_line, circle.middle, base_key="end")
         )
 
 
@@ -291,24 +268,6 @@ class MidpointPointScene(sketch_scene.Scene):
         )
 
 
-def get_translation(line: sketch.Line, circle: sketch.Circle) -> sketch.Line:
-    projection: vector.Point2d = line.get_projection(circle.get_center())  # type: ignore
-    translation: vector.Vector2d = vector.direction(projection, circle.get_center()) * (
-        vector.norm(circle.get_center() - projection) - circle.radius
-    )
-    return sketch.make_line(
-        line.get_start() + translation, line.get_end() + translation
-    )
-
-
-def tangent_transform(line: sketch.Line, circle: sketch.Circle) -> mn.Animation:
-    return mn.Succession(
-        sketch_utils.Click(line),
-        sketch_utils.Click(circle),
-        mn.Transform(line, get_translation(line, circle)),
-    )
-
-
 class TangentLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle = sketch.make_circle(mn.ORIGIN, 1.5)
@@ -316,25 +275,8 @@ class TangentLineScene(sketch_scene.Scene):
         right = sketch.make_line(vector.point_2d(2, -2.5), vector.point_2d(6, -2))
 
         self.introduce(circle, left, right)
-        self.run_group(tangent_transform(left, circle))
-        self.run_group(tangent_transform(right, circle))
-
-
-def get_circle_translation(
-    base: sketch.Circle | sketch.Arc, target: sketch.Circle
-) -> vector.Vector2d:
-    vec = target.get_center() - base.get_center()
-    return vector.normalize(vec) * (vector.norm(vec) - base.radius - target.radius)
-
-
-def tangent_circle_transform(
-    base: sketch.Circle | sketch.Arc, target: sketch.Circle
-) -> Iterable[mn.Animation]:
-    return (
-        sketch_utils.Click(base),
-        sketch_utils.Click(target),
-        mn.prepare_animation(base.animate.shift(get_circle_translation(base, target))),
-    )
+        self.run_group(constraint.Tangent(left, circle))
+        self.run_group(constraint.Tangent(right, circle))
 
 
 class TangentCircleScene(sketch_scene.Scene):
@@ -346,8 +288,8 @@ class TangentCircleScene(sketch_scene.Scene):
         )
 
         self.introduce(circle, left, right)
-        self.run_group(*tangent_circle_transform(left, circle))
-        self.run_group(*tangent_circle_transform(right, circle))
+        self.run_group(constraint.Tangent(left, circle))
+        self.run_group(constraint.Tangent(right, circle))
 
 
 def concentric_common() -> tuple[sketch.Circle, sketch.Circle, sketch.Arc]:
