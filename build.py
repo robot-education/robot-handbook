@@ -64,6 +64,7 @@ def get_all_scenes(file_paths: list[pathlib.Path]) -> dict[str, pathlib.Path]:
 
 
 def get_scene_names(file_path: pathlib.Path) -> list[str]:
+    """Extracts a list of scene names from the file specified by file_path."""
     module_path = str(file_path).replace("/", ".").removesuffix(".py")
     module = importlib.import_module(module_path)
     return [
