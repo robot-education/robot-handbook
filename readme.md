@@ -1,7 +1,8 @@
-# Robot Concepts
+# Manim Dev Container
 This branch features a stripped down vscode dev container useful for developing animations in manim.
-Using a dev container makes it much easier to reliably write animations in a known enviornment that automatically manages
-tooling like imports, extensions, and dependencies.
+
+This dev container comes with python 3.11 and manim as well as extensions and settings for developing
+in python, jupyter notebook.
 
 ## Development
 This repository includes a vs-code dev container. To open the repository:
