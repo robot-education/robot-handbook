@@ -60,7 +60,6 @@ class Circle(mn.Circle, Base):
     """Defines a Sketch circle with a vertex at its center."""
 
     def __init__(self, circle: mn.Circle):
-        # self.middle = _make_point()
         super().__init__()
         self.become(circle)
         self.radius = circle.radius
@@ -68,26 +67,10 @@ class Circle(mn.Circle, Base):
         # center is already used
         self.middle = _make_point().follow(self.get_center)
 
-        # def circle_updater(mobject: mn.Mobject) -> None:
-        #     self.move_to(self.middle.get_center())
-
-        # self.add_updater(circle_updater)
-
-    # def get_center(self) -> vector.Point2d:
-    #     return self.middle.get_center()
-
     def set_radius(self, radius: float) -> Self:
         self.scale(radius / self.radius)
         self.radius = radius
         return self
-
-    # def move_to(self, point: vector.Point2d) -> Self:
-    #     self.middle.move_to(point)
-    #     return self
-
-    # def shift(self, vector: vector.Vector2d) -> Self:
-    #     self.middle.shift(vector)
-    #     return self
 
     def create(self) -> mn.Animation:
         return mn.Succession(self.middle.create(), mn.GrowFromCenter(self))
@@ -102,6 +85,7 @@ class Line(mn.Line, Base):
     def __init__(self, line: mn.Line) -> None:
         super().__init__()
         self.become(line)
+
         self.start = _make_point().follow(self.get_start)
         self.end = _make_point().follow(self.get_end)
 
@@ -113,13 +97,12 @@ class Line(mn.Line, Base):
 
     def move_start(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(point, self.get_end())  # type: ignore
-        # self.start.move_to(point)
-        # return self
 
     def move_end(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
     def create(self) -> mn.Animation:
+        # self.create._override_animation = None
         return mn.Succession(
             *[point.create() for point in [self.start, self.end]],
             mn.Create(self),
