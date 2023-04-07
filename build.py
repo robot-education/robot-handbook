@@ -69,8 +69,10 @@ def get_scene_names(file_path: pathlib.Path) -> list[str]:
     module = importlib.import_module(module_path)
     return [
         name
-        for name, cls in module.__dict__.items()
-        if inspect.isclass(cls) and issubclass(cls, mn.Scene)
+        for name, cls in inspect.getmembers(module)
+        if inspect.isclass(cls)
+        and issubclass(cls, mn.Scene)
+        and cls.__module__ == module_path
     ]
 
 
@@ -171,9 +173,6 @@ def split_tokens(input: str) -> str:
 
     end = re.findall("[A-Z/_][^A-Z/_]*", input)
     matches.extend(end)
-    # ignore presence of scene
-    if matches[-1].lower() == "scene":
-        matches.pop()
     return " ".join(matches)
 
 
