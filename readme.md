@@ -16,3 +16,5 @@ Python packages may be added to `requirements.txt`. Packages may be added to `se
 
 If you make changes to `requirements.txt` or `setup.sh`, you'll need to rebuild the container or run `bash setup.sh` for the changes to apply.
 
+## Build Script
+This project includes a build script for 

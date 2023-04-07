@@ -23,11 +23,10 @@
     ],
     "cSpell.flagWords": [],
     "python.analysis.extraPaths": [
-        "rc_lib/**",
-        "website/**"
+        "animations/**",
     ],
     "python.formatting.provider": "black",
     // Type checking
     "python.analysis.typeCheckingMode": "basic",
-    "python.defaultInterpreterPath": "/usr/local/bin/python"
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
 }
