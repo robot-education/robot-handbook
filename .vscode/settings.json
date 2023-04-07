@@ -53,7 +53,8 @@
         "coincentric"
     ],
     "python.analysis.extraPaths": [
-        "rc_lib"
+        "rc_lib/**",
+        "website/**"
     ],
     "python.formatting.provider": "black",
     "python.analysis.typeCheckingMode": "basic",
