@@ -1,6 +1,7 @@
 # Robot Concepts
-This branch features a stripped down dev-container useful for developing animations in manim.
-Using a dev container makes it much easier to reliably write animations in a fixed environment.
+This branch features a stripped down vscode dev container useful for developing animations in manim.
+Using a dev container makes it much easier to reliably write animations in a known enviornment that automatically manages
+tooling like imports, extensions, and dependencies.
 
 ## Development
 This repository includes a vs-code dev container. To open the repository:
