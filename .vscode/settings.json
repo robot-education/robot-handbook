@@ -58,5 +58,6 @@
     ],
     "python.formatting.provider": "black",
     "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
     "python.defaultInterpreterPath": "/usr/local/bin/python"
 }
