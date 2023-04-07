@@ -11,52 +11,23 @@
     "files.eol": "\n",
     "cSpell.allowCompoundWords": true,
     "cSpell.ignorePaths": [
-        "build",
         ".git",
         ".vscode",
-        ".devcontainer",
-        "conf.py"
+        ".devcontainer"
     ],
+    // spell words which are okay
     "cSpell.words": [
-        "atleast",
-        "autopictureinpicture",
-        "disablepictureinpicture",
-        "Egan",
-        "eganj",
-        "finfo",
-        "fuzzer",
-        "fuzzywuzzy",
-        "imgpath",
-        "interp",
-        "ipynb",
-        "Kempen",
         "kwargs",
         "manim",
-        "Mobject",
-        "mobjects",
-        "Mobjects",
         "ndarray",
-        "nocontrols",
-        "onshape",
-        "opengl",
-        "refid",
-        "reservee",
-        "submobjects",
-        "unannotate",
-        "Uncreate",
-        "Viridis",
-        "vmobject",
-        "vmobjects",
-        "webm"
     ],
-    "cSpell.flagWords": [
-        "coincentric"
-    ],
+    "cSpell.flagWords": [],
     "python.analysis.extraPaths": [
         "rc_lib/**",
         "website/**"
     ],
     "python.formatting.provider": "black",
+    // Type checking
     "python.analysis.typeCheckingMode": "basic",
     "python.defaultInterpreterPath": "/usr/local/bin/python"
 }
