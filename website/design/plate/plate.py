@@ -5,7 +5,7 @@ import manim as mn
 from rc_lib.style import color, animation
 from rc_lib.math_utils import vector
 from rc_lib.view_utils import title_sequence
-from rc_lib.design import plate, sketch, sketch_utils
+from rc_lib.design import plate, sketch, sketch_utils, constraint
 
 inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE
@@ -130,44 +130,14 @@ class BoundaryConstraintScene(mn.Scene):
         self.play(self._line.create())
 
         self.play(title.next("Add coincident constraints"))
-        self.do_coincident_move(sketch_utils.LineEnd.START)
-        self.do_coincident_move(sketch_utils.LineEnd.END)
+        self.play(constraint.Coincident(self._line, self._left, base_key="start"))
+        self.play(constraint.Coincident(self._line, self._right, base_key="end"))
 
         self.play(title.next("Add tangent constraints"))
         self.do_tangent_move(sketch_utils.LineEnd.START)
         self.do_tangent_move(sketch_utils.LineEnd.END)
 
         self.wait(animation.END_DELAY)
-
-    def _do_clicks(self, line_end: sketch_utils.LineEnd) -> None:
-        circle = self.get_var(line_end, "circle")
-        self.play(
-            sketch_utils.Click(
-                self._line.start
-                if line_end == sketch_utils.LineEnd.START
-                else self._line.end
-            )
-        )
-        self.play(sketch_utils.Click(circle.outer_circle))
-
-    def do_coincident_move(self, line_end: sketch_utils.LineEnd) -> None:
-        self._do_clicks(line_end)
-        new_point = self._coincident_point(line_end)
-
-        base = self._line.animate
-        move_func = None
-        if line_end == sketch_utils.LineEnd.START:
-            move_func = base.move_start
-        else:
-            move_func = base.move_end
-        self.play(move_func(new_point))
-
-    def _coincident_point(self, line_end: sketch_utils.LineEnd) -> vector.Point2d:
-        circle, point = self.get_vars(line_end, "circle", "point")
-        return (
-            circle.get_center()
-            + vector.direction(circle.get_center(), point) * circle.get_outer_radius()
-        )
 
     def do_tangent_move(self, line_end: sketch_utils.LineEnd) -> None:
         circle, tangent_point = self.get_vars(line_end, "circle", "tangent_point")

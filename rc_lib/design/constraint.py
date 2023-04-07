@@ -1,11 +1,13 @@
 from abc import ABC
 import enum
 from types import UnionType
-from typing import NoReturn
+from typing import Any, NoReturn
 
 import manim as mn
+import numpy as np
+
 from rc_lib.design import sketch, sketch_utils
-from rc_lib.math_utils import vector
+from rc_lib.math_utils import vector, tangent
 
 
 def get_key(base: sketch.Base, key: str | None) -> sketch.Base:
@@ -46,7 +48,18 @@ def key_error() -> NoReturn:
     raise KeyError("A key passed to constraint is invalid")
 
 
-class Coincident(mn.Succession):
+class ConstraintBase(mn.Succession, ABC):
+    def __init__(
+        self, base: mn.VMobject, target: mn.VMobject, builder: mn.Animation | Any
+    ):
+        super().__init__(
+            sketch_utils.Click(base),
+            sketch_utils.Click(target),
+            mn.prepare_animation(builder),
+        )
+
+
+class Coincident(ConstraintBase):
     """Constrains a point to a target using a coincident constraint."""
 
     def __init__(
@@ -58,17 +71,12 @@ class Coincident(mn.Succession):
         base_element = get_key(base, base_key)
         target_point = self._get_target(target, base_element.get_center())
 
-        animation = base.animate
         if isinstance(base, sketch.Line):
             animation = move_line(base, base_key, target_point)
         else:
-            animation.move_to(target_point)
+            animation = base.animate.move_to(target_point)
 
-        super().__init__(
-            sketch_utils.Click(base_element),
-            sketch_utils.Click(target),
-            mn.prepare_animation(animation),
-        )
+        super().__init__(base_element, target, animation)
 
     def _get_target(self, target: sketch.Base, point: vector.Point2d) -> vector.Point2d:
         if isinstance(target, sketch.Circle | sketch.Arc):
@@ -98,7 +106,7 @@ class AlignType(enum.IntEnum):
     VERTICAL = 1
 
 
-class AlignPointBase(mn.Succession, ABC):
+class AlignPointBase(ConstraintBase, ABC):
     def __init__(
         self, base: sketch.Base, target: sketch.Point, *, base_key: str, type: AlignType
     ) -> None:
@@ -117,11 +125,7 @@ class AlignPointBase(mn.Succession, ABC):
         else:
             animation = base.animate.move_to(target_point)
 
-        super().__init__(
-            sketch_utils.Click(base_element),
-            sketch_utils.Click(target),
-            mn.prepare_animation(animation),
-        )
+        super().__init__(base_element, target, animation)
 
 
 class VerticalPoint(AlignPointBase):
@@ -138,7 +142,7 @@ class HorizontalPoint(AlignPointBase):
         super().__init__(base, target, base_key=base_key, type=AlignType.HORIZONTAL)
 
 
-class Tangent(mn.Succession):
+class Tangent(ConstraintBase):
     """Constrains a point to a target using a tangent constraint.
 
     The move performed is a straight line transform to the closest tangent position.
@@ -156,11 +160,7 @@ class Tangent(mn.Succession):
             translation = self._get_circle_translation(base, target)
         animation = base.animate.shift(translation)
 
-        super().__init__(
-            sketch_utils.Click(base),
-            sketch_utils.Click(target),
-            mn.prepare_animation(animation),
-        )
+        super().__init__(base, target, animation)
 
     def _get_line_translation(
         self, base: sketch.Line, target: sketch.Circle | sketch.Arc
@@ -175,3 +175,36 @@ class Tangent(mn.Succession):
     ) -> vector.Vector2d:
         vec = target.get_center() - base.get_center()
         return vector.normalize(vec) * (vector.norm(vec) - base.radius - target.radius)
+
+
+class TangentRotate(ConstraintBase):
+    """Applies a tangent constraint to a line which is already coincident to a circle or arc."""
+
+    def __init__(self, base: sketch.Line, target: sketch.Circle | sketch.Arc):
+        key = self._get_touching_key(base, target)
+        opposite_key = "end" if key == "start" else "start"
+        close_point = getattr(base, "get_" + key)
+        far_point = getattr(base, "get_" + opposite_key)
+
+        tangent_point = tangent.point_to_circle_tangent(
+            far_point, target.get_center(), target.radius
+        )
+        angle = vector.angle_between_points(
+            close_point, tangent_point, target.get_center()
+        )
+        animation = base.animate(path_arc=angle, path_arg_centers=[target.get_center()])
+
+        super().__init__(base, target, animation)
+
+    def _get_touching_key(
+        self, base: sketch.Line, target: sketch.Circle | sketch.Arc
+    ) -> str:
+        if np.isclose(
+            vector.norm(base.get_start() - target.get_center()), target.radius
+        ):
+            return "start"
+        elif np.isclose(
+            vector.norm(base.get_end() - target.get_center()), target.radius
+        ):
+            return "end"
+        raise ValueError("Expected line to touch target")

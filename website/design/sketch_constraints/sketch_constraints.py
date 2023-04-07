@@ -1,7 +1,6 @@
 """Animations showcasing various Onshape sketch constraints."""
 
 import math
-from typing import Iterable
 
 import manim as mn
 from rc_lib.math_utils import vector
