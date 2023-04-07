@@ -6,7 +6,7 @@ class BooleanOperations(Scene):
         ellipse1 = Ellipse(
             width=4.0, height=5.0, fill_opacity=0.5, color=BLUE, stroke_width=10
         ).move_to(LEFT)
-        ellipse2 = ellipse1.copy().set_color(color=RED).move_to(RIGHT)  # type: ignore
+        ellipse2 = ellipse1.copy().set_color(color=RED).move_to(RIGHT)
         bool_ops_text = MarkupText("<u>Boolean Operation</u>").next_to(ellipse1, UP * 3)
         ellipse_group = Group(bool_ops_text, ellipse1, ellipse2).move_to(LEFT * 3)
         self.play(FadeIn(ellipse_group))
@@ -18,7 +18,9 @@ class BooleanOperations(Scene):
 
         u = Union(ellipse1, ellipse2, color=ORANGE, fill_opacity=0.5)
         union_text = Text("Union", font_size=23)
-        self.play(u.animate.scale(0.3).next_to(i, DOWN, buff=union_text.height * 3))
+        self.play(
+            u.animate.scale(0.3).next_to(i, DOWN, buff=union_text.height * 3),
+        )
         union_text.next_to(u, UP)
         self.play(FadeIn(union_text))
 

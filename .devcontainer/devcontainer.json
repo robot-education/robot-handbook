@@ -15,10 +15,10 @@
 		"vscode": {
 			"extensions": [
 				"streetsidesoftware.code-spell-checker",
-				"redhat.vscode-yaml",
-				"yzhang.markdown-all-in-one",
+				"ms-python.python",
 				"ms-toolsai.jupyter",
-				"ms-python.python"
+				"yzhang.markdown-all-in-one",
+				"redhat.vscode-yaml"
 			]
 		}
 	},
