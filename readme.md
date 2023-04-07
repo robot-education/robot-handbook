@@ -20,3 +20,8 @@ This project includes a build script for compling animations with manim. The cod
 When used with the dev container, it can be run from the command line directly, e.g. `build`.
 The build script includes a fuzzy matcher which will aggressively match inputs to targets. By default, `build` will build everything in `animations/`,
 but individual paths, files, and scenes may be specified as well. For more information, run `build -h`.
+
+### Examples
+`build` to build everything.
+`build -s MA` to build `MovingAnimation`.
+`build -f ex` to build `example.py`.
