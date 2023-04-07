@@ -22,6 +22,6 @@ The build script includes a fuzzy matcher which will aggressively match inputs t
 but individual paths, files, and scenes may be specified as well. For more information, run `build -h`.
 
 ### Examples
-`build` to build everything.
-`build -s MA` to build `MovingAnimation`.
-`build -f ex` to build `example.py`.
+* Run `build` to build everything.
+* Run `build -s MA` to build the scene `MovingAnimation`.
+* Run `build -f ex` to build all scenes in `example.py`.
