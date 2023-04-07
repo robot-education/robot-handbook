@@ -7,9 +7,8 @@ This repository includes a vs-code dev container. To open the repository:
 1. Install [docker desktop](https://www.docker.com/products/docker-desktop/).
 2. Install [vs-code](https://code.visualstudio.com/download).
 3. Add the **Dev Containers** extension to vs-code.
-4. Open the command Palette (*Ctrl + Shift + P*), and run the *Dev Containers: Open Folder in Container* task. Select a folder containing a local copy of this repository.
-
-When the dev container is opened for the first time, it is expected for the code to run for some time. 
+4. Launch Docker Desktop on your computer.
+5. Open the command Palette (*Ctrl + Shift + P*), and run the *Dev Containers: Open Folder in Container* task. Select a folder containing a local copy of this repository.
 
 ## Files
 Python packages may be added to `requirements.txt`. Packages may be added to `setup.sh`.
@@ -17,4 +16,7 @@ Python packages may be added to `requirements.txt`. Packages may be added to `se
 If you make changes to `requirements.txt` or `setup.sh`, you'll need to rebuild the container or run `bash setup.sh` for the changes to apply.
 
 ## Build Script
-This project includes a build script for 
+This project includes a build script for compling animations with manim. The code is in `build.py`.
+When used with the dev container, it can be run from the command line directly, e.g. `build`.
+The build script includes a fuzzy matcher which will aggressively match inputs to targets. By default, `build` will build everything in `animations/`,
+but individual paths, files, and scenes may be specified as well. For more information, run `build -h`.

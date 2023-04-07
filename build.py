@@ -84,10 +84,9 @@ def get_arg_parser() -> argparse.ArgumentParser:
 
     description = """
     Inputs to the builder. All inputs are parsed using a fuzzy matcher which enables (often aggressive) abbreviations.
-    The fuzzer works by comparing tokens in the input with target tokens. 
-    Token splits are determined using capital letters, slashes, and underscores.
-    So, to match a scene like "CoincidentLine", "coinLi" is probably sufficient, but "coinli" and "COINLI" will likely
-    fail due to to many (or to few) tokens.
+    The fuzzer works by comparing tokens in the input with target tokens.
+    Token splits are determined using capital letters, slashes, backslashes, and underscores.
+    So, "CoLi" or "coLi" will match "CoincidentLine" better than "coli" or "COLI".
     """
 
     group = parser.add_argument_group("inputs", description)
