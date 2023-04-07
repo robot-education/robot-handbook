@@ -27,6 +27,8 @@ quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
 
 exclude_folders = ["__pycache__", "media", "_style"]
 
+split_regex = "A-Z_/\\\\"
+
 
 def get_all_file_paths(base: pathlib.Path) -> list[pathlib.Path]:
     """Searches source_path for all potential files. Returns a mapping of file names to their paths."""
@@ -115,9 +117,8 @@ def get_arg_parser() -> argparse.ArgumentParser:
     description = """
     Inputs to the builder. All inputs are parsed using a fuzzy matcher which enables (often aggressive) abbreviations.
     The fuzzer works by comparing tokens in the input with target tokens. 
-    Token splits are determined using capital letters, slashes, and underscores, and the word "scene" is ignored.
-    So, to match a scene like "CoincidentLineScene", "coinLi" is probably sufficient, but "coinli" and "COINLI" will likely
-    fail due to to many (or to few) tokens.
+    Token splits are determined using capital letters, slashes, backslashes, and underscores.
+    So, "CoLi" or "coLi" will match "CoincidentLine" better than "coli" or "COLI".
     """
 
     group = parser.add_argument_group("inputs", description)
@@ -166,12 +167,12 @@ def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
 
 
 def split_tokens(input: str) -> str:
-    parsed = re.search("[^A-Z/_]*", input)
+    parsed = re.search("[^{}]*".format(split_regex), input)
     matches: list[str] = []
     if parsed is not None:
         matches.append(parsed.group(0))
 
-    end = re.findall("[A-Z/_][^A-Z/_]*", input)
+    end = re.findall("[{}][^{}]*".format(split_regex, split_regex), input)
     matches.extend(end)
     return " ".join(matches)
 
