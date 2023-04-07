@@ -24,6 +24,9 @@ source_path = pathlib.Path("animations")
 
 exclude_folders = ["__pycache__", "media", "_style"]
 
+# Split around A-Z, _, /, and \
+split_regex = "A-Z_/\\\\"
+
 
 def get_all_file_paths(base: pathlib.Path) -> list[pathlib.Path]:
     """Searches source_path for all potential files. Returns a mapping of file names to their paths."""
@@ -59,10 +62,13 @@ def get_all_scenes(file_paths: list[pathlib.Path]) -> dict[str, pathlib.Path]:
 def get_scene_names(file_path: pathlib.Path) -> list[str]:
     module_path = str(file_path).replace("/", ".").removesuffix(".py")
     module = importlib.import_module(module_path)
+
     return [
         name
-        for name, cls in module.__dict__.items()
-        if inspect.isclass(cls) and issubclass(cls, mn.Scene)
+        for name, cls in inspect.getmembers(module)
+        if inspect.isclass(cls)
+        and issubclass(cls, mn.Scene)
+        and cls.__module__ == module_path
     ]
 
 
@@ -123,19 +129,17 @@ def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
 
         if score < 95:
             print("Found {} for input {} (score: {})".format(target_name, value, score))
-        # print("Inputs:", parsed_targets)
-        # print("Query:", parsed_value)
         matches.append(target_name)
     return matches
 
 
 def split_tokens(input: str) -> str:
-    parsed = re.search("[^A-Z/_]*", input)
+    parsed = re.search("[^{}]*".format(split_regex), input)
     matches: list[str] = []
     if parsed is not None:
         matches.append(parsed.group(0))
 
-    end = re.findall("[A-Z/_][^A-Z/_]*", input)
+    end = re.findall("[{}][^{}]*".format(split_regex, split_regex), input)
     matches.extend(end)
     return " ".join(matches)
 
