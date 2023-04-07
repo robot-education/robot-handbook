@@ -27,3 +27,9 @@ but individual paths, files, and scenes may be specified as well. For more infor
 * Run `build` to build everything.
 * Run `build -s MA` to build the scene `MovingAnimation`.
 * Run `build -f ex` to build all scenes in `example.py`.
+
+## Comparsion to the Development Branch
+This branch is stripped down compared to the `development` branch. 
+In particular, `development` includes additional tooling for building and displaying animations in a `sphinx` website, including
+additional code in `build` to relocate built animations from `media` to a target folder automatically. `development` also features
+use of an internal python library, `rc_lib`, made available as a package for animations in `website`.
