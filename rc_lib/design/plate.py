@@ -6,20 +6,21 @@ from rc_lib.math_utils import tangent, vector
 from rc_lib.design import sketch
 
 
-class PlateCircle(mn.VGroup):
+class PlateCircle(sketch.Circle):
     def __init__(self, inner_circle: mn.Circle, outer_circle: mn.Circle) -> None:
-        super().__init__(inner_circle, outer_circle)
-        self.inner_circle: mn.Circle = inner_circle
-        self.outer_circle: mn.Circle = outer_circle
+        super().__init__(outer_circle)
+        self.inner_circle = inner_circle
 
-    def get_center(self) -> vector.Point2d:
-        return self.inner_circle.get_center()
+        def follow(mobject: mn.Mobject) -> None:
+            mobject.move_to(self.get_center())
+
+        self.inner_circle.add_updater(follow, call_updater=True)
 
     def get_inner_radius(self) -> float:
         return self.inner_circle.radius
 
     def get_outer_radius(self) -> float:
-        return self.outer_circle.radius
+        return self.radius
 
 
 def plate_circle_tangent_points(
@@ -99,7 +100,7 @@ class PlateGroup(mn.VGroup):
 
     def draw_outer_circles(self) -> mn.Animation:
         return mn.Succession(
-            *[mn.GrowFromCenter(x.outer_circle) for x in self._entities], lag_ratio=0.75
+            *[mn.GrowFromCenter(x) for x in self._entities], lag_ratio=0.75
         )
 
     def draw_boundary(self) -> mn.Animation:

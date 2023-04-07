@@ -1,7 +1,7 @@
 from abc import ABC
-import enum
 from types import UnionType
 from typing import Any, NoReturn
+import enum
 
 import manim as mn
 import numpy as np
@@ -21,31 +21,31 @@ def get_key(base: sketch.Base, key: str | None) -> sketch.Base:
         case "end":
             throw_if_not(base, sketch.Line | sketch.Arc)
         case _:
-            key_error()
+            raise_key_error()
 
     return getattr(base, key)
 
 
 def throw_if(base: sketch.Base, type: type[sketch.Base] | UnionType) -> None:
     if isinstance(base, type):
-        key_error()
+        raise_key_error()
 
 
 def throw_if_not(base: sketch.Base, type: type[sketch.Base] | UnionType) -> None:
     if not isinstance(base, type):
-        key_error()
+        raise_key_error()
+
+
+def raise_key_error() -> NoReturn:
+    raise KeyError("A key passed to constraint is invalid")
 
 
 def move_line(
-    base: sketch.Line, base_key: str | None, point: vector.Point2d
+    base: sketch.Line, base_key: str | None, point: vector.Point2d, **anim_kwargs
 ) -> mn.Animation:
     if base_key is None or (base_key != "start" and base_key != "end"):
-        key_error()
-    return getattr(base.animate, "move_" + base_key)(point)
-
-
-def key_error() -> NoReturn:
-    raise KeyError("A key passed to constraint is invalid")
+        raise_key_error()
+    return getattr(base.animate(**anim_kwargs), "move_" + base_key)(point)
 
 
 class ConstraintBase(mn.Succession, ABC):
@@ -180,20 +180,37 @@ class Tangent(ConstraintBase):
 class TangentRotate(ConstraintBase):
     """Applies a tangent constraint to a line which is already coincident to a circle or arc."""
 
-    def __init__(self, base: sketch.Line, target: sketch.Circle | sketch.Arc):
+    def __init__(
+        self, base: sketch.Line, target: sketch.Circle | sketch.Arc, reverse=False
+    ):
         key = self._get_touching_key(base, target)
         opposite_key = "end" if key == "start" else "start"
-        close_point = getattr(base, "get_" + key)
-        far_point = getattr(base, "get_" + opposite_key)
+        close_point = getattr(base, "get_" + key)()
+        far_point = getattr(base, "get_" + opposite_key)()
 
-        tangent_point = tangent.point_to_circle_tangent(
-            far_point, target.get_center(), target.radius
-        )
+        if reverse:
+            tangent_point = tangent.point_to_circle_tangent(
+                far_point, target.get_center(), target.radius
+            )
+        else:
+            tangent_point = tangent.circle_to_point_tangent(
+                target.get_center(), target.radius, far_point
+            )
+
         angle = vector.angle_between_points(
             close_point, tangent_point, target.get_center()
         )
-        animation = base.animate(path_arc=angle, path_arg_centers=[target.get_center()])
 
+        if reverse:
+            angle *= -1
+
+        animation = move_line(
+            base,
+            key,
+            tangent_point,
+            path_arc=angle,
+            path_arg_centers=[target.get_center()],
+        )
         super().__init__(base, target, animation)
 
     def _get_touching_key(

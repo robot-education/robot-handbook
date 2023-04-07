@@ -79,7 +79,7 @@ class BoundaryRedrawScene(mn.Scene):
 
     def construct(self):
         self.play(title.next("Add outer circle"))
-        self.play(mn.GrowFromCenter(self._middle.outer_circle))
+        self.play(mn.GrowFromCenter(self._middle))
 
         self.play(title.next("Redraw boundary"))
         self.play(self._line.uncreate())
@@ -95,7 +95,9 @@ class BoundaryConstraintScene(mn.Scene):
         generator = plate_factory.make_generator(1.75, 0.75)
         self._left: plate.PlateCircle = generator(vector.point_2d(-6, -2))
         self._right: plate.PlateCircle = generator(vector.point_2d(6, -2))
-        self.add(self._left, self._right)
+        self.add(
+            self._left, self._right, self._left.inner_circle, self._right.inner_circle
+        )
 
         self._tangent_points: tuple[
             vector.Point2d, vector.Point2d
@@ -105,25 +107,7 @@ class BoundaryConstraintScene(mn.Scene):
         right_start_point = self._tangent_points[1] + vector.point_2d(-2, 0.5)
 
         self._line: sketch.Line = sketch.make_line(left_start_point, right_start_point)
-
         title.reset()
-
-    def get_vars(self, line_end: sketch_utils.LineEnd, *keys: str) -> list[Any]:
-        return [self.get_var(line_end, key) for key in keys]
-
-    def get_var(self, line_end: sketch_utils.LineEnd, key: str) -> Any:
-        if key == "tangent_point":
-            return self._tangent_points[line_end]
-        elif key == "point":
-            return (
-                self._line.get_start()
-                if line_end == sketch_utils.LineEnd.START
-                else self._line.get_end()
-            )
-        elif key == "circle":
-            return self._left if line_end == sketch_utils.LineEnd.START else self._right
-        else:
-            raise ValueError("Could not fetch var coresponding to key")
 
     def construct(self):
         self.play(title.next("Create line"))
@@ -134,32 +118,7 @@ class BoundaryConstraintScene(mn.Scene):
         self.play(constraint.Coincident(self._line, self._right, base_key="end"))
 
         self.play(title.next("Add tangent constraints"))
-        self.do_tangent_move(sketch_utils.LineEnd.START)
-        self.do_tangent_move(sketch_utils.LineEnd.END)
+        self.play(constraint.TangentRotate(self._line, self._left))
+        self.play(constraint.TangentRotate(self._line, self._right, reverse=True))
 
         self.wait(animation.END_DELAY)
-
-    def do_tangent_move(self, line_end: sketch_utils.LineEnd) -> None:
-        circle, tangent_point = self.get_vars(line_end, "circle", "tangent_point")
-
-        self.play(sketch_utils.Click(self._line))
-        self.play(sketch_utils.Click(circle.outer_circle))
-
-        angle = self._tangent_angle(line_end)
-        base = self._line.animate(
-            path_arc=angle, path_arg_centers=[circle.get_center()]
-        )
-        move_func = None
-        if line_end == sketch_utils.LineEnd.START:
-            move_func = base.move_start
-        else:
-            move_func = base.move_end
-        self.play(move_func(tangent_point))
-
-    def _tangent_angle(self, line_end: sketch_utils.LineEnd) -> float:
-        point, tangent_point, circle = self.get_vars(
-            line_end, "point", "tangent_point", "circle"
-        )
-        return (
-            1 if line_end == sketch_utils.LineEnd.START else -1
-        ) * vector.angle_between_points(point, tangent_point, circle.get_center())

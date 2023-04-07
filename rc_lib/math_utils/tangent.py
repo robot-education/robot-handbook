@@ -44,4 +44,4 @@ def point_to_circle_tangent(
 def circle_to_point_tangent(
     center: vector.Point2d, radius: float, point: vector.Point2d
 ) -> vector.Point2d:
-    return point_to_circle_tangent(center, -radius, point)
+    return point_to_circle_tangent(point, center, -radius)
