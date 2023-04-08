@@ -1,11 +1,11 @@
-from abc import ABC
+from typing import Any
 
 import manim as mn
 
 from rc_lib.style import color
 
 
-class Click(mn.Succession):
+class Click(mn.Transform):
     """Defines an animation which represents an object getting clicked."""
 
     Z_INDEX = 500
@@ -17,59 +17,31 @@ class Click(mn.Succession):
         mobject.set_z_index(self.Z_INDEX)
         self.Z_INDEX += 1
 
-        super().__init__(
-            mn.Transform(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
-        )
+        super().__init__(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
 
 
-class ConstraintBase(mn.Animation, ABC):
-    def __new__(cls, base: mn.Mobject, *args, mobjects: list[mn.Mobject], **kwargs):
-        func = base.animation_override_for(cls)
-        if not callable(func):
-            raise TypeError("Equal must be overridden")
-
-        mobjects.insert(0, base)  # base always comes first
-
-        return mn.Succession(
-            *[Click(mobject) for mobject in mobjects], func(base, *args, **kwargs)
-        )
+def make(animation: mn.Animation | Any, *mobjects: mn.Mobject) -> mn.Succession:
+    return mn.Succession(*[Click(mobject) for mobject in mobjects], animation)
 
 
-class Equal(ConstraintBase):
-    def __new__(cls, base: mn.Mobject, target: mn.Mobject):
-        return super().__new__(cls, base, target, mobjects=[target])
-
+class Equal(mn.Animation):
     def __init__(self, base: mn.Mobject, target: mn.Mobject) -> None:
-        pass
+        raise NotImplementedError
 
 
-# def get_key(base: sketch.Base, key: str | None) -> sketch.Base:
-#     match key:
-#         case None:
-#             return base
-#         case "middle":
-#             throw_if_not(base, sketch.Circle | sketch.Arc)
-#   throw_if_not(base, sketch.Line | sketch.Arc)
-#         case "end":
-#             throw_if_not(base, sketch.Line | sketch.Arc)
-#         case _:
-#             raise_key_error()
-
-#     return getattr(base, key)
+class Coincident(mn.Animation):
+    def __init__(self, base: mn.Mobject, target: mn.Mobject, *, base_key: str) -> None:
+        raise NotImplementedError
 
 
-# def throw_if(base: sketch.Base, type: type[sketch.Base] | UnionType) -> None:
-#     if isinstance(base, type):
-#         raise_key_error()
+class VerticalPoint(mn.Animation):
+    def __init__(self, base: mn.Mobject, target: mn.Mobject, *, base_key: str) -> None:
+        raise NotImplementedError
 
 
-# def throw_if_not(base: sketch.Base, type: type[sketch.Base] | UnionType) -> None:
-#     if not isinstance(base, type):
-#         raise_key_error()
-
-
-# def raise_key_error() -> NoReturn:
-#     raise KeyError("A key passed to constraint is invalid")
+class HorizontalPoint(mn.Animation):
+    def __init__(self, base: mn.Mobject, target: mn.Mobject, *, base_key: str) -> None:
+        raise NotImplementedError
 
 
 # def move_line(
@@ -78,56 +50,6 @@ class Equal(ConstraintBase):
 #     if base_key is None or (base_key != "start" and base_key != "end"):
 #         raise_key_error()
 #     return getattr(base.animate(**anim_kwargs), "move_" + base_key)(point)
-
-
-# class ConstraintBase(mn.Succession, ABC):
-#     def __init__(self, builder: mn.Animation | Any, *mobjects: mn.VMobject):
-#         super().__init__(
-#             *[Click(mobject) for mobject in mobjects],
-#             mn.prepare_animation(builder),
-#         )
-
-
-# class Coincident(ConstraintBase):
-#     """Constrains a point to a target using a coincident constraint."""
-
-#     def __init__(
-#         self, base: sketch.Base, target: sketch.Base, base_key: str | None = None
-#     ) -> None:
-#         if base_key is None:
-#             throw_if(base, sketch.Line | sketch.Arc | sketch.Circle)
-
-#         base_element = get_key(base, base_key)
-#         target_point = self._get_target(target, base_element.get_center())
-
-#         if isinstance(base, sketch.Line):
-#             animation = move_line(base, base_key, target_point)
-#         else:
-#             animation = base.animate.move_to(target_point)
-
-#         super().__init__(animation, base_element, target)
-
-#     def _get_target(self, target: sketch.Base, point: vector.Point2d) -> vector.Point2d:
-#         if isinstance(target, sketch.Circle | sketch.Arc):
-#             return target.get_center() + (
-#                 vector.direction(target.get_center(), point) * target.radius
-#             )
-#         elif isinstance(target, sketch.Line):
-#             return target.get_projection(point)
-#         elif isinstance(target, sketch.Point):
-#             return target.get_center()
-
-
-# # class Horizontal(mn.Succession):
-# #     def __init__(
-# #         self, base: sketch.Line
-# #     ) -> None:
-
-
-# # class VerticalLine(mn.Succession):
-# #     def __init__(self, base: sketch.Line) -> None:
-# #         angle = base.get_angle()
-# #         pass
 
 
 # class AlignType(enum.IntEnum):

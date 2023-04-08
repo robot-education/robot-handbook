@@ -1,5 +1,6 @@
 """Defines entities which look like Onshape sketch entities.
 """
+from __future__ import annotations
 
 from typing import Callable, Self
 from abc import ABC, abstractmethod
@@ -10,6 +11,36 @@ import manim as mn
 from rc_lib.math_utils import vector
 from rc_lib.style import color, animation
 from rc_lib.design import constraint
+
+
+# def get_key(base: Base, key: str | None) -> Base:
+#     match key:
+#         case None:
+#             return base
+#         case "middle":
+#             throw_if_not(base, Circle | Arc)
+#         case "start":
+#             throw_if_not(base, Line | Arc)
+#         case "end":
+#             throw_if_not(base, Line | Arc)
+#         case _:
+#             raise_key_error()
+
+#     return getattr(base, key)
+
+
+# def throw_if(base: Base, type: type[Base] | UnionType) -> None:
+#     if isinstance(base, type):
+#         raise_key_error()
+
+
+# def throw_if_not(base: Base, type: type[Base] | UnionType) -> None:
+#     if not isinstance(base, type):
+#         raise_key_error()
+
+
+# def raise_key_error() -> NoReturn:
+#     raise KeyError("A key passed to constraint is invalid")
 
 
 class SketchState(color.Color, enum.Enum):
@@ -31,11 +62,20 @@ class Base(mn.VMobject, ABC):
     def _uncreate_override(self) -> mn.Animation:
         raise NotImplementedError
 
+    @abstractmethod
+    def coincident_target(self, point: vector.Point2d) -> mn.Animation:
+        raise NotImplementedError
+
 
 class ArcBase(Base, ABC):
     @mn.override_animation(constraint.Equal)
     def _equal_override(self, target: Self) -> mn.Animation:
         return target.animate.set_radius(self.radius)  # type: ignore
+
+    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
+        return self.get_center() + (
+            vector.direction(self.get_center(), point) * self.radius
+        )
 
 
 class Point(mn.Dot, Base):
@@ -54,6 +94,9 @@ class Point(mn.Dot, Base):
         self.add_updater(updater, call_updater=True)
 
         return self
+
+    def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
+        return self.get_center()
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
@@ -90,7 +133,24 @@ class Line(mn.Line, Base):
     def _equal_override(self, target: Self) -> mn.Animation:
         midpoint = target.get_midpoint()
         offset = target.get_direction() * (self.get_length() / 2)
-        return target.animate.put_start_and_end_on(midpoint - offset, midpoint + offset)  # type: ignore
+        animation = target.animate.put_start_and_end_on(
+            midpoint - offset, midpoint + offset
+        )
+        return constraint.make(animation, self, target)
+
+    @mn.override_animation(constraint.Coincident)
+    def _coincident_override(self, target: Point, *, base_key: str) -> mn.Animation:
+        animation = self.animate
+        if base_key == "start":
+            animation.move_start(target.coincident_target(self.get_start()))
+        elif base_key == "end":
+            animation.move_end(target.coincident_target(self.get_end()))
+        else:
+            raise KeyError("Expected start or end")
+        return constraint.make(animation, getattr(self, base_key), target)
+
+    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
+        return self.get_projection(point)
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
