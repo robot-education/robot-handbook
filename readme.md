@@ -1,13 +1,13 @@
 # Manim Dev Container
-This branch features a stripped down vscode dev container useful for developing animations in manim.
+This branch features a VS Code dev container useful for developing animations in manim.
 
 This dev container comes with python 3.11 and manim as well as extensions and settings for developing
 in python and jupyter notebooks.
 
 ## Development
-This repository includes a vs-code dev container. To open the repository:
+This repository includes a VS Code dev container. To open the repository:
 1. Install [docker desktop](https://www.docker.com/products/docker-desktop/).
-2. Install [vs-code](https://code.visualstudio.com/download).
+2. Install [VS Code](https://code.visualstudio.com/download).
 3. Add the **Dev Containers** extension to vs-code.
 4. Launch Docker Desktop on your computer.
 5. Open the command Palette (*Ctrl + Shift + P*), and run the *Dev Containers: Open Folder in Container* task. Select a folder containing a local copy of this repository.
