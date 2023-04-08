@@ -180,27 +180,22 @@ class Tangent(ConstraintBase):
 class Equal(ConstraintBase):
     def __init__(
         self,
-        base: sketch.Line | sketch.Circle | sketch.Line,
-        target: sketch.Line | sketch.Circle | sketch.Arc,
+        base: sketch.Line | sketch.ArcBase,
+        target: sketch.Line | sketch.ArcBase,
     ) -> None:
         """Sets target to be equal to length.
 
         This constraint is moderately counterintuitive in that base is preserved while target is modified.
         However, this matches the behavior of equal for multiple targets.
         """
-        animation = target.animate
-        if isinstance(base, sketch.Line) and isinstance(target, sketch.Line):
-            midpoint = target.get_midpoint()
-            offset = target.get_direction() * (base.get_length() / 2)
-            animation.put_start_and_end_on(midpoint - offset, midpoint + offset)
-        elif isinstance(base, sketch.Circle | sketch.Arc) and isinstance(
-            target, sketch.Circle | sketch.Arc
-        ):
-            animation.set_radius(base.radius)
-        else:
-            raise TypeError("Equal entities must be compatible")
 
-        super().__init__(base, target, animation)
+        # or doesn't work with type guards...
+        if isinstance(base, sketch.Line) and isinstance(target, sketch.Line):
+            super().__init__(base, target, base.equal(target))
+        elif isinstance(base, sketch.ArcBase) and isinstance(target, sketch.ArcBase):
+            super().__init__(base, target, base.equal(target))
+        else:
+            raise TypeError("base and target must be the same")
 
 
 class TangentRotate(ConstraintBase):

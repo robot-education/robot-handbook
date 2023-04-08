@@ -2,7 +2,7 @@
 """
 
 from typing import Callable, Self
-import abc
+from abc import ABC, abstractmethod
 import enum
 
 import manim as mn
@@ -17,18 +17,23 @@ class SketchState(color.Color, enum.Enum):
     ERROR = color.Palette.RED.value
 
 
-class Base(mn.VMobject, abc.ABC):
+class Base(mn.VMobject, ABC):
     """An abstract base class for Sketch entities."""
 
     state = SketchState.NORMAL
 
-    @abc.abstractmethod
+    @abstractmethod
     def _create_override(self) -> mn.Animation:
         raise NotImplementedError
 
-    @abc.abstractmethod
+    @abstractmethod
     def _uncreate_override(self) -> mn.Animation:
         raise NotImplementedError
+
+
+class ArcBase(Base, ABC):
+    def equal(self, target: Self) -> mn.Animation:
+        return target.animate.set_radius(self.radius)  # type: ignore
 
 
 class Point(mn.Dot, Base):
@@ -57,13 +62,51 @@ class Point(mn.Dot, Base):
         return mn.Animation(self, introducer=True, remover=True, run_time=0)
 
 
-# class ArcBase(mn.Arc, Base):
-#     @mn.override_animation(constraint.Equal)
-#     def equal(target: Self) -> mn.Animation:
-#         return target.animate.set_radius(self.radius)
+class Line(mn.Line, Base):
+    """Defines a Sketch line segment vertices at each end."""
+
+    def __init__(self, line: mn.Line) -> None:
+        super().__init__()
+        self.become(line)
+
+        self.start = _make_point().follow(self.get_start)
+        self.end = _make_point().follow(self.get_end)
+
+    def get_length(self) -> float:
+        return vector.norm(self.get_end() - self.get_start())
+
+    def get_direction(self) -> vector.Direction2d:
+        return vector.normalize(self.get_end() - self.get_start())
+
+    def move_start(self, point: vector.Point2d) -> Self:
+        return self.put_start_and_end_on(point, self.get_end())  # type: ignore
+
+    def move_end(self, point: vector.Point2d) -> Self:
+        return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
+
+    def equal(self, target: Self) -> mn.Animation:
+        midpoint = target.get_midpoint()
+        offset = target.get_direction() * (self.get_length() / 2)
+        return self.animate.put_start_and_end_on(midpoint - offset, midpoint + offset)  # type: ignore
+
+    @mn.override_animation(mn.Create)
+    def _create_override(self) -> mn.Animation:
+        return mn.Succession(
+            mn.Create(self.start),
+            mn.Create(self.end),
+            mn.Create(self, use_override=False, suspend_mobject_updating=False),
+        )
+
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self) -> mn.Animation:
+        return mn.Succession(
+            mn.Uncreate(self, use_override=False, suspend_mobject_updating=False),
+            mn.Uncreate(self.start),
+            mn.Uncreate(self.end),
+        )
 
 
-class Circle(mn.Circle, Base):
+class Circle(mn.Circle, ArcBase):
     """Defines a Sketch circle with a vertex at its center."""
 
     def __init__(self, circle: mn.Circle):
@@ -88,46 +131,7 @@ class Circle(mn.Circle, Base):
         return mn.Succession(animation.ShrinkToCenter(self), mn.Uncreate(self.middle))
 
 
-class Line(mn.Line, Base):
-    """Defines a Sketch line segment vertices at each end."""
-
-    def __init__(self, line: mn.Line) -> None:
-        super().__init__()
-        self.become(line)
-
-        self.start = _make_point().follow(self.get_start)
-        self.end = _make_point().follow(self.get_end)
-
-    def get_length(self) -> float:
-        return vector.norm(self.get_end() - self.get_start())
-
-    def get_direction(self) -> vector.Direction2d:
-        return vector.normalize(self.get_end() - self.get_start())
-
-    def move_start(self, point: vector.Point2d) -> Self:
-        return self.put_start_and_end_on(point, self.get_end())  # type: ignore
-
-    def move_end(self, point: vector.Point2d) -> Self:
-        return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
-
-    @mn.override_animation(mn.Create)
-    def _create_override(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Create(self.start),
-            mn.Create(self.end),
-            mn.Create(self, use_override=False, suspend_mobject_updating=False),
-        )
-
-    @mn.override_animation(mn.Uncreate)
-    def _uncreate_override(self) -> mn.Animation:
-        return mn.Succession(
-            mn.Uncreate(self, use_override=False, suspend_mobject_updating=False),
-            mn.Uncreate(self.start),
-            mn.Uncreate(self.end),
-        )
-
-
-class Arc(mn.Arc, Base):
+class Arc(mn.Arc, ArcBase):
     """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
     def __init__(self, arc: mn.Arc) -> None:
