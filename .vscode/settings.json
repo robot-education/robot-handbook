@@ -27,9 +27,6 @@
     ],
     "python.formatting.provider": "black",
     // Type checking
-    "python.analysis.typeCheckingMode": "basic",
-    // "python.linting.pylintArgs": [
-    //     "allow-wildcard-with-all=yes"
-    // ],
+    // "python.analysis.typeCheckingMode": "basic",
     "python.defaultInterpreterPath": "/usr/local/bin/python",
 }
