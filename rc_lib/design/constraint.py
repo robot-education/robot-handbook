@@ -5,6 +5,32 @@ import manim as mn
 from rc_lib.style import color
 
 
+class Add(mn.Succession):
+    def __init__(self, *mobjects: mn.VMobject):
+        super().__init__(
+            *[
+                mn.Create(mobject, introducer=True, run_time=0, use_override=False)
+                for mobject in mobjects
+            ]
+        )
+
+
+class Remove(mn.Succession):
+    def __init__(self, *mobjects: mn.VMobject):
+        super().__init__(
+            *[
+                mn.Create(
+                    mobject,
+                    introducer=True,
+                    remover=True,
+                    run_time=0,
+                    use_override=False,
+                )
+                for mobject in mobjects
+            ]
+        )
+
+
 class Click(mn.Transform):
     """Defines an animation which represents an object getting clicked."""
 

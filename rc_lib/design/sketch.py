@@ -119,8 +119,15 @@ class Line(mn.Line, Base):
         super().__init__()
         self.become(line)
 
-        self.start = _make_point().follow(self.get_start)
-        self.end = _make_point().follow(self.get_end)
+        self.start_point = _make_point(point=self.get_start())
+        self.end_point = _make_point(point=self.get_end())
+
+        def updater(mobject: mn.Mobject) -> None:
+            mobject.put_start_and_end_on(
+                self.start_point.get_center(), self.end_point.get_center()
+            )
+
+        self.add_updater(updater)
 
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
@@ -129,10 +136,14 @@ class Line(mn.Line, Base):
         return vector.normalize(self.get_end() - self.get_start())
 
     def move_start(self, point: vector.Point2d) -> Self:
-        return self.put_start_and_end_on(point, self.get_end())  # type: ignore
+        self.start_point.move_to(point)
+        return self
+        # return self.put_start_and_end_on(point, self.get_end())  # type: ignore
 
     def move_end(self, point: vector.Point2d) -> Self:
-        return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
+        self.end_point.move_to(point)
+        return self
+        # return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
     @mn.override_animation(constraint.Equal)
     def _equal_override(self, target: Self) -> mn.Animation:
@@ -148,18 +159,25 @@ class Line(mn.Line, Base):
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
+        end = self.get_end()
         return mn.Succession(
-            mn.Create(self.start),
-            mn.Create(self.end),
-            mn.Create(self, use_override=False, suspend_mobject_updating=False),
+            constraint.Add(self.start_point, self.end_point, self),
+            mn.prepare_animation(
+                self.end_point.move_to(self.get_start() + vector.point_2d(0, 0.0001))
+                .animate(suspend_mobject_updating=False)
+                .move_to(end)
+            ),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
-            mn.Uncreate(self, use_override=False, suspend_mobject_updating=False),
-            mn.Uncreate(self.start),
-            mn.Uncreate(self.end),
+            mn.prepare_animation(
+                self.end_point.animate(suspend_mobject_updating=False).move_to(
+                    self.get_start() + vector.point_2d(0, 0.0001)
+                )
+            ),
+            constraint.Remove(self.start_point, self.end_point, self),
         )
 
 
