@@ -9,6 +9,7 @@ import manim as mn
 
 from rc_lib.math_utils import vector
 from rc_lib.style import color, animation
+from rc_lib.design import constraint
 
 
 class SketchState(color.Color, enum.Enum):
@@ -32,7 +33,8 @@ class Base(mn.VMobject, ABC):
 
 
 class ArcBase(Base, ABC):
-    def equal(self, target: Self) -> mn.Animation:
+    @mn.override_animation(constraint.Equal)
+    def _equal_override(self, target: Self) -> mn.Animation:
         return target.animate.set_radius(self.radius)  # type: ignore
 
 
@@ -84,10 +86,11 @@ class Line(mn.Line, Base):
     def move_end(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
-    def equal(self, target: Self) -> mn.Animation:
+    @mn.override_animation(constraint.Equal)
+    def _equal_override(self, target: Self) -> mn.Animation:
         midpoint = target.get_midpoint()
         offset = target.get_direction() * (self.get_length() / 2)
-        return self.animate.put_start_and_end_on(midpoint - offset, midpoint + offset)  # type: ignore
+        return target.animate.put_start_and_end_on(midpoint - offset, midpoint + offset)  # type: ignore
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
