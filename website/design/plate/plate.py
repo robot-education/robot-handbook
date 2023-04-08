@@ -5,7 +5,7 @@ import manim as mn
 from rc_lib.style import color, animation
 from rc_lib.math_utils import vector
 from rc_lib.view_utils import title_sequence
-from rc_lib.design import plate, sketch, sketch_utils, constraint
+from rc_lib.design import plate, sketch, constraint
 
 inner_color: color.Color = color.Palette.GREEN
 boundary_color: color.Color = color.Palette.BLUE

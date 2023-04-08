@@ -4,7 +4,7 @@ import math
 
 import manim as mn
 from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_utils, sketch_scene, constraint
+from rc_lib.design import sketch, sketch_scene, constraint
 
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:
@@ -49,13 +49,13 @@ class CoincidentLineScene(sketch_scene.Scene):
 
         self.introduce(fixed_line, start_line)
         self.run_group(
-            sketch_utils.Click(start_line),
-            sketch_utils.Click(fixed_line),
+            constraint.Click(start_line),
+            constraint.Click(fixed_line),
             start_line.animate.rotate(-angle, about_point=fixed_line.get_end()),  # type: ignore
         )
 
 
-def vh_common_line() -> tuple[sketch.Line, float]:
+def align_common_line() -> tuple[sketch.Line, float]:
     return (
         sketch.make_line(vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3)),
         math.radians(45),
@@ -64,25 +64,25 @@ def vh_common_line() -> tuple[sketch.Line, float]:
 
 class VerticalLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        start_line, angle = vh_common_line()
+        start_line, angle = align_common_line()
         angle = math.radians(90) - angle
 
         self.introduce(start_line)
 
         self.run_group(
-            sketch_utils.Click(start_line),
+            constraint.Click(start_line),
             mn.Rotate(start_line, angle=angle),
         )
 
 
 class HorizontalLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        start_line, angle = vh_common_line()
+        start_line, angle = align_common_line()
         angle = -angle
         self.introduce(start_line)
 
         self.run_group(
-            sketch_utils.Click(start_line),
+            constraint.Click(start_line),
             mn.Rotate(start_line, angle=angle),
         )
 
@@ -130,8 +130,8 @@ class ParallelScene(sketch_scene.Scene):
 
         self.introduce(line, start_line)
         self.run_group(
-            sketch_utils.Click(start_line),
-            sketch_utils.Click(line),
+            constraint.Click(start_line),
+            constraint.Click(line),
             start_line.animate.rotate(angle, about_point=line.get_midpoint()),
         )
 
@@ -151,8 +151,8 @@ class PerpendicularScene(sketch_scene.Scene):
 
         self.introduce(start_line, line)
         self.run_group(
-            sketch_utils.Click(start_line),
-            sketch_utils.Click(line),
+            constraint.Click(start_line),
+            constraint.Click(line),
             # rotate to end position
             start_line.animate.rotate(angle, about_point=rotation_point),
         )
@@ -191,13 +191,13 @@ class MidpointLineScene(sketch_scene.Scene):
 
         self.introduce(top, bottom, middle)
         self.run_group(
-            sketch_utils.Click(middle.start),
-            sketch_utils.Click(top),
+            constraint.Click(middle.start),
+            constraint.Click(top),
             middle.animate.move_start(top.get_midpoint()),
         )
         self.run_group(
-            sketch_utils.Click(middle.end),
-            sketch_utils.Click(bottom),
+            constraint.Click(middle.end),
+            constraint.Click(bottom),
             middle.animate.move_end(bottom.get_midpoint()),
         )
 
@@ -213,29 +213,29 @@ class MidpointPointScene(sketch_scene.Scene):
 
         self.introduce(line, circle, first_line)
         self.run_group(
-            sketch_utils.Click(line.start),
-            sketch_utils.Click(first_line.start),
-            sketch_utils.Click(circle.middle),
+            constraint.Click(line.start),
+            constraint.Click(first_line.start),
+            constraint.Click(circle.middle),
             first_line.animate.move_start((line.get_start() + circle.get_center()) / 2),
         )
         self.run_group(
-            sketch_utils.Click(line.end),
-            sketch_utils.Click(first_line.end),
-            sketch_utils.Click(circle.middle),
+            constraint.Click(line.end),
+            constraint.Click(first_line.end),
+            constraint.Click(circle.middle),
             first_line.animate.move_end((line.get_end() + circle.get_center()) / 2),
         )
 
         self.introduce(second_line)
         self.run_group(
-            sketch_utils.Click(line.start),
-            sketch_utils.Click(second_line.start),
-            sketch_utils.Click(line.end),
+            constraint.Click(line.start),
+            constraint.Click(second_line.start),
+            constraint.Click(line.end),
             second_line.animate.move_start(line.get_midpoint()),
         )
         self.run_group(
-            sketch_utils.Click(first_line.start),
-            sketch_utils.Click(second_line.end),
-            sketch_utils.Click(first_line.end),
+            constraint.Click(first_line.start),
+            constraint.Click(second_line.end),
+            constraint.Click(first_line.end),
             second_line.animate.move_end(first_line.get_midpoint()),
         )
 
@@ -278,13 +278,13 @@ class ConcentricEdgeScene(sketch_scene.Scene):
         self.introduce(circle, left, right)
         # move to origin using shift
         self.run_group(
-            sketch_utils.Click(left),
-            sketch_utils.Click(circle),
+            constraint.Click(left),
+            constraint.Click(circle),
             left.animate.shift(-left.get_center()),
         )
         self.run_group(
-            sketch_utils.Click(right),
-            sketch_utils.Click(circle),
+            constraint.Click(right),
+            constraint.Click(circle),
             right.animate.shift(-right.get_center()),
         )
 
@@ -296,13 +296,13 @@ class ConcentricPointScene(sketch_scene.Scene):
 
         # move to origin using shift
         self.run_group(
-            sketch_utils.Click(left.middle),
-            sketch_utils.Click(circle),
+            constraint.Click(left.middle),
+            constraint.Click(circle),
             left.animate.shift(-left.get_center()),
         )
 
         self.run_group(
-            sketch_utils.Click(right.middle),
-            sketch_utils.Click(circle),
+            constraint.Click(right.middle),
+            constraint.Click(circle),
             right.animate.shift(-right.get_center()),
         )
