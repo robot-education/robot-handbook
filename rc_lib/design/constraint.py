@@ -24,24 +24,38 @@ def make(animation: mn.Animation | Any, *mobjects: mn.Mobject) -> mn.Succession:
     return mn.Succession(*[Click(mobject) for mobject in mobjects], animation)
 
 
-class Equal(mn.Animation):
+class TwoSelectionBase(mn.Animation):
     def __init__(self, base: mn.Mobject, target: mn.Mobject) -> None:
         raise NotImplementedError
 
 
-class Coincident(mn.Animation):
-    def __init__(self, base: mn.Mobject, target: mn.Mobject, *, base_key: str) -> None:
+class OneSelectionBase(mn.Animation):
+    def __init__(self, base: mn.Mobject) -> None:
         raise NotImplementedError
 
 
-class VerticalPoint(mn.Animation):
-    def __init__(self, base: mn.Mobject, target: mn.Mobject, *, base_key: str) -> None:
-        raise NotImplementedError
+class Equal(TwoSelectionBase):
+    pass
 
 
-class HorizontalPoint(mn.Animation):
-    def __init__(self, base: mn.Mobject, target: mn.Mobject, *, base_key: str) -> None:
-        raise NotImplementedError
+class Coincident(TwoSelectionBase):
+    pass
+
+
+class VerticalPoint(TwoSelectionBase):
+    pass
+
+
+class HorizontalPoint(TwoSelectionBase):
+    pass
+
+
+class Horizontal(OneSelectionBase):
+    pass
+
+
+class Vertical(OneSelectionBase):
+    pass
 
 
 # def move_line(

@@ -95,6 +95,11 @@ class Point(mn.Dot, Base):
 
         return self
 
+    @mn.override_animation(constraint.Coincident)
+    def _coincident_override(self, target: Base) -> mn.Animation:
+        animation = self.animate.move_to(target.coincident_target(self.get_center()))
+        return constraint.make(animation, self, target)
+
     def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
         return self.get_center()
 
@@ -137,17 +142,6 @@ class Line(mn.Line, Base):
             midpoint - offset, midpoint + offset
         )
         return constraint.make(animation, self, target)
-
-    @mn.override_animation(constraint.Coincident)
-    def _coincident_override(self, target: Point, *, base_key: str) -> mn.Animation:
-        animation = self.animate
-        if base_key == "start":
-            animation.move_start(target.coincident_target(self.get_start()))
-        elif base_key == "end":
-            animation.move_end(target.coincident_target(self.get_end()))
-        else:
-            raise KeyError("Expected start or end")
-        return constraint.make(animation, getattr(self, base_key), target)
 
     def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
         return self.get_projection(point)
