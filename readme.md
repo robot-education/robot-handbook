@@ -2,7 +2,7 @@
 This branch features a stripped down vscode dev container useful for developing animations in manim.
 
 This dev container comes with python 3.11 and manim as well as extensions and settings for developing
-in python, jupyter notebook.
+in python and jupyter notebooks.
 
 ## Development
 This repository includes a vs-code dev container. To open the repository:
