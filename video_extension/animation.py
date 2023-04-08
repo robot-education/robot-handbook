@@ -137,13 +137,6 @@ def setup(app: application.Sphinx) -> Dict[str, bool]:
 
     app.add_directive("animation", Animation)
 
-    # app.builder.supported_image_types = [
-    #     "image/svg+xml",
-    #     "image/png",
-    #     "image/gif",
-    #     "video/mp4",
-    # ]
-
     return {
         "parallel_read_safe": True,
         "parallel_read_write": True,

@@ -177,12 +177,38 @@ class Tangent(ConstraintBase):
         return vector.normalize(vec) * (vector.norm(vec) - base.radius - target.radius)
 
 
+class Equal(ConstraintBase):
+    def __init__(
+        self,
+        base: sketch.Line | sketch.Circle | sketch.Line,
+        target: sketch.Line | sketch.Circle | sketch.Arc,
+    ) -> None:
+        """Sets target to be equal to length.
+
+        This constraint is moderately counterintuitive in that base is preserved while target is modified.
+        However, this matches the behavior of equal for multiple targets.
+        """
+        animation = target.animate
+        if isinstance(base, sketch.Line) and isinstance(target, sketch.Line):
+            midpoint = target.get_midpoint()
+            offset = target.get_direction() * (base.get_length() / 2)
+            animation.put_start_and_end_on(midpoint - offset, midpoint + offset)
+        elif isinstance(base, sketch.Circle | sketch.Arc) and isinstance(
+            target, sketch.Circle | sketch.Arc
+        ):
+            animation.set_radius(base.radius)
+        else:
+            raise TypeError("Equal entities must be compatible")
+
+        super().__init__(base, target, animation)
+
+
 class TangentRotate(ConstraintBase):
     """Applies a tangent constraint to a line which is already coincident to a circle or arc."""
 
     def __init__(
         self, base: sketch.Line, target: sketch.Circle | sketch.Arc, reverse=False
-    ):
+    ) -> None:
         key = self._get_touching_key(base, target)
         opposite_key = "end" if key == "start" else "start"
         close_point = getattr(base, "get_" + key)()

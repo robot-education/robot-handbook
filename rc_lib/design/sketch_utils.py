@@ -1,7 +1,6 @@
-import enum
-
 import manim as mn
 from rc_lib.style import color
+from rc_lib.design import sketch
 
 
 class Click(mn.Succession):
@@ -19,10 +18,3 @@ class Click(mn.Succession):
         super().__init__(
             mn.Transform(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
         )
-
-
-class LineEnd(enum.IntEnum):
-    """An enum defining the start and end of a line (or other edge)."""
-
-    START = 0
-    END = 1

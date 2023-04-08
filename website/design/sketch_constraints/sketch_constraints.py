@@ -158,35 +158,16 @@ class PerpendicularScene(sketch_scene.Scene):
         )
 
 
-def centered_line(line: sketch.Line, length: float) -> sketch.Line:
-    """Returns a line centered on the given line with the specified length."""
-    center = line.get_midpoint()
-    offset = line.get_direction() * length / 2
-    return sketch.make_line(center - offset, center + offset)
-
-
 class EqualLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         base = sketch.make_line(vector.point_2d(-5.5, -1.5), vector.point_2d(-1.25, 2))
         first = sketch.make_line(vector.point_2d(-5, -3), vector.point_2d(5, -1))
         second = sketch.make_line(vector.point_2d(-0.5, 2.75), vector.point_2d(6, 0.5))
 
-        length = base.get_length()
-
         self.introduce(base, first, second)
-        self.run_group(
-            sketch_utils.Click(base),
-            sketch_utils.Click(first),
-            first.animate.become(centered_line(first, length))
-            # mn.Transform(first, centered_line(first, length)),
-        )
+        self.run_group(constraint.Equal(base, first))
 
-        self.run_group(
-            sketch_utils.Click(base),
-            sketch_utils.Click(second),
-            second.animate.become(centered_line(second, length))
-            # mn.Transform(second, centered_line(second, length)),
-        )
+        self.run_group(constraint.Equal(base, second))
 
 
 class EqualCircleScene(sketch_scene.Scene):
@@ -198,16 +179,8 @@ class EqualCircleScene(sketch_scene.Scene):
         )
 
         self.introduce(base, arc, circle)
-        self.run_group(
-            sketch_utils.Click(base),
-            sketch_utils.Click(circle),
-            circle.animate.set_radius(1.5),
-        )
-        self.run_group(
-            sketch_utils.Click(base),
-            sketch_utils.Click(arc),
-            arc.animate.set_radius(1.5),
-        )
+        self.run_group(constraint.Equal(base, circle))
+        self.run_group(constraint.Equal(base, arc))
 
 
 class MidpointLineScene(sketch_scene.Scene):
