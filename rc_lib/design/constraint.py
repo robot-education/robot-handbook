@@ -1,5 +1,4 @@
 from abc import ABC
-import inspect
 
 import manim as mn
 
@@ -31,9 +30,6 @@ class ConstraintBase(mn.Animation, ABC):
 
         mobjects.insert(0, base)  # base always comes first
 
-        # arg_spec = inspect.getfullargspec(func)
-        # if arg_spec.varkw != None:
-
         return mn.Succession(
             *[Click(mobject) for mobject in mobjects], func(base, *args, **kwargs)
         )
@@ -53,8 +49,7 @@ class Equal(ConstraintBase):
 #             return base
 #         case "middle":
 #             throw_if_not(base, sketch.Circle | sketch.Arc)
-#         case "start":
-#             throw_if_not(base, sketch.Line | sketch.Arc)
+#   throw_if_not(base, sketch.Line | sketch.Arc)
 #         case "end":
 #             throw_if_not(base, sketch.Line | sketch.Arc)
 #         case _:
