@@ -5,30 +5,14 @@ import manim as mn
 from rc_lib.style import color
 
 
-class Add(mn.Succession):
+class Add(mn.Animation):
     def __init__(self, *mobjects: mn.VMobject):
-        super().__init__(
-            *[
-                mn.Create(mobject, introducer=True, run_time=0, use_override=False)
-                for mobject in mobjects
-            ]
-        )
+        super().__init__(mn.VGroup(*mobjects), introducer=True, run_time=0)
 
 
-class Remove(mn.Succession):
+class Remove(mn.Animation):
     def __init__(self, *mobjects: mn.VMobject):
-        super().__init__(
-            *[
-                mn.Create(
-                    mobject,
-                    introducer=True,
-                    remover=True,
-                    run_time=0,
-                    use_override=False,
-                )
-                for mobject in mobjects
-            ]
-        )
+        super().__init__(mn.VGroup(*mobjects), remover=True, run_time=0)
 
 
 class Click(mn.Transform):

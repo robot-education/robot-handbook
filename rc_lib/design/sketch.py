@@ -13,36 +13,6 @@ from rc_lib.style import color, animation
 from rc_lib.design import constraint
 
 
-# def get_key(base: Base, key: str | None) -> Base:
-#     match key:
-#         case None:
-#             return base
-#         case "middle":
-#             throw_if_not(base, Circle | Arc)
-#         case "start":
-#             throw_if_not(base, Line | Arc)
-#         case "end":
-#             throw_if_not(base, Line | Arc)
-#         case _:
-#             raise_key_error()
-
-#     return getattr(base, key)
-
-
-# def throw_if(base: Base, type: type[Base] | UnionType) -> None:
-#     if isinstance(base, type):
-#         raise_key_error()
-
-
-# def throw_if_not(base: Base, type: type[Base] | UnionType) -> None:
-#     if not isinstance(base, type):
-#         raise_key_error()
-
-
-# def raise_key_error() -> NoReturn:
-#     raise KeyError("A key passed to constraint is invalid")
-
-
 class SketchState(color.Color, enum.Enum):
     NORMAL = color.Palette.BLUE.value
     CONSTRAINED = color.Palette.BLACK.value
@@ -119,13 +89,11 @@ class Line(mn.Line, Base):
         super().__init__()
         self.become(line)
 
-        self.start_point = _make_point(point=self.get_start())
-        self.end_point = _make_point(point=self.get_end())
+        self.start = _make_point(point=self.get_start())
+        self.end = _make_point(point=self.get_end())
 
         def updater(mobject: mn.Mobject) -> None:
-            mobject.put_start_and_end_on(
-                self.start_point.get_center(), self.end_point.get_center()
-            )
+            mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
 
         self.add_updater(updater)
 
@@ -136,14 +104,12 @@ class Line(mn.Line, Base):
         return vector.normalize(self.get_end() - self.get_start())
 
     def move_start(self, point: vector.Point2d) -> Self:
-        self.start_point.move_to(point)
+        self.start.move_to(point)
         return self
-        # return self.put_start_and_end_on(point, self.get_end())  # type: ignore
 
     def move_end(self, point: vector.Point2d) -> Self:
-        self.end_point.move_to(point)
+        self.end.move_to(point)
         return self
-        # return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
     @mn.override_animation(constraint.Equal)
     def _equal_override(self, target: Self) -> mn.Animation:
@@ -161,9 +127,9 @@ class Line(mn.Line, Base):
     def _create_override(self) -> mn.Animation:
         end = self.get_end()
         return mn.Succession(
-            constraint.Add(self.start_point, self.end_point, self),
+            constraint.Add(self.start, self.end, self),
             mn.prepare_animation(
-                self.end_point.move_to(self.get_start() + vector.point_2d(0, 0.0001))
+                self.end.move_to(self.get_start() + vector.ZERO_LENGTH_VECTOR)
                 .animate(suspend_mobject_updating=False)
                 .move_to(end)
             ),
@@ -173,11 +139,11 @@ class Line(mn.Line, Base):
     def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
             mn.prepare_animation(
-                self.end_point.animate(suspend_mobject_updating=False).move_to(
-                    self.get_start() + vector.point_2d(0, 0.0001)
+                self.end.animate(suspend_mobject_updating=False).move_to(
+                    self.get_start() + vector.ZERO_LENGTH_VECTOR
                 )
             ),
-            constraint.Remove(self.start_point, self.end_point, self),
+            constraint.Remove(self.start, self.end, self),
         )
 
 

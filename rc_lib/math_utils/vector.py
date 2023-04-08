@@ -10,16 +10,16 @@ import numpy as np
 Vector: TypeAlias = Any
 # For compatability with manim, a 2d vector is defined as 3d vector with its third coordinate equal to zero.
 Vector2d: TypeAlias = Any
-Vector3d: TypeAlias = Any
+# Vector3d: TypeAlias = Any
 
 Point: TypeAlias = Any
 # For compatability with manim, a 2d point is defined as a 3d point with its third coordinate equal to zero.
 Point2d: TypeAlias = Any
-Point3d: TypeAlias = Any
+# Point3d: TypeAlias = Any
 
 Direction: TypeAlias = Any
 Direction2d: TypeAlias = Any
-Direction3d: TypeAlias = Any
+# Direction3d: TypeAlias = Any
 
 # An angle in radians
 Angle = float
@@ -45,9 +45,9 @@ def vector_2d(x: float, y: float) -> Vector2d:
     return np.array([x, y, 0])
 
 
-def vector_3d(x: float, y: float, z: float) -> Vector3d:
-    """A constructor for a 3D vector."""
-    return np.array([x, y, z])
+# def vector_3d(x: float, y: float, z: float) -> Vector3d:
+#     """A constructor for a 3D vector."""
+#     return np.array([x, y, z])
 
 
 def point_2d(x: float, y: float) -> Point2d:
@@ -55,9 +55,9 @@ def point_2d(x: float, y: float) -> Point2d:
     return np.array([x, y, 0])
 
 
-def point_3d(x: float, y: float, z: float) -> Point3d:
-    """A constructor for a 3D point."""
-    return np.array([x, y, z])
+# def point_3d(x: float, y: float, z: float) -> Point3d:
+#     """A constructor for a 3D point."""
+#     return np.array([x, y, z])
 
 
 def direction(from_point: Point, to_point: Point) -> Direction:
@@ -69,9 +69,9 @@ def direction_2d(x: float, y: float) -> Direction2d:
     return normalize(np.array([x, y, 0]))
 
 
-def direction_3d(x: float, y: float, z: float) -> Direction3d:
-    """A constructor for a 3D direction."""
-    return normalize(np.array([x, y, z]))
+# def direction_3d(x: float, y: float, z: float) -> Direction3d:
+#     """A constructor for a 3D direction."""
+#     return normalize(np.array([x, y, z]))
 
 
 def angle_between_vectors(x1: Vector, x2: Vector) -> Angle:
@@ -82,22 +82,5 @@ def angle_between_points(start: Point, end: Point, center: Point) -> Angle:
     return angle_between_vectors(start - center, end - center)
 
 
-def project_to_line(point: Point, start: Point, end: Point) -> Point:
-    """Projects point onto the line defined by start, end."""
-    vector = normalize(end - start)
-    return start + vector * dot(vector, point - start)
-
-
-# def rotate_vector(vector: Vector, angle: Angle, axis: Vector) -> Vector:
-#     """Function for rotating a vector.
-
-#     Parameters
-#     ----------
-#     vector
-#         The vector to be rotated.
-#     angle
-#         The angle to rotate by.
-#     axis
-#         A point specifying the axis to rotate about.
-#     """
-#     return mn.rotate_vector(vector, angle, axis)
+ZERO_LENGTH: float = 0.00001
+ZERO_LENGTH_VECTOR: Vector2d = vector_2d(ZERO_LENGTH, ZERO_LENGTH)

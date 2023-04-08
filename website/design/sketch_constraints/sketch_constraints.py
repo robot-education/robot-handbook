@@ -20,16 +20,16 @@ class CoincidentPointsScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
-        self.run_group(constraint.Coincident(move_line.start_point, circle.middle))
-        self.run_group(constraint.Coincident(move_line.end_point, line.end_point))
+        self.run_group(constraint.Coincident(move_line.start, circle.middle))
+        self.run_group(constraint.Coincident(move_line.end, line.end))
 
 
 class CoincidentPointLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
-        self.run_group(constraint.Coincident(move_line.start_point, circle))
-        self.run_group(constraint.Coincident(move_line.start_point, line))
+        self.run_group(constraint.Coincident(move_line.start, circle))
+        self.run_group(constraint.Coincident(move_line.start, line))
 
 
 class CoincidentLineScene(sketch_scene.Scene):
