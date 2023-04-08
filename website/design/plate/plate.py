@@ -82,10 +82,10 @@ class BoundaryRedrawScene(mn.Scene):
         self.play(mn.GrowFromCenter(self._middle))
 
         self.play(title.next("Redraw boundary"))
-        self.play(self._line.uncreate())
+        self.play(mn.Uncreate(self._line))
         self.wait(0.5)
-        self.play(plate.plate_circle_tangent_line(self._left, self._middle).create())
-        self.play(plate.plate_circle_tangent_line(self._middle, self._right).create())
+        self.play(mn.Create(plate.plate_circle_tangent_line(self._left, self._middle)))
+        self.play(mn.Create(plate.plate_circle_tangent_line(self._middle, self._right)))
 
         self.wait(animation.END_DELAY)
 
@@ -111,7 +111,7 @@ class BoundaryConstraintScene(mn.Scene):
 
     def construct(self):
         self.play(title.next("Create line"))
-        self.play(self._line.create())
+        self.play(mn.Create(self._line))
 
         self.play(title.next("Add coincident constraints"))
         self.play(constraint.Coincident(self._line, self._left, base_key="start"))

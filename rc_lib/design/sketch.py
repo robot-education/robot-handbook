@@ -23,11 +23,11 @@ class Base(mn.VMobject, abc.ABC):
     state = SketchState.NORMAL
 
     @abc.abstractmethod
-    def create(self) -> mn.Animation:
+    def _create_override(self) -> mn.Animation:
         raise NotImplementedError
 
     @abc.abstractmethod
-    def uncreate(self) -> mn.Animation:
+    def _uncreate_override(self) -> mn.Animation:
         raise NotImplementedError
 
 
@@ -44,16 +44,23 @@ class Point(mn.Dot, Base):
         def updater(mobject: mn.Mobject):
             mobject.move_to(point_function())
 
-        self.add_updater(updater)
-        updater(self)
+        self.add_updater(updater, call_updater=True)
 
         return self
 
-    def create(self) -> mn.Animation:
-        return mn.Create(self, run_time=0)
+    @mn.override_animation(mn.Create)
+    def _create_override(self) -> mn.Animation:
+        return mn.Animation(self, introducer=True, run_time=0)
 
-    def uncreate(self) -> mn.Animation:
-        return mn.Create(self, reverse_rate_function=True, remover=True, run_time=0)
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self) -> mn.Animation:
+        return mn.Animation(self, introducer=True, remover=True, run_time=0)
+
+
+# class ArcBase(mn.Arc, Base):
+#     @mn.override_animation(constraint.Equal)
+#     def equal(target: Self) -> mn.Animation:
+#         return target.animate.set_radius(self.radius)
 
 
 class Circle(mn.Circle, Base):
@@ -72,11 +79,13 @@ class Circle(mn.Circle, Base):
         self.radius = radius
         return self
 
-    def create(self) -> mn.Animation:
-        return mn.Succession(self.middle.create(), mn.GrowFromCenter(self))
+    @mn.override_animation(mn.Create)
+    def _create_override(self) -> mn.Animation:
+        return mn.Succession(mn.Create(self.middle), mn.GrowFromCenter(self))
 
-    def uncreate(self) -> mn.Animation:
-        return mn.Succession(animation.ShrinkToCenter(self), self.middle.uncreate())
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self) -> mn.Animation:
+        return mn.Succession(animation.ShrinkToCenter(self), mn.Uncreate(self.middle))
 
 
 class Line(mn.Line, Base):
@@ -101,17 +110,20 @@ class Line(mn.Line, Base):
     def move_end(self, point: vector.Point2d) -> Self:
         return self.put_start_and_end_on(self.get_start(), point)  # type: ignore
 
-    def create(self) -> mn.Animation:
-        # self.create._override_animation = None
+    @mn.override_animation(mn.Create)
+    def _create_override(self) -> mn.Animation:
         return mn.Succession(
-            *[point.create() for point in [self.start, self.end]],
-            mn.Create(self),
+            mn.Create(self.start),
+            mn.Create(self.end),
+            mn.Create(self, use_override=False, suspend_mobject_updating=False),
         )
 
-    def uncreate(self) -> mn.Animation:
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
-            mn.Uncreate(self),
-            *[point.uncreate() for point in [self.start, self.end]],
+            mn.Uncreate(self, use_override=False, suspend_mobject_updating=False),
+            mn.Uncreate(self.start),
+            mn.Uncreate(self.end),
         )
 
 
@@ -136,16 +148,22 @@ class Arc(mn.Arc, Base):
         self.radius = radius
         return self
 
-    def create(self) -> mn.Animation:
+    @mn.override_animation(mn.Create)
+    def _create_override(self) -> mn.Animation:
         return mn.Succession(
-            *[point.create() for point in [self.start, self.middle, self.end]],
+            mn.Create(self.start),
+            mn.Create(self.end),
+            mn.Create(self.middle),
             mn.GrowFromCenter(self),
         )
 
-    def uncreate(self) -> mn.Animation:
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
             animation.ShrinkToCenter(self),
-            *[point.uncreate() for point in [self.start, self.middle, self.end]],
+            mn.Uncreate(self.start),
+            mn.Uncreate(self.end),
+            mn.Uncreate(self.middle),
         )
 
 

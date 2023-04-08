@@ -105,5 +105,5 @@ class PlateGroup(mn.VGroup):
 
     def draw_boundary(self) -> mn.Animation:
         return mn.Succession(
-            *[line.create() for line in self._boundary_lines], lag_ratio=1
+            *[mn.Create(line) for line in self._boundary_lines], lag_ratio=1
         )
