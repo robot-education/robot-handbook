@@ -1,13 +1,9 @@
 from abc import ABC
-from types import UnionType
-from typing import Any, NoReturn
-import enum
+import inspect
 
 import manim as mn
-import numpy as np
 
 from rc_lib.style import color
-from rc_lib.math_utils import vector, tangent
 
 
 class Click(mn.Succession):
@@ -27,15 +23,26 @@ class Click(mn.Succession):
         )
 
 
-class Equal(mn.Animation):
-    def __new__(cls, base: mn.Mobject, target: mn.Mobject):
+class ConstraintBase(mn.Animation, ABC):
+    def __new__(cls, base: mn.Mobject, *args, mobjects: list[mn.Mobject], **kwargs):
         func = base.animation_override_for(cls)
         if not callable(func):
             raise TypeError("Equal must be overridden")
 
-        return mn.Succession(Click(base), Click(target), func(base, target))
+        mobjects.insert(0, base)  # base always comes first
 
-    # 
+        # arg_spec = inspect.getfullargspec(func)
+        # if arg_spec.varkw != None:
+
+        return mn.Succession(
+            *[Click(mobject) for mobject in mobjects], func(base, *args, **kwargs)
+        )
+
+
+class Equal(ConstraintBase):
+    def __new__(cls, base: mn.Mobject, target: mn.Mobject):
+        return super().__new__(cls, base, target, mobjects=[target])
+
     def __init__(self, base: mn.Mobject, target: mn.Mobject) -> None:
         pass
 
