@@ -37,29 +37,6 @@ class Base(mn.VMobject, ABC):
         raise NotImplementedError
 
 
-class ArcBase(Base, ABC):
-    radius: float
-    middle: Point
-
-    def set_radius(self, radius: float) -> Self:
-        self.scale(radius / self.radius)
-        self.radius = radius
-        return self
-
-    @mn.override_animation(constraint.Equal)
-    def _equal_override(self, target: Self) -> mn.Animation:
-        return target.animate.set_radius(self.radius)  # type: ignore
-
-    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
-        return self.get_center() + (
-            vector.direction(self.get_center(), point) * self.radius
-        )
-
-    def _get_circle_translation(self, target: Self) -> vector.Vector2d:
-        vec = target.get_center() - self.get_center()
-        return vector.normalize(vec) * (vector.norm(vec) - self.radius - target.radius)
-
-
 class Point(mn.Dot, Base):
     """Defines a singlar Sketch vertex."""
 
@@ -215,27 +192,49 @@ class Line(mn.Line, Base):
         )
 
 
+class ArcBase(mn.Arc, Base, ABC):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # center is already used
+        self.middle = _make_point(point=self.arc_center)
+
+    def get_center(self) -> vector.Point2d:
+        return self.middle.get_center()
+
+    def set_radius(self, radius: float) -> Self:
+        self.scale(radius / self.radius)
+        self.radius = radius
+        return self
+
+    @mn.override_animation(constraint.Equal)
+    def _equal_override(self, target: Self) -> mn.Animation:
+        return target.animate.set_radius(self.radius)  # type: ignore
+
+    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
+        return self.get_center() + (
+            vector.direction(self.get_center(), point) * self.radius
+        )
+
+    @mn.override_animation(constraint.Tangent)
+    def _tangent_override(self, target: ArcBase) -> Any:
+        translation = super()._get_circle_translation(target)  # type: ignore
+        return self.middle.animate(suspend_mobject_updating=False).shift(translation)
+
+    def _get_circle_translation(self, target: Self) -> vector.Vector2d:
+        vec = target.get_center() - self.get_center()
+        return vector.normalize(vec) * (vector.norm(vec) - self.radius - target.radius)
+
+
 class Circle(mn.Circle, ArcBase):
     """Defines a Sketch circle with a vertex at its center."""
 
-    def __init__(self, circle: mn.Circle):
-        super().__init__()
-        self.become(circle)
-        self.radius = circle.radius
-        self.arc_center = circle.arc_center
-
-        # center is already used
-        self.middle = _make_point(point=self.arc_center)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.move_to(self.middle.get_center())
 
         self.add_updater(updater)
-
-    @mn.override_animation(constraint.Tangent)
-    def _tangent_override(self, target: ArcBase) -> Any:
-        translation = super()._get_circle_translation(target)  # type: ignore
-        return self.middle.animate.shift(translation)
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
@@ -257,20 +256,13 @@ class Circle(mn.Circle, ArcBase):
         )
 
 
-class Arc(mn.Arc, ArcBase):
+class Arc(ArcBase):
     """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
-    def __init__(self, arc: mn.Arc) -> None:
-        super().__init__()
-        self.become(arc)
-        self.radius = arc.radius
-        self.arc_center = arc.arc_center
-
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.start = _make_point().follow(self.get_start)
         self.end = _make_point().follow(self.get_end)
-
-        # center is already used
-        self.middle = _make_point(point=self.arc_center)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.move_arc_center_to(self.middle.get_center())
@@ -278,15 +270,6 @@ class Arc(mn.Arc, ArcBase):
             self.end.update()
 
         self.add_updater(updater)
-
-    def get_center(self) -> vector.Point2d:
-        return self.middle.get_center()
-
-    @mn.override_animation(constraint.Tangent)
-    def _tangent_override(self, target: ArcBase) -> Any:
-        translation = super()._get_circle_translation(target)  # type: ignore
-        return self.middle.animate(suspend_mobject_updating=False).shift(translation)
-        # return mn.Transform(group, group.copy().shift(translation))
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
@@ -317,13 +300,16 @@ def make_line(start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
 
 
 def make_circle(center: vector.Point2d, radius: float) -> Circle:
-    return Circle(mn.Circle(radius, color=SketchState.NORMAL, arc_center=center))
+    return Circle(radius, color=SketchState.NORMAL, arc_center=center)
 
 
 def make_arc(
     center: vector.Point2d, radius: float, start_angle: float, angle: float
 ) -> Arc:
     return Arc(
-        # start_angle is typed incorrectly as int
-        mn.Arc(radius, start_angle=start_angle, angle=angle, color=SketchState.NORMAL, arc_center=center)  # type: ignore
+        radius,
+        start_angle=start_angle,
+        angle=angle,
+        color=SketchState.NORMAL,
+        arc_center=center,
     )
