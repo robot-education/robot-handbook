@@ -114,11 +114,13 @@ class BoundaryConstraintScene(mn.Scene):
         self.play(mn.Create(self._line))
 
         self.play(title.next("Add coincident constraints"))
-        self.play(constraint.Coincident(self._line, self._left, base_key="start"))
-        self.play(constraint.Coincident(self._line, self._right, base_key="end"))
+        self.play(constraint.Coincident(self._line.start, self._left))
+        self.play(constraint.Coincident(self._line.end, self._right))
 
         self.play(title.next("Add tangent constraints"))
-        self.play(constraint.TangentRotate(self._line, self._left))
-        self.play(constraint.TangentRotate(self._line, self._right, reverse=True))
+        self.play(constraint.Tangent(self._line, self._left, rotate=True))
+        self.play(
+            constraint.Tangent(self._line, self._right, rotate=True, reverse=True)
+        )
 
         self.wait(animation.END_DELAY)

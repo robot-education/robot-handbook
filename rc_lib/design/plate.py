@@ -7,8 +7,8 @@ from rc_lib.design import sketch
 
 
 class PlateCircle(sketch.Circle):
-    def __init__(self, inner_circle: mn.Circle, outer_circle: mn.Circle) -> None:
-        super().__init__(outer_circle)
+    def __init__(self, *args, inner_circle: mn.Circle, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.inner_circle = inner_circle
 
         def follow(mobject: mn.Mobject) -> None:
@@ -62,9 +62,11 @@ class PlateCircleFactory:
 
         def generator(point: vector.Point2d) -> PlateCircle:
             return PlateCircle(
-                mn.Circle(radius, color=self._inner_color),
-                mn.Circle(radius + offset, color=self._outer_color),
-            ).move_to(point)
+                radius + offset,
+                color=self._outer_color,
+                arc_center=point,
+                inner_circle=mn.Circle(radius, color=self._inner_color),
+            )
 
         return generator
 

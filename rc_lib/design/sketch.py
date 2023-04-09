@@ -7,16 +7,16 @@ from abc import ABC, abstractmethod
 import enum
 
 import manim as mn
+import numpy as np
 
-from rc_lib.math_utils import vector
-from rc_lib.style import color, animation
+from rc_lib.math_utils import vector, tangent
+from rc_lib.style import color
 from rc_lib.design import constraint
 
 
 class SketchState(color.Color, enum.Enum):
     NORMAL = color.Palette.BLUE.value
     CONSTRAINED = color.Palette.BLACK.value
-    ERROR = color.Palette.RED.value
 
 
 class Base(mn.VMobject, ABC):
@@ -146,21 +146,42 @@ class Line(mn.Line, Base):
     def _equal_override(self, target: Self) -> Any:
         midpoint = target.get_midpoint()
         offset = target.get_direction() * (self.get_length() / 2)
-        return target.animate(suspend_mobject_updating=False).put_start_and_end_on(
-            midpoint - offset, midpoint + offset
-        )
+        return target.animate.put_start_and_end_on(midpoint - offset, midpoint + offset)
 
     def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
         return self.get_projection(point)
 
     @mn.override_animation(constraint.Tangent)
-    def _tangent_override(self, target: ArcBase) -> Any:
-        translation = self._get_line_translation(target)
-        return (
-            mn.VGroup(self.start, self.end)
-            .animate(suspend_mobject_updating=False)
-            .shift(translation)
-        )
+    def _tangent_override(
+        self, target: ArcBase, rotate: bool = False, reverse: bool = False
+    ) -> Any:
+        if not rotate:
+            translation = self._get_line_translation(target)
+            return mn.VGroup(self.start, self.end).animate.shift(translation)
+        else:
+            start = self._is_start_touching(target)
+            close, far = (self.start, self.end) if start else (self.end, self.start)
+            close_point, far_point = close.get_center(), far.get_center()
+
+            if reverse:
+                tangent_point = tangent.point_to_circle_tangent(
+                    far_point, target.get_center(), target.radius
+                )
+            else:
+                tangent_point = tangent.circle_to_point_tangent(
+                    target.get_center(), target.radius, far_point
+                )
+
+            angle = vector.angle_between_points(
+                close_point, tangent_point, target.get_center()
+            )
+
+            if reverse:
+                angle *= -1
+
+            return close.animate(
+                path_arc=angle, path_arg_centers=[target.get_center()]
+            ).move_to(tangent_point)
 
     def _get_line_translation(self, target: ArcBase) -> vector.Vector2d:
         projection: vector.Point2d = self.get_projection(target.get_center())  # type: ignore
@@ -168,15 +189,30 @@ class Line(mn.Line, Base):
             vector.norm(target.get_center() - projection) - target.radius
         )
 
+    def _is_start_touching(self, target: ArcBase) -> bool:
+        return vector.norm(self.get_start() - target.get_center()) < vector.norm(
+            self.get_end() - target.get_center()
+        )
+        # if np.isclose(
+        #     vector.norm(self.get_start() - target.get_center()), target.radius
+        # ):
+        #     return True
+        # elif np.isclose(
+        #     vector.norm(self.get_end() - target.get_center()), target.radius
+        # ):
+        #     return False
+        # else:
+        #     raise ValueError("Expected line to touch target")
+
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
         end = self.get_end()
         return mn.Succession(
             constraint.Add(self.start, self.end, self),
             mn.prepare_animation(
-                self.end.move_to(self.get_start() + vector.ZERO_LENGTH_VECTOR)
-                .animate(suspend_mobject_updating=False)
-                .move_to(end)
+                self.end.move_to(
+                    self.get_start() + vector.ZERO_LENGTH_VECTOR
+                ).animate.move_to(end)
             ),
         )
 
@@ -184,9 +220,7 @@ class Line(mn.Line, Base):
     def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
             mn.prepare_animation(
-                self.end.animate(suspend_mobject_updating=False).move_to(
-                    self.get_start() + vector.ZERO_LENGTH_VECTOR
-                )
+                self.end.animate.move_to(self.get_start() + vector.ZERO_LENGTH_VECTOR)
             ),
             constraint.Remove(self.start, self.end, self),
         )
@@ -217,8 +251,8 @@ class ArcBase(mn.Arc, Base, ABC):
 
     @mn.override_animation(constraint.Tangent)
     def _tangent_override(self, target: ArcBase) -> Any:
-        translation = super()._get_circle_translation(target)  # type: ignore
-        return self.middle.animate(suspend_mobject_updating=False).shift(translation)
+        translation = self._get_circle_translation(target)  # type: ignore
+        return self.middle.animate().shift(translation)
 
     def _get_circle_translation(self, target: Self) -> vector.Vector2d:
         vec = target.get_center() - self.get_center()

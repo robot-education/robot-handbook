@@ -18,19 +18,24 @@ class Remove(mn.Animation):
         )
 
 
+# doesn't work as a class member...
+Z_INDEX = 500
+
+
 class Click(mn.Transform):
     """Defines an animation which represents an object getting clicked."""
-
-    Z_INDEX = 500
 
     def __init__(self, mobject: mn.Mobject):
         target = mobject.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
 
         # set z_index to make highlight go over the top (a bit suss)
-        mobject.set_z_index(self.Z_INDEX)
-        self.Z_INDEX += 1
+        global Z_INDEX
+        mobject.set_z_index(Z_INDEX)
+        Z_INDEX += 1
 
-        super().__init__(mobject, target, rate_func=mn.there_and_back, run_time=0.75)
+        super().__init__(
+            mobject, target_mobject=target, rate_func=mn.there_and_back, run_time=0.75
+        )
 
 
 def make(animation: mn.Animation | Any, *mobjects: mn.Mobject) -> mn.Succession:
@@ -72,7 +77,11 @@ class Coincident(TwoSelectionBase):
 
 class Tangent(ConstraintBase):
     def __init__(
-        self, base: mn.Mobject, target: mn.Mobject, rotate: bool | None = None
+        self,
+        base: mn.Mobject,
+        target: mn.Mobject,
+        rotate: bool = False,
+        reverse: bool = False,
     ) -> None:
         raise NotImplementedError
 
@@ -96,45 +105,3 @@ class Vertical(ConstraintBase):
 #     def __init__(
 #         self, base: sketch.Line, target: sketch.Circle | sketch.Arc, reverse=False
 #     ) -> None:
-#         key = self._get_touching_key(base, target)
-#         opposite_key = "end" if key == "start" else "start"
-#         close_point = getattr(base, "get_" + key)()
-#         far_point = getattr(base, "get_" + opposite_key)()
-
-#         if reverse:
-#             tangent_point = tangent.point_to_circle_tangent(
-#                 far_point, target.get_center(), target.radius
-#             )
-#         else:
-#             tangent_point = tangent.circle_to_point_tangent(
-#                 target.get_center(), target.radius, far_point
-#             )
-
-#         angle = vector.angle_between_points(
-#             close_point, tangent_point, target.get_center()
-#         )
-
-#         if reverse:
-#             angle *= -1
-
-#         animation = move_line(
-#             base,
-#             key,
-#             tangent_point,
-#             path_arc=angle,
-#             path_arg_centers=[target.get_center()],
-#         )
-#         super().__init__(animation, base, target)
-
-#     def _get_touching_key(
-#         self, base: sketch.Line, target: sketch.Circle | sketch.Arc
-#     ) -> str:
-#         if np.isclose(
-#             vector.norm(base.get_start() - target.get_center()), target.radius
-#         ):
-#             return "start"
-#         elif np.isclose(
-#             vector.norm(base.get_end() - target.get_center()), target.radius
-#         ):
-#             return "end"
-#         raise ValueError("Expected line to touch target")
