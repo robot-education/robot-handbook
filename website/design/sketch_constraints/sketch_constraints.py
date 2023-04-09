@@ -53,36 +53,22 @@ class CoincidentLineScene(sketch_scene.Scene):
         )
 
 
-def align_common_line() -> tuple[sketch.Line, float]:
-    return (
-        sketch.make_line(vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3)),
-        math.radians(45),
-    )
+def align_common_line() -> sketch.Line:
+    return sketch.make_line(vector.point_2d(-2.3, -2.3), vector.point_2d(2.3, 2.3))
 
 
 class VerticalLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        start_line, angle = align_common_line()
-        angle = math.radians(90) - angle
-
+        start_line = align_common_line()
         self.introduce(start_line)
-
-        self.run_group(
-            constraint.Click(start_line),
-            mn.Rotate(start_line, angle=angle),
-        )
+        self.run_group(constraint.Vertical(start_line))
 
 
 class HorizontalLineScene(sketch_scene.Scene):
     def construct(self) -> None:
-        start_line, angle = align_common_line()
-        angle = -angle
+        start_line = align_common_line()
         self.introduce(start_line)
-
-        self.run_group(
-            constraint.Click(start_line),
-            mn.Rotate(start_line, angle=angle),
-        )
+        self.run_group(constraint.Horizontal(start_line))
 
 
 class VerticalPointsScene(sketch_scene.Scene):
@@ -94,10 +80,8 @@ class VerticalPointsScene(sketch_scene.Scene):
         )
 
         self.introduce(circle, line, move_line)
-        self.run_group(
-            constraint.VerticalPoint(move_line, circle.middle, base_key="start")
-        )
-        self.run_group(constraint.VerticalPoint(move_line, line.end, base_key="end"))
+        self.run_group(constraint.Vertical(move_line.start, circle.middle))
+        self.run_group(constraint.Vertical(move_line.end, line.end))
 
 
 class HorizontalPointsScene(sketch_scene.Scene):
@@ -106,12 +90,8 @@ class HorizontalPointsScene(sketch_scene.Scene):
         line = sketch.make_line(vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5))
         move_line = sketch.make_line(vector.point_2d(2, -1.5), vector.point_2d(4.5, 3))
         self.introduce(circle, line, move_line)
-        self.run_group(
-            constraint.HorizontalPoint(move_line, line.end, base_key="start")
-        )
-        self.run_group(
-            constraint.HorizontalPoint(move_line, circle.middle, base_key="end")
-        )
+        self.run_group(constraint.Horizontal(move_line.start, line.end))
+        self.run_group(constraint.Horizontal(move_line.end, circle.middle))
 
 
 class ParallelScene(sketch_scene.Scene):

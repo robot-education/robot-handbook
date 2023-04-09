@@ -40,5 +40,5 @@ class ShrinkToCenter(ShrinkToPoint):
         self, mobject: mn.Mobject, point_color: color.Color | None = None, **kwargs
     ) -> None:
         super().__init__(
-            mobject, point=mobject.get_center(), point_color=point_color, **kwargs
+            mobject, mobject.get_center(), point_color=point_color, **kwargs
         )
