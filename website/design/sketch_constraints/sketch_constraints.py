@@ -89,6 +89,7 @@ class HorizontalPointsScene(sketch_scene.Scene):
         circle = sketch.make_circle(vector.point_2d(-3.5, 1.5), 1.5)
         line = sketch.make_line(vector.point_2d(-5, -0.75), vector.point_2d(-1, -2.5))
         move_line = sketch.make_line(vector.point_2d(2, -1.5), vector.point_2d(4.5, 3))
+
         self.introduce(circle, line, move_line)
         self.run_group(constraint.Horizontal(move_line.start, line.end))
         self.run_group(constraint.Horizontal(move_line.end, circle.middle))
@@ -168,16 +169,8 @@ class MidpointLineScene(sketch_scene.Scene):
         middle = sketch.make_line(vector.point_2d(-1, 1.5), vector.point_2d(1, -1.5))
 
         self.introduce(top, bottom, middle)
-        self.run_group(
-            constraint.Click(middle.start),
-            constraint.Click(top),
-            middle.animate.move_start(top.get_midpoint()),
-        )
-        self.run_group(
-            constraint.Click(middle.end),
-            constraint.Click(bottom),
-            middle.animate.move_end(bottom.get_midpoint()),
-        )
+        self.run_group(constraint.Midpoint(middle.start, top))
+        self.run_group(constraint.Midpoint(middle.end, bottom))
 
 
 class MidpointPointScene(sketch_scene.Scene):
@@ -190,31 +183,13 @@ class MidpointPointScene(sketch_scene.Scene):
         )
 
         self.introduce(line, circle, first_line)
-        self.run_group(
-            constraint.Click(line.start),
-            constraint.Click(first_line.start),
-            constraint.Click(circle.middle),
-            first_line.animate.move_start((line.get_start() + circle.get_center()) / 2),
-        )
-        self.run_group(
-            constraint.Click(line.end),
-            constraint.Click(first_line.end),
-            constraint.Click(circle.middle),
-            first_line.animate.move_end((line.get_end() + circle.get_center()) / 2),
-        )
+        self.run_group(constraint.Midpoint(first_line.start, line.start, circle.middle))
+        self.run_group(constraint.Midpoint(first_line.end, line.end, circle.middle))
 
         self.introduce(second_line)
+        self.run_group(constraint.Midpoint(second_line.start, line.start, line.end))
         self.run_group(
-            constraint.Click(line.start),
-            constraint.Click(second_line.start),
-            constraint.Click(line.end),
-            second_line.animate.move_start(line.get_midpoint()),
-        )
-        self.run_group(
-            constraint.Click(first_line.start),
-            constraint.Click(second_line.end),
-            constraint.Click(first_line.end),
-            second_line.animate.move_end(first_line.get_midpoint()),
+            constraint.Midpoint(second_line.end, first_line.start, first_line.end)
         )
 
 
@@ -255,32 +230,14 @@ class ConcentricEdgeScene(sketch_scene.Scene):
         circle, left, right = concentric_common()
         self.introduce(circle, left, right)
         # move to origin using shift
-        self.run_group(
-            constraint.Click(left),
-            constraint.Click(circle),
-            left.animate.shift(-left.get_center()),
-        )
-        self.run_group(
-            constraint.Click(right),
-            constraint.Click(circle),
-            right.animate.shift(-right.get_center()),
-        )
+        self.run_group(constraint.Concentric(left, circle))
+        # click larger circle
+        self.run_group(constraint.Concentric(right, left))
 
 
 class ConcentricPointScene(sketch_scene.Scene):
     def construct(self) -> None:
         circle, left, right = concentric_common()
         self.introduce(circle, left, right)
-
-        # move to origin using shift
-        self.run_group(
-            constraint.Click(left.middle),
-            constraint.Click(circle),
-            left.animate.shift(-left.get_center()),
-        )
-
-        self.run_group(
-            constraint.Click(right.middle),
-            constraint.Click(circle),
-            right.animate.shift(-right.get_center()),
-        )
+        self.run_group(constraint.Concentric(left.middle, circle))
+        self.run_group(constraint.Concentric(right.middle, circle))

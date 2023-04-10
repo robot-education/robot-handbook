@@ -43,14 +43,16 @@ def make(animation: mn.Animation | Any, *mobjects: mn.Mobject) -> mn.Succession:
 
 
 class ConstraintBase(mn.Animation):
-    def __new__(cls, base: mn.Mobject, *mobjects: mn.Mobject, **kwargs):
+    def __new__(
+        cls, base: mn.Mobject, *mobjects: mn.Mobject, base_index: int = 0, **kwargs
+    ):
         override_function = base.animation_override_for(cls)
         if not callable(override_function):
             raise NotImplementedError
         animation = override_function(base, *mobjects, **kwargs)
 
         values = list(mobjects)
-        values.insert(0, base)
+        values.insert(base_index, base)
         return mn.Succession(*[Click(mobject) for mobject in values], animation)
 
     def __init__(self, base: mn.Mobject, *args, **kwargs) -> None:
@@ -99,9 +101,22 @@ class Vertical(ConstraintBase):
     pass
 
 
-# class TangentRotate(ConstraintBase):
-#     """Applies a tangent constraint to a line which is already coincident to a circle or arc."""
+class Midpoint(ConstraintBase):
+    def __new__(cls, base: mn.Mobject, *args):
+        if len(args) == 1:
+            base_index = 0
+        elif len(args) == 2:
+            base_index = 1
+        else:
+            raise ValueError("Expected a line or two points.")
+        return super().__new__(cls, base, *args, base_index=base_index)
 
-#     def __init__(
-#         self, base: sketch.Line, target: sketch.Circle | sketch.Arc, reverse=False
-#     ) -> None:
+    def __init__(
+        self, base: mn.Mobject, *args: mn.Mobject
+    ) -> None:
+        """Performs a midpoint constraint on the passed in points."""
+        raise NotImplementedError
+
+
+class Concentric(TwoSelectionBase):
+    pass

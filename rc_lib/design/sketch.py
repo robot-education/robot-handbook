@@ -61,6 +61,21 @@ class Point(mn.Dot, Base):
     def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
         return self.get_center()
 
+    @mn.override_animation(constraint.Midpoint)
+    def _midpoint_override(self, *args: Point | Line) -> Any:
+        if len(args) == 1:
+            assert isinstance(args[0], Line)
+            return self.animate.move_to(args[0].get_midpoint())
+        elif len(args) == 2:
+            assert isinstance(args[0], Point) and isinstance(args[1], Point)
+            return self.animate.move_to(
+                (args[0].get_center() + args[1].get_center()) / 2
+            )
+
+    @mn.override_animation(constraint.Concentric)
+    def _concentric_override(self, target: ArcBase) -> Any:
+        return self._coincident_override(target.middle)
+
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
         return mn.Animation(self, introducer=True, run_time=0)
@@ -190,6 +205,7 @@ class Line(mn.Line, Base):
         )
 
     def _is_start_touching(self, target: ArcBase) -> bool:
+        """Returns whether the line is closer to the start or the end."""
         return vector.norm(self.get_start() - target.get_center()) < vector.norm(
             self.get_end() - target.get_center()
         )
@@ -257,6 +273,12 @@ class ArcBase(mn.Arc, Base, ABC):
     def _get_circle_translation(self, target: Self) -> vector.Vector2d:
         vec = target.get_center() - self.get_center()
         return vector.normalize(vec) * (vector.norm(vec) - self.radius - target.radius)
+
+    @mn.override_animation(constraint.Concentric)
+    def _concentric_override(self, target: Self | Point) -> mn.Animation:
+        if isinstance(target, ArcBase):
+            target = target.middle
+        return self.middle._coincident_override(target)
 
 
 class Circle(mn.Circle, ArcBase):
