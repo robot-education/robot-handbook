@@ -1,8 +1,8 @@
 """Animations showcasing various Onshape sketch constraints."""
-
 import math
 
 import manim as mn
+
 from rc_lib.math_utils import vector
 from rc_lib.design import sketch, sketch_scene, constraint
 
@@ -29,7 +29,7 @@ class CoincidentPointLineScene(sketch_scene.Scene):
         circle, line, move_line = coincident_common_mobjects()
         self.introduce(circle, line, move_line)
         self.run_group(constraint.Coincident(move_line.start, circle))
-        self.run_group(constraint.Coincident(move_line.start, line))
+        self.run_group(constraint.Coincident(move_line.end, line))
 
 
 class CoincidentLineScene(sketch_scene.Scene):
@@ -49,7 +49,7 @@ class CoincidentLineScene(sketch_scene.Scene):
         self.run_group(
             constraint.Click(start_line),
             constraint.Click(fixed_line),
-            start_line.animate.rotate(-angle, about_point=fixed_line.get_end()),  # type: ignore
+            mn.Rotate(mn.VGroup(start_line.start, start_line.end), -angle, about_point=fixed_line.get_end()),  # type: ignore
         )
 
 
@@ -111,7 +111,7 @@ class ParallelScene(sketch_scene.Scene):
         self.run_group(
             constraint.Click(start_line),
             constraint.Click(line),
-            start_line.animate.rotate(angle, about_point=line.get_midpoint()),
+            mn.Rotate(mn.VGroup(start_line.start, start_line.end), angle, about_point=line.get_midpoint()),  # type: ignore
         )
 
 

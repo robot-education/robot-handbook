@@ -111,9 +111,7 @@ class Midpoint(ConstraintBase):
             raise ValueError("Expected a line or two points.")
         return super().__new__(cls, base, *args, base_index=base_index)
 
-    def __init__(
-        self, base: mn.Mobject, *args: mn.Mobject
-    ) -> None:
+    def __init__(self, base: mn.Mobject, *args: mn.Mobject) -> None:
         """Performs a midpoint constraint on the passed in points."""
         raise NotImplementedError
 
