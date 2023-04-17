@@ -35,7 +35,7 @@ class Scene(mn.Scene, ABC):
         self.wait(self.CONSTRAINT_DELAY)
 
     def tear_down(self):
-        self.wait(animation.END_DELAY - self.CONSTRAINT_DELAY)
+        self.wait(animation.END_DELAY - self.CONSTRAINT_DELAY * 2)
 
         self.play(
             mn.AnimationGroup(

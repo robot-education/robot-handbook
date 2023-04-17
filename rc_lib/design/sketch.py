@@ -40,10 +40,6 @@ class Base(mn.VMobject, ABC):
     #     return self
 
     @abstractmethod
-    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
-        raise NotImplementedError
-
-    @abstractmethod
     def click_target(self) -> mn.VMobject:
         raise NotImplementedError
 
@@ -65,27 +61,26 @@ class Point(mn.Dot, Base):
         return self
 
     @override
-    def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
-        return self.get_center()
-
     def click_target(self) -> mn.VMobject:
         return self
 
-    # @mn.override_animation(constraint.Midpoint)
-    def _midpoint_override(self, *args: Point | Line) -> mn.Animation:
-        if len(args) == 1:
-            assert isinstance(args[0], Line)
-            return self.animate.move_to(args[0].line.get_midpoint()).build()
-        elif len(args) == 2:
-            assert isinstance(args[0], Point) and isinstance(args[1], Point)
-            return self.animate.move_to(
-                (args[0].get_center() + args[1].get_center()) / 2
-            ).build()
-        else:
+    def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
+        return self.get_center()
+
+    def concentric_target(self) -> vector.Point2d:
+        return self.get_center()
+
+    def midpoint_constraint(
+        self, points: tuple[Point, Point] | None = None, line: Line | None = None
+    ) -> mn.Animation:
+        if line is not None:
+            points = (line.start, line.end)
+        elif points is None:
             raise ValueError("Expected a line or two points.")
 
-    def concentric_constraint(self, target: ArcBase) -> Any:
-        return self.coincident_constraint(target.middle)
+        return self.animate.move_to(
+            (points[0].get_center() + points[1].get_center()) / 2
+        )  # type: ignore
 
     def align_constraint(self, target: Point, type: AlignType) -> mn.Animation:
         if type == AlignType.VERTICAL:
@@ -95,7 +90,7 @@ class Point(mn.Dot, Base):
         target_point = vector.point_2d(
             values[0].get_center()[0], values[1].get_center()[1]
         )
-        return self.animate.move_to(target_point).build()
+        return self.animate.move_to(target_point)  # type: ignore
 
 
 class Line(mn.VGroup, Base):
@@ -120,6 +115,10 @@ class Line(mn.VGroup, Base):
     def get_end(self) -> vector.Point2d:
         return self.end.get_center()
 
+    @override
+    def get_midpoint(self) -> vector.Point2d:
+        return self.line.get_midpoint()
+
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
 
@@ -138,7 +137,6 @@ class Line(mn.VGroup, Base):
     def click_target(self) -> mn.VMobject:
         return self.line
 
-    @override
     def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
         return self.line.get_projection(point)
 
@@ -154,57 +152,24 @@ class Line(mn.VGroup, Base):
                 angle = -curr_angle
             else:
                 angle = -mn.PI - curr_angle
-        return mn.Rotate(self, angle=angle, about_point=self.line.get_midpoint())  # type: ignore
+        return mn.Rotate(self, angle=angle, about_point=self.get_midpoint())  # type: ignore
 
-    def equal_constraint(self, target: Self) -> mn.Animation:
-        midpoint = target.line.get_midpoint()
+    def equal_constraint(self, target: Self) -> Any:
+        midpoint = target.get_midpoint()
         offset = target.get_direction() * (self.get_length() / 2)
-        return (
-            target.animate.move_start(midpoint - offset)
-            .move_end(midpoint + offset)
-            .build()
-        )
+        return target.animate.move_start(midpoint - offset).move_end(midpoint + offset)
 
-    # @mn.override_animation(constraint.Tangent)
-    def _tangent_override(
-        self, target: ArcBase, rotate: bool = False, reverse: bool = False
-    ) -> Any:
-        if not rotate:
-            translation = self._get_line_translation(target)
-            return self.animate.shift(translation)
-        else:
-            start = self._is_start_touching(target)
-            close, far = (self.start, self.end) if start else (self.end, self.start)
-            close_point, far_point = close.get_center(), far.get_center()
-
-            if reverse:
-                tangent_point = tangent.point_to_circle_tangent(
-                    far_point, target.get_center(), target.radius
-                )
-            else:
-                tangent_point = tangent.circle_to_point_tangent(
-                    target.get_center(), target.radius, far_point
-                )
-
-            angle = vector.angle_between_points(
-                close_point, tangent_point, target.get_center()
-            )
-
-            if reverse:
-                angle *= -1
-
-            return close.animate(
-                path_arc=angle, path_arg_centers=[target.get_center()]
-            ).move_to(tangent_point)
-
-    def _get_line_translation(self, target: ArcBase) -> vector.Vector2d:
-        projection: vector.Point2d = self.get_projection(target.get_center())  # type: ignore
+    def get_tangent_translation(self, target: ArcBase) -> vector.Vector2d:
+        projection: vector.Point2d = self.line.get_projection(target.get_center())  # type: ignore
         return vector.direction(projection, target.get_center()) * (
             vector.norm(target.get_center() - projection) - target.radius
         )
 
-    def _is_start_touching(self, target: ArcBase) -> bool:
-        """Returns whether the line is closer to the start or the end."""
+    def is_start_closer_to_target(self, target: ArcBase) -> bool:
+        """Returns whether the start is closer than the end to target.
+
+        Used by tangent's rotate mode.
+        """
         return vector.norm(self.get_start() - target.get_center()) < vector.norm(
             self.get_end() - target.get_center()
         )
@@ -216,7 +181,7 @@ class Line(mn.VGroup, Base):
         self.move_end(self.get_start() + vector.ZERO_LENGTH_VECTOR)
         return mn.Succession(
             animation.Add(self.line),
-            self.animate(introducer=True).move_end(end), # type: ignore
+            self.animate(introducer=True).move_end(end),  # type: ignore
         )
 
     @override
@@ -224,7 +189,7 @@ class Line(mn.VGroup, Base):
     def _uncreate_override(self) -> mn.Animation:
         start = self.get_start() + vector.ZERO_LENGTH_VECTOR
         return mn.Succession(
-            self.animate(remover=True).move_end(start), # type: ignore
+            self.animate(remover=True).move_end(start),  # type: ignore
             animation.Remove(self.line),
         )
 
@@ -245,32 +210,36 @@ class ArcBase(mn.VGroup, Base, ABC):
         self.radius = radius
         return self
 
-    @override
-    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
-        return self.get_center() + (
-            vector.direction(self.get_center(), point) * self.radius
+    @mn.override_animate(set_radius)
+    def _set_radius_override(self, radius: float, anim_args={}) -> mn.Animation:
+        # set_radius doesn't exist on arc, so we have to implement more manually
+        animation = mn.Transform(
+            self.arc,
+            target_mobject=self.arc.copy().scale(radius / self.radius),
+            **anim_args,
         )
+        self.radius = radius
+        return animation
 
     @override
     def click_target(self) -> mn.VMobject:
         return self.arc
 
-    def equal_constraint(self, target: Self) -> mn.Animation:
-        return target.animate.set_radius(self.radius).build()
+    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
+        return self.get_center() + (
+            vector.direction(self.get_center(), point) * self.radius
+        )
 
-    # @mn.override_animation(constraint.Tangent)
-    def _tangent_override(self, target: ArcBase) -> mn.Animation:
-        translation = self._get_circle_translation(target)
-        return self.middle.animate().shift(translation).build()
+    def concentric_target(self) -> vector.Point2d:
+        return self.middle.get_center()
 
-    def _get_circle_translation(self, target: ArcBase) -> vector.Vector2d:
+    # def tangent_constraint(self, target: ArcBase) -> mn.Animation:
+    #     translation = self._get_circle_translation(target)
+    #     return self.middle.animate().shift(translation)
+
+    def get_tangent_translation(self, target: ArcBase) -> vector.Vector2d:
         vec = target.get_center() - self.get_center()
         return vector.normalize(vec) * (vector.norm(vec) - self.radius - target.radius)
-
-    def concentric_constraint(self, target: Self | Point) -> mn.Animation:
-        if isinstance(target, ArcBase):
-            target = target.middle
-        return self.middle.coincident_constraint(target)
 
 
 class Circle(ArcBase):

@@ -163,8 +163,8 @@ class MidpointLineScene(sketch_scene.Scene):
         middle = sketch.make_line(vector.point_2d(-1, 1.5), vector.point_2d(1, -1.5))
 
         self.introduce(top, bottom, middle)
-        self.run_group(constraint.Midpoint(middle.start, top))
-        self.run_group(constraint.Midpoint(middle.end, bottom))
+        self.run_group(constraint.Midpoint(middle.start, line=top))
+        self.run_group(constraint.Midpoint(middle.end, line=bottom))
 
 
 class MidpointPointScene(sketch_scene.Scene):
@@ -177,13 +177,21 @@ class MidpointPointScene(sketch_scene.Scene):
         )
 
         self.introduce(line, circle, first_line)
-        self.run_group(constraint.Midpoint(first_line.start, line.start, circle.middle))
-        self.run_group(constraint.Midpoint(first_line.end, line.end, circle.middle))
+        self.run_group(
+            constraint.Midpoint(first_line.start, points=(line.start, circle.middle))
+        )
+        self.run_group(
+            constraint.Midpoint(first_line.end, points=(line.end, circle.middle))
+        )
 
         self.introduce(second_line)
-        self.run_group(constraint.Midpoint(second_line.start, line.start, line.end))
         self.run_group(
-            constraint.Midpoint(second_line.end, first_line.start, first_line.end)
+            constraint.Midpoint(second_line.start, points=(line.start, line.end))
+        )
+        self.run_group(
+            constraint.Midpoint(
+                second_line.end, points=(first_line.start, first_line.end)
+            )
         )
 
 
