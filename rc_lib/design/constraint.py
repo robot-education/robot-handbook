@@ -93,6 +93,11 @@ class AlignType(enum.IntEnum):
     VERTICAL = 1
 
 
+# class Align(mn.Animation):
+#     def __init__(self, *args: mn.Mobject):
+#         pass
+
+
 class Horizontal(ConstraintBase):
     pass
 

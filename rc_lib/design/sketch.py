@@ -109,7 +109,7 @@ class Line(mn.VGroup, Base):
         self.line = line
         self.start = _make_point(point=self.line.get_start())
         self.end = _make_point(point=self.line.get_end())
-        super().__init__(self.line, self.start)
+        super().__init__(self.start, self.end)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
@@ -156,10 +156,7 @@ class Line(mn.VGroup, Base):
                 angle = -curr_angle
             else:
                 angle = -mn.PI - curr_angle
-        return self.animate.rotate(
-            angle=angle, about_point=self.line.get_midpoint()
-        ).build()
-        # return mn.Rotate(self, angle=angle, about_point=self.get_midpoint())  # type: ignore
+        return mn.Rotate(self, angle=angle, about_point=self.line.get_midpoint())  # type: ignore
 
     @mn.override_animation(constraint.Equal)
     def _equal_override(self, target: Self) -> mn.Animation:
@@ -222,25 +219,33 @@ class Line(mn.VGroup, Base):
     def _create_override(self) -> mn.Animation:
         end = self.get_end()
         self.move_end(self.get_start() + vector.ZERO_LENGTH_VECTOR)
-        return self.animate(introducer=True).move_end(end).build()
+        return mn.Succession(
+            constraint.Add(self.line),
+            self.animate(introducer=True).move_end(end).build(),
+        )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
         start = self.get_start() + vector.ZERO_LENGTH_VECTOR
-        return self.animate(remover=True, introducer=True).move_end(start).build()
+        # return self.animate(remover=True, introducer=True).move_end(start).build()
+        return mn.Succession(
+            self.animate(remover=True, introducer=True).move_end(start).build(),
+            constraint.Remove(self.line),
+        )
 
 
-class ArcBase(mn.Arc, Base, ABC):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # center is already used
-        self.middle = _make_point(point=self.arc_center)
+class ArcBase(mn.VGroup, Base, ABC):
+    def __init__(self, arc: mn.Arc):
+        self.arc = arc
+        self.radius = self.arc.radius
+        self.middle = _make_point(point=self.arc.arc_center)
+        super().__init__(self.middle)
 
     def get_center(self) -> vector.Point2d:
         return self.middle.get_center()
 
     def set_radius(self, radius: float) -> Self:
-        self.scale(radius / self.radius)
+        self.arc.scale(radius / self.radius)
         self.radius = radius
         return self
 
@@ -269,33 +274,29 @@ class ArcBase(mn.Arc, Base, ABC):
         return self.middle._coincident_override(target)
 
 
-class Circle(mn.Circle, ArcBase):
+class Circle(ArcBase):
     """Defines a Sketch circle with a vertex at its center."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, circle: mn.Circle):
+        self.circle = circle
+        super().__init__(self.circle)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.move_to(self.middle.get_center())
 
-        self.add_updater(updater)
+        self.arc.add_updater(updater)
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
         return mn.Succession(
             constraint.Add(self.middle),
-            mn.GrowFromCenter(self, suspend_mobject_updaters=False),
+            mn.GrowFromCenter(self.arc),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
-            mn.GrowFromCenter(
-                self,
-                reverse_rate_function=True,
-                remover=True,
-                suspend_mobject_updaters=False,
-            ),
+            mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
             constraint.Remove(self.middle),
         )
 
@@ -307,34 +308,27 @@ class Arc(ArcBase):
         self.arc = arc
         self.start = _make_point().follow(self.arc.get_start)
         self.end = _make_point().follow(self.arc.get_end)
-        self.middle = _make_point(point=arc.get_arc_center())
-
-        super().__init__(self.arc, self.start, self.end, self.middle)
+        super().__init__(self.arc)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.move_arc_center_to(self.middle.get_center())
             self.start.update()
             self.end.update()
 
-        self.add_updater(updater)
+        self.arc.add_updater(updater)
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
         return mn.Succession(
-            # constraint.Add(self.start, self.end, self.middle),
-            mn.GrowFromCenter(self, suspend_mobject_updaters=False),
+            constraint.Add(self.start, self.end, self.middle),
+            mn.GrowFromCenter(self.arc),
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
-            mn.GrowFromCenter(
-                self,
-                reverse_rate_function=True,
-                remover=True,
-                suspend_mobject_updaters=False,
-            ),
-            # constraint.Remove(self.start, self.end, self.middle),
+            mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
+            constraint.Remove(self.start, self.end, self.middle),
         )
 
 
@@ -347,7 +341,7 @@ def make_line(start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
 
 
 def make_circle(center: vector.Point2d, radius: float) -> Circle:
-    return Circle(radius, color=SketchState.NORMAL, arc_center=center)
+    return Circle(mn.Circle(radius, color=SketchState.NORMAL, arc_center=center))
 
 
 def make_arc(
