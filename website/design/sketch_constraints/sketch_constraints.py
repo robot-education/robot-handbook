@@ -145,7 +145,6 @@ class EqualLineScene(sketch_scene.Scene):
 
         self.introduce(base, first, second)
         self.run_group(constraint.Equal(base, first))
-
         self.run_group(constraint.Equal(base, second))
 
 

@@ -1,13 +1,13 @@
 """Defines entities which look like Onshape sketch entities.
 """
 from __future__ import annotations
+from multiprocessing import Value
 
 from typing import Callable, Self, Any
 from abc import ABC, abstractmethod
 import enum
 
 import manim as mn
-import numpy as np
 
 from rc_lib.math_utils import vector, tangent
 from rc_lib.style import color
@@ -24,13 +24,16 @@ class Base(mn.VMobject, ABC):
 
     state = SketchState.NORMAL
 
-    @abstractmethod
     def _create_override(self) -> mn.Animation:
         raise NotImplementedError
 
-    @abstractmethod
     def _uncreate_override(self) -> mn.Animation:
         raise NotImplementedError
+
+    # @abstractmethod
+    # def set_state(self, state: SketchState) -> Self:
+    #     self.state = state
+    #     return self
 
     @abstractmethod
     def coincident_target(self, point: vector.Point2d) -> mn.Animation:
@@ -51,38 +54,31 @@ class Point(mn.Dot, Base):
             mobject.move_to(point_function())
 
         self.add_updater(updater, call_updater=True)
-
         return self
 
     @mn.override_animation(constraint.Coincident)
-    def _coincident_override(self, target: Base) -> Any:
-        return self.animate.move_to(target.coincident_target(self.get_center()))
+    def _coincident_override(self, target: Base) -> mn.Animation:
+        return self.animate.move_to(target.coincident_target(self.get_center())).build()
 
     def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
         return self.get_center()
 
     @mn.override_animation(constraint.Midpoint)
-    def _midpoint_override(self, *args: Point | Line) -> Any:
+    def _midpoint_override(self, *args: Point | Line) -> mn.Animation:
         if len(args) == 1:
             assert isinstance(args[0], Line)
-            return self.animate.move_to(args[0].get_midpoint())
+            return self.animate.move_to(args[0].line.get_midpoint()).build()
         elif len(args) == 2:
             assert isinstance(args[0], Point) and isinstance(args[1], Point)
             return self.animate.move_to(
                 (args[0].get_center() + args[1].get_center()) / 2
-            )
+            ).build()
+        else:
+            raise ValueError("Expected a line or two points.")
 
     @mn.override_animation(constraint.Concentric)
     def _concentric_override(self, target: ArcBase) -> Any:
         return self._coincident_override(target.middle)
-
-    @mn.override_animation(mn.Create)
-    def _create_override(self) -> mn.Animation:
-        return mn.Animation(self, introducer=True, run_time=0)
-
-    @mn.override_animation(mn.Uncreate)
-    def _uncreate_override(self) -> mn.Animation:
-        return mn.Animation(self, introducer=True, remover=True, run_time=0)
 
     @mn.override_animation(constraint.Vertical)
     def _vertical_override(self, target: Point) -> mn.Animation:
@@ -103,23 +99,28 @@ class Point(mn.Dot, Base):
         target_point = vector.point_2d(
             values[0].get_center()[0], values[1].get_center()[1]
         )
-        return mn.prepare_animation(self.animate.move_to(target_point))
+        return self.animate.move_to(target_point).build()
 
 
-class Line(mn.Line, Base):
+class Line(mn.VGroup, Base):
     """Defines a Sketch line segment vertices at each end."""
 
     def __init__(self, line: mn.Line) -> None:
-        super().__init__()
-        self.become(line)
-
-        self.start = _make_point(point=self.get_start())
-        self.end = _make_point(point=self.get_end())
+        self.line = line
+        self.start = _make_point(point=self.line.get_start())
+        self.end = _make_point(point=self.line.get_end())
+        super().__init__(self.line, self.start)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
 
-        self.add_updater(updater)
+        self.line.add_updater(updater)
+
+    def get_start(self) -> vector.Point2d:
+        return self.start.get_center()
+
+    def get_end(self) -> vector.Point2d:
+        return self.end.get_center()
 
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
@@ -144,7 +145,7 @@ class Line(mn.Line, Base):
         return self._align_override(constraint.AlignType.HORIZONTAL)
 
     def _align_override(self, type: constraint.AlignType) -> mn.Animation:
-        curr_angle = self.get_angle()
+        curr_angle = self.line.get_angle()
         if type == constraint.AlignType.VERTICAL:
             if curr_angle >= 0 and curr_angle < mn.PI:
                 angle = (mn.PI / 2) - curr_angle
@@ -155,16 +156,23 @@ class Line(mn.Line, Base):
                 angle = -curr_angle
             else:
                 angle = -mn.PI - curr_angle
-        return mn.Rotate(mn.VGroup(self.start, self.end), angle=angle, about_point=self.get_midpoint())  # type: ignore
+        return self.animate.rotate(
+            angle=angle, about_point=self.line.get_midpoint()
+        ).build()
+        # return mn.Rotate(self, angle=angle, about_point=self.get_midpoint())  # type: ignore
 
     @mn.override_animation(constraint.Equal)
-    def _equal_override(self, target: Self) -> Any:
-        midpoint = target.get_midpoint()
+    def _equal_override(self, target: Self) -> mn.Animation:
+        midpoint = target.line.get_midpoint()
         offset = target.get_direction() * (self.get_length() / 2)
-        return target.animate.put_start_and_end_on(midpoint - offset, midpoint + offset)
+        return (
+            target.animate.move_start(midpoint - offset)
+            .move_end(midpoint + offset)
+            .build()
+        )
 
     def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
-        return self.get_projection(point)
+        return self.line.get_projection(point)
 
     @mn.override_animation(constraint.Tangent)
     def _tangent_override(
@@ -172,7 +180,7 @@ class Line(mn.Line, Base):
     ) -> Any:
         if not rotate:
             translation = self._get_line_translation(target)
-            return mn.VGroup(self.start, self.end).animate.shift(translation)
+            return self.animate.shift(translation)
         else:
             start = self._is_start_touching(target)
             close, far = (self.start, self.end) if start else (self.end, self.start)
@@ -209,37 +217,17 @@ class Line(mn.Line, Base):
         return vector.norm(self.get_start() - target.get_center()) < vector.norm(
             self.get_end() - target.get_center()
         )
-        # if np.isclose(
-        #     vector.norm(self.get_start() - target.get_center()), target.radius
-        # ):
-        #     return True
-        # elif np.isclose(
-        #     vector.norm(self.get_end() - target.get_center()), target.radius
-        # ):
-        #     return False
-        # else:
-        #     raise ValueError("Expected line to touch target")
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
         end = self.get_end()
-        return mn.Succession(
-            constraint.Add(self.start, self.end, self),
-            mn.prepare_animation(
-                self.end.move_to(
-                    self.get_start() + vector.ZERO_LENGTH_VECTOR
-                ).animate.move_to(end)
-            ),
-        )
+        self.move_end(self.get_start() + vector.ZERO_LENGTH_VECTOR)
+        return self.animate(introducer=True).move_end(end).build()
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
-        return mn.Succession(
-            mn.prepare_animation(
-                self.end.animate.move_to(self.get_start() + vector.ZERO_LENGTH_VECTOR)
-            ),
-            constraint.Remove(self.start, self.end, self),
-        )
+        start = self.get_start() + vector.ZERO_LENGTH_VECTOR
+        return self.animate(remover=True, introducer=True).move_end(start).build()
 
 
 class ArcBase(mn.Arc, Base, ABC):
@@ -258,7 +246,7 @@ class ArcBase(mn.Arc, Base, ABC):
 
     @mn.override_animation(constraint.Equal)
     def _equal_override(self, target: Self) -> mn.Animation:
-        return target.animate.set_radius(self.radius)  # type: ignore
+        return target.animate.set_radius(self.radius).build()
 
     def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
         return self.get_center() + (
@@ -266,11 +254,11 @@ class ArcBase(mn.Arc, Base, ABC):
         )
 
     @mn.override_animation(constraint.Tangent)
-    def _tangent_override(self, target: ArcBase) -> Any:
-        translation = self._get_circle_translation(target)  # type: ignore
-        return self.middle.animate().shift(translation)
+    def _tangent_override(self, target: ArcBase) -> mn.Animation:
+        translation = self._get_circle_translation(target)
+        return self.middle.animate().shift(translation).build()
 
-    def _get_circle_translation(self, target: Self) -> vector.Vector2d:
+    def _get_circle_translation(self, target: ArcBase) -> vector.Vector2d:
         vec = target.get_center() - self.get_center()
         return vector.normalize(vec) * (vector.norm(vec) - self.radius - target.radius)
 
@@ -315,10 +303,13 @@ class Circle(mn.Circle, ArcBase):
 class Arc(ArcBase):
     """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.start = _make_point().follow(self.get_start)
-        self.end = _make_point().follow(self.get_end)
+    def __init__(self, arc: mn.Arc) -> None:
+        self.arc = arc
+        self.start = _make_point().follow(self.arc.get_start)
+        self.end = _make_point().follow(self.arc.get_end)
+        self.middle = _make_point(point=arc.get_arc_center())
+
+        super().__init__(self.arc, self.start, self.end, self.middle)
 
         def updater(mobject: mn.Mobject) -> None:
             mobject.move_arc_center_to(self.middle.get_center())
@@ -330,7 +321,7 @@ class Arc(ArcBase):
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
         return mn.Succession(
-            constraint.Add(self.start, self.end, self.middle),
+            # constraint.Add(self.start, self.end, self.middle),
             mn.GrowFromCenter(self, suspend_mobject_updaters=False),
         )
 
@@ -343,7 +334,7 @@ class Arc(ArcBase):
                 remover=True,
                 suspend_mobject_updaters=False,
             ),
-            constraint.Remove(self.start, self.end, self.middle),
+            # constraint.Remove(self.start, self.end, self.middle),
         )
 
 
@@ -363,9 +354,11 @@ def make_arc(
     center: vector.Point2d, radius: float, start_angle: float, angle: float
 ) -> Arc:
     return Arc(
-        radius,
-        start_angle=start_angle,
-        angle=angle,
-        color=SketchState.NORMAL,
-        arc_center=center,
+        mn.Arc(
+            radius,
+            start_angle=start_angle,  # type: ignore
+            angle=angle,
+            color=SketchState.NORMAL,
+            arc_center=center,
+        )
     )
