@@ -4,8 +4,7 @@ A sphinx extension designed to work with the build script to automatically inser
 Supports .mp4 videos compiled by the build script.
 """
 
-import copy
-from typing import Any, Dict, List, cast
+from typing import Dict, List, cast
 from pathlib import Path
 
 from sphinx import application
