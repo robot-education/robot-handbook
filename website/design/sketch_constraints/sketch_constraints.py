@@ -4,7 +4,7 @@ import math
 import manim as mn
 
 from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_scene, constraint
+from rc_lib.design import sketch, sketch_scene, constraint, sketch_animation
 
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:
@@ -46,11 +46,9 @@ class CoincidentLineScene(sketch_scene.Scene):
         )
 
         self.introduce(fixed_line, start_line)
-        self.run_group(
-            constraint.Click(start_line),
-            constraint.Click(fixed_line),
-            mn.Rotate(mn.VGroup(start_line.start, start_line.end), -angle, about_point=fixed_line.get_end()),  # type: ignore
-        )
+
+        animation = mn.Rotate(start_line, -angle, about_point=fixed_line.get_end())
+        self.run_group(sketch_animation.make(animation, start_line, fixed_line))
 
 
 def align_common_line() -> sketch.Line:
@@ -61,14 +59,14 @@ class VerticalLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         start_line = align_common_line()
         self.introduce(start_line)
-        self.run_group(constraint.Vertical(start_line))
+        self.run_group(constraint.Vertical(line=start_line))
 
 
 class HorizontalLineScene(sketch_scene.Scene):
     def construct(self) -> None:
         start_line = align_common_line()
         self.introduce(start_line)
-        self.run_group(constraint.Horizontal(start_line))
+        self.run_group(constraint.Horizontal(line=start_line))
 
 
 class VerticalPointsScene(sketch_scene.Scene):
@@ -80,8 +78,8 @@ class VerticalPointsScene(sketch_scene.Scene):
         )
 
         self.introduce(circle, line, move_line)
-        self.run_group(constraint.Vertical(move_line.start, circle.middle))
-        self.run_group(constraint.Vertical(move_line.end, line.end))
+        self.run_group(constraint.Vertical(points=(move_line.start, circle.middle)))
+        self.run_group(constraint.Vertical(points=(move_line.end, line.end)))
 
 
 class HorizontalPointsScene(sketch_scene.Scene):
@@ -91,8 +89,8 @@ class HorizontalPointsScene(sketch_scene.Scene):
         move_line = sketch.make_line(vector.point_2d(2, -1.5), vector.point_2d(4.5, 3))
 
         self.introduce(circle, line, move_line)
-        self.run_group(constraint.Horizontal(move_line.start, line.end))
-        self.run_group(constraint.Horizontal(move_line.end, circle.middle))
+        self.run_group(constraint.Horizontal(points=(move_line.start, line.end)))
+        self.run_group(constraint.Horizontal(points=(move_line.end, circle.middle)))
 
 
 class ParallelScene(sketch_scene.Scene):
@@ -107,12 +105,9 @@ class ParallelScene(sketch_scene.Scene):
             -angle, about_point=line.get_midpoint()  # type: ignore
         )
 
+        animation = mn.Rotate(start_line, angle, about_point=line.get_midpoint())  # type: ignore
         self.introduce(line, start_line)
-        self.run_group(
-            constraint.Click(start_line),
-            constraint.Click(line),
-            mn.Rotate(mn.VGroup(start_line.start, start_line.end), angle, about_point=line.get_midpoint()),  # type: ignore
-        )
+        self.run_group(sketch_animation.make(animation, start_line, line))
 
 
 class PerpendicularScene(sketch_scene.Scene):
@@ -130,8 +125,8 @@ class PerpendicularScene(sketch_scene.Scene):
 
         self.introduce(start_line, line)
         self.run_group(
-            constraint.Click(start_line),
-            constraint.Click(line),
+            sketch_animation.Click(start_line),
+            sketch_animation.Click(line),
             # rotate to end position
             start_line.animate.rotate(angle, about_point=rotation_point),
         )

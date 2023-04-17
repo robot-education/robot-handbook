@@ -1,80 +1,34 @@
 from typing import Any
-import enum
 
 import manim as mn
 
-from rc_lib.style import color
+from rc_lib.design import sketch, sketch_animation
 
 
-class Add(mn.Animation):
-    def __init__(self, *mobjects: mn.VMobject):
-        super().__init__(mn.VGroup(*mobjects), introducer=True, run_time=0)
-
-
-class Remove(mn.Animation):
-    def __init__(self, *mobjects: mn.VMobject):
+class ConstraintBase(mn.Succession):
+    def __init__(self, animation: mn.Animation | Any, *mobjects: sketch.Base) -> None:
         super().__init__(
-            mn.VGroup(*mobjects), introducer=True, remover=True, run_time=0
+            *[sketch_animation.Click(mobject) for mobject in mobjects], animation
         )
 
 
-# doesn't work as a class member...
-Z_INDEX = 500
+class Equal(ConstraintBase):
+    def __init__(
+        self, base: sketch.ArcBase | sketch.Line, target: sketch.ArcBase | sketch.Line
+    ) -> None:
+        if isinstance(base, sketch.ArcBase) and isinstance(target, sketch.ArcBase):
+            animation = base.equal_constraint(target)
+        elif isinstance(base, sketch.Line) and isinstance(target, sketch.Line):
+            animation = base.equal_constraint(target)
+        else:
+            raise TypeError("Expected arguments to be of the same type.")
+        super().__init__(animation, base, target)
 
 
-class Click(mn.Transform):
-    """Defines an animation which represents an object getting clicked."""
-
-    def __init__(self, mobject: mn.Mobject):
-        target = mobject.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
-
-        # set z_index to make highlight go over the top (a bit suss)
-        global Z_INDEX
-        mobject.set_z_index(Z_INDEX)
-        Z_INDEX += 1
-
-        super().__init__(
-            mobject, target_mobject=target, rate_func=mn.there_and_back, run_time=0.75
-        )
-
-
-def make(animation: mn.Animation | Any, *mobjects: mn.Mobject) -> mn.Succession:
-    return mn.Succession(*[Click(mobject) for mobject in mobjects], animation)
-
-
-class ConstraintBase(mn.Animation):
-    def __new__(
-        cls, base: mn.Mobject, *mobjects: mn.Mobject, base_index: int = 0, **kwargs
-    ):
-        override_function = base.animation_override_for(cls)
-        if not callable(override_function):
-            raise NotImplementedError
-        animation = override_function(base, *mobjects, **kwargs)
-
-        values = list(mobjects)
-        values.insert(base_index, base)
-        return mn.Succession(*[Click(mobject) for mobject in values], animation)
-
-    def __init__(self, base: mn.Mobject, *args, **kwargs) -> None:
-        raise NotImplementedError
-
-
-class TwoSelectionBase(ConstraintBase):
-    def __init__(self, base: mn.Mobject, target: mn.Mobject) -> None:
-        raise NotImplementedError
-
-
-class OneSelectionBase(ConstraintBase):
-    def __init__(self, base: mn.Mobject) -> None:
-        raise NotImplementedError
-
-
-class Equal(TwoSelectionBase):
-    pass
-
-
-class Coincident(TwoSelectionBase):
-    pass
+class Coincident(ConstraintBase):
+    def __init__(self, base: sketch.Point, target: sketch.Base) -> None:
+        animation = base.animate.move_to(target.coincident_target(base.get_center()))
+        super().__init__(animation, base, target)
 
 
 class Tangent(ConstraintBase):
@@ -88,22 +42,37 @@ class Tangent(ConstraintBase):
         raise NotImplementedError
 
 
-class AlignType(enum.IntEnum):
-    HORIZONTAL = 0
-    VERTICAL = 1
+class Align(ConstraintBase):
+    def __init__(
+        self,
+        type: sketch.AlignType,
+        line: sketch.Line | None = None,
+        points: tuple[sketch.Point, sketch.Point] | None = None,
+    ):
+        if line is not None:
+            super().__init__(line.align_constraint(type), line)
+        elif points is not None:
+            super().__init__(points[0].align_constraint(points[1], type), *points)
+        else:
+            raise ValueError("Expected either a line or two points.")
 
 
-# class Align(mn.Animation):
-#     def __init__(self, *args: mn.Mobject):
-#         pass
+class Horizontal(Align):
+    def __init__(
+        self,
+        line: sketch.Line | None = None,
+        points: tuple[sketch.Point, sketch.Point] | None = None,
+    ):
+        return super().__init__(sketch.AlignType.HORIZONTAL, line=line, points=points)
 
 
-class Horizontal(ConstraintBase):
-    pass
-
-
-class Vertical(ConstraintBase):
-    pass
+class Vertical(Align):
+    def __init__(
+        self,
+        line: sketch.Line | None = None,
+        points: tuple[sketch.Point, sketch.Point] | None = None,
+    ):
+        return super().__init__(sketch.AlignType.VERTICAL, line=line, points=points)
 
 
 class Midpoint(ConstraintBase):
@@ -121,5 +90,5 @@ class Midpoint(ConstraintBase):
         raise NotImplementedError
 
 
-class Concentric(TwoSelectionBase):
+class Concentric(ConstraintBase):
     pass
