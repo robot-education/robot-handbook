@@ -7,20 +7,27 @@ from rc_lib.design import sketch
 
 
 class PlateCircle(sketch.Circle):
-    def __init__(self, *args, inner_circle: mn.Circle, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.inner_circle = inner_circle
+    def __init__(self, inner_circle: mn.Circle, outer_circle: mn.Circle) -> None:
+        self.inside = inner_circle
+        self.outside = outer_circle
+        super().__init__(self.outside)
 
         def follow(mobject: mn.Mobject) -> None:
             mobject.move_to(self.get_center())
 
-        self.inner_circle.add_updater(follow, call_updater=True)
+        self.inside.add_updater(follow, call_updater=True)
 
     def get_inner_radius(self) -> float:
-        return self.inner_circle.radius
+        return self.inside.radius
 
     def get_outer_radius(self) -> float:
-        return self.radius
+        return self.outside.radius
+
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.inside, super().get_group())
+
+    def click_target(self) -> mn.VMobject:
+        return self.outside
 
 
 def plate_circle_tangent_points(
@@ -62,10 +69,8 @@ class PlateCircleFactory:
 
         def generator(point: vector.Point2d) -> PlateCircle:
             return PlateCircle(
-                radius + offset,
-                color=self._outer_color,
-                arc_center=point,
-                inner_circle=mn.Circle(radius, color=self._inner_color),
+                mn.Circle(radius, color=self._inner_color, arc_center=point),
+                mn.Circle(radius + offset, color=self._outer_color, arc_center=point),
             )
 
         return generator
@@ -97,12 +102,12 @@ class PlateGroup(mn.VGroup):
 
     def draw_inner_circles(self) -> mn.Animation:
         return mn.Succession(
-            *[mn.GrowFromCenter(x.inner_circle) for x in self._entities], lag_ratio=0.75
+            *[mn.GrowFromCenter(x.inside) for x in self._entities], lag_ratio=0.75
         )
 
     def draw_outer_circles(self) -> mn.Animation:
         return mn.Succession(
-            *[mn.GrowFromCenter(x) for x in self._entities], lag_ratio=0.75
+            *[mn.GrowFromCenter(x.outside) for x in self._entities], lag_ratio=0.75
         )
 
     def draw_boundary(self) -> mn.Animation:

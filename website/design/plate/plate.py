@@ -68,18 +68,17 @@ class BoundaryRedrawScene(mn.Scene):
         self._line = plate.plate_circle_tangent_line(self._left, self._right)
 
         self.add(
-            self._left,
-            self._right,
-            self._line,
-            self._line.start,
-            self._line.end,
-            self._middle.inner_circle,
+            self._middle.inside,
+            self._middle.middle,
+            self._left.get_group(),
+            self._right.get_group(),
+            self._line.get_group(),
         )
         title.reset()
 
     def construct(self):
         self.play(title.next("Add outer circle"))
-        self.play(mn.GrowFromCenter(self._middle))
+        self.play(mn.GrowFromCenter(self._middle.outside))
 
         self.play(title.next("Redraw boundary"))
         self.play(mn.Uncreate(self._line))
@@ -95,9 +94,7 @@ class BoundaryConstraintScene(mn.Scene):
         generator = plate_factory.make_generator(1.75, 0.75)
         self._left: plate.PlateCircle = generator(vector.point_2d(-6, -2))
         self._right: plate.PlateCircle = generator(vector.point_2d(6, -2))
-        self.add(
-            self._left, self._right, self._left.inner_circle, self._right.inner_circle
-        )
+        self.add(self._left.get_group(), self._right.get_group())
 
         self._tangent_points: tuple[
             vector.Point2d, vector.Point2d

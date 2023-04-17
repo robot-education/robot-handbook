@@ -18,11 +18,7 @@ class Equal(ConstraintBase):
         self, base: sketch.ArcBase | sketch.Line, target: sketch.ArcBase | sketch.Line
     ) -> None:
         if isinstance(base, sketch.ArcBase) and isinstance(target, sketch.ArcBase):
-            animation = target.animate.set_radius(base.radius)
-            # animation = mn.Transform(
-            #     target.arc, target.arc.copy().scale(base.radius / target.arc.radius)
-            # )
-            # target.radius = base.radius
+            animation = target.animate.set_radius(base.get_radius())
         elif isinstance(base, sketch.Line) and isinstance(target, sketch.Line):
             animation = base.equal_constraint(target)
         else:
@@ -63,11 +59,11 @@ class Tangent(ConstraintBase):
 
             if reverse:
                 tangent_point = tangent.point_to_circle_tangent(
-                    far_point, target.get_center(), target.radius
+                    far_point, target.get_center(), target.get_radius()
                 )
             else:
                 tangent_point = tangent.circle_to_point_tangent(
-                    target.get_center(), target.radius, far_point
+                    target.get_center(), target.get_radius(), far_point
                 )
 
             angle = vector.angle_between_points(

@@ -40,6 +40,11 @@ class Base(mn.VMobject, ABC):
     #     return self
 
     @abstractmethod
+    def get_group(self) -> mn.VGroup:
+        """Returns a group containing all mobjects owned by the entity."""
+        raise NotImplementedError
+
+    @abstractmethod
     def click_target(self) -> mn.VMobject:
         raise NotImplementedError
 
@@ -59,6 +64,9 @@ class Point(mn.Dot, Base):
 
         self.add_updater(updater, call_updater=True)
         return self
+
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self)
 
     @override
     def click_target(self) -> mn.VMobject:
@@ -106,6 +114,10 @@ class Line(mn.VGroup, Base):
             mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
 
         self.line.add_updater(updater)
+
+    @override
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.line, self.start, self.end)
 
     @override
     def get_start(self) -> vector.Point2d:
@@ -162,7 +174,7 @@ class Line(mn.VGroup, Base):
     def get_tangent_translation(self, target: ArcBase) -> vector.Vector2d:
         projection: vector.Point2d = self.line.get_projection(target.get_center())  # type: ignore
         return vector.direction(projection, target.get_center()) * (
-            vector.norm(target.get_center() - projection) - target.radius
+            vector.norm(target.get_center() - projection) - target.get_radius()
         )
 
     def is_start_closer_to_target(self, target: ArcBase) -> bool:
@@ -197,7 +209,6 @@ class Line(mn.VGroup, Base):
 class ArcBase(mn.VGroup, Base, ABC):
     def __init__(self, arc: mn.Arc):
         self.arc = arc
-        self.radius = self.arc.radius
         self.middle = _make_point(point=self.arc.arc_center)
         super().__init__(self.middle)
 
@@ -205,9 +216,12 @@ class ArcBase(mn.VGroup, Base, ABC):
     def get_center(self) -> vector.Point2d:
         return self.middle.get_center()
 
+    def get_radius(self) -> float:
+        return self.arc.radius
+
     def set_radius(self, radius: float) -> Self:
-        self.arc.scale(radius / self.radius)
-        self.radius = radius
+        self.arc.scale(radius / self.get_radius())
+        self.arc.radius = radius
         return self
 
     @mn.override_animate(set_radius)
@@ -215,10 +229,10 @@ class ArcBase(mn.VGroup, Base, ABC):
         # set_radius doesn't exist on arc, so we have to implement more manually
         animation = mn.Transform(
             self.arc,
-            target_mobject=self.arc.copy().scale(radius / self.radius),
+            target_mobject=self.arc.copy().scale(radius / self.get_radius()),
             **anim_args,
         )
-        self.radius = radius
+        self.arc.radius = radius
         return animation
 
     @override
@@ -227,7 +241,7 @@ class ArcBase(mn.VGroup, Base, ABC):
 
     def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
         return self.get_center() + (
-            vector.direction(self.get_center(), point) * self.radius
+            vector.direction(self.get_center(), point) * self.get_radius()
         )
 
     def concentric_target(self) -> vector.Point2d:
@@ -239,7 +253,9 @@ class ArcBase(mn.VGroup, Base, ABC):
 
     def get_tangent_translation(self, target: ArcBase) -> vector.Vector2d:
         vec = target.get_center() - self.get_center()
-        return vector.normalize(vec) * (vector.norm(vec) - self.radius - target.radius)
+        return vector.normalize(vec) * (
+            vector.norm(vec) - self.get_radius() - target.get_radius()
+        )
 
 
 class Circle(ArcBase):
@@ -253,6 +269,10 @@ class Circle(ArcBase):
             mobject.move_to(self.middle.get_center())
 
         self.arc.add_updater(updater)
+
+    @override
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.circle, self.middle)
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
@@ -284,6 +304,10 @@ class Arc(ArcBase):
             self.end.update()
 
         self.arc.add_updater(updater)
+
+    @override
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.arc, self.start, self.end, self.middle)
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
