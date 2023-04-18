@@ -9,13 +9,21 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+
+
+# import pathlib
+
+# gets path to video_extension. Does not rely on working directory, as this fails in gh actions?
+# path = pathlib.Path(__file__)
+# sys.path.append((path.parents[1] / "video_extension").as_posix())
+
+# sys.path.append(os.path.abspath("website/video_extension"))
+
 import sys
+import os
 
-import pathlib
+sys.path.append(os.path.abspath("./_ext"))
 
-# gets path to video_extension. Does not rely on working directory, as this fails in gh actions
-path = pathlib.Path(__file__)
-sys.path.append((path.parents[1] / "video_extension").as_posix())
 
 # -- Project information -----------------------------------------------------
 
@@ -35,7 +43,8 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx_copybutton",
     "myst_parser",
-    "video_extension.animation",
+    # custom animation extension
+    "animation",
 ]
 
 myst_enable_extensions = [

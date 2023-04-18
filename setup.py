@@ -3,4 +3,3 @@
 import setuptools
 
 setuptools.setup(name="rc_lib", version="0.1", packages=["rc_lib"])
-# setup(name="video_extension", version="0.1", packages=["video_extension"])

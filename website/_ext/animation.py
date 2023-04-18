@@ -16,7 +16,7 @@ from docutils import nodes
 # from myst_parser.parsers import directives as myst_directives
 from myst_parser import mocking as myst_mocking
 
-from video_extension import local_nodes
+import local_nodes
 
 logger = logging.getLogger(__name__)
 

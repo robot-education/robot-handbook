@@ -118,6 +118,7 @@ class Midpoint(ConstraintBase):
         points: tuple[sketch.Point, sketch.Point] | None = None,
     ) -> None:
         """Performs a midpoint constraint on the passed in points."""
+        # setup click order
         if line is not None:
             args = [base, line]
         elif points is not None:
@@ -125,7 +126,6 @@ class Midpoint(ConstraintBase):
         else:
             # midpoint_constraint will throw
             args = []
-
         return super().__init__(
             base.midpoint_constraint(line=line, points=points), *args
         )
