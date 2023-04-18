@@ -3,22 +3,31 @@ from typing import Callable, Self
 
 from rc_lib.style import color
 from rc_lib.math_utils import tangent, vector
+from rc_lib.design import sketch
 
 
-class PlateCircle(mn.VGroup):
+class PlateCircle(sketch.Circle):
     def __init__(self, inner_circle: mn.Circle, outer_circle: mn.Circle) -> None:
-        super().__init__(inner_circle, outer_circle)
-        self.inner_circle: mn.Circle = inner_circle
-        self.outer_circle: mn.Circle = outer_circle
+        self.inside = inner_circle
+        self.outside = outer_circle
+        super().__init__(self.outside)
 
-    def get_center(self) -> vector.Point2d:
-        return self.inner_circle.get_center()
+        def follow(mobject: mn.Mobject) -> None:
+            mobject.move_to(self.get_center())
+
+        self.inside.add_updater(follow, call_updater=True)
 
     def get_inner_radius(self) -> float:
-        return self.inner_circle.radius
+        return self.inside.radius
 
     def get_outer_radius(self) -> float:
-        return self.outer_circle.radius
+        return self.outside.radius
+
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.inside, super().get_group())
+
+    def click_target(self) -> mn.VMobject:
+        return self.outside
 
 
 def plate_circle_tangent_points(
@@ -32,11 +41,8 @@ def plate_circle_tangent_points(
     )
 
 
-def plate_circle_tangent_line(
-    start: PlateCircle, end: PlateCircle, color: color.Color
-) -> mn.Line:
-    return mn.Line(*plate_circle_tangent_points(start, end), color=color)
-    # return sketch_factory.make_line(*plate_circle_tangent_points(start, end))
+def plate_circle_tangent_line(start: PlateCircle, end: PlateCircle) -> sketch.Line:
+    return sketch.make_line(*plate_circle_tangent_points(start, end))
 
 
 PlateCircleGenerator = Callable[[vector.Point2d], PlateCircle]
@@ -63,9 +69,9 @@ class PlateCircleFactory:
 
         def generator(point: vector.Point2d) -> PlateCircle:
             return PlateCircle(
-                mn.Circle(radius, color=self._inner_color),
-                mn.Circle(radius + offset, color=self._outer_color),
-            ).move_to(point)
+                mn.Circle(radius, color=self._inner_color, arc_center=point),
+                mn.Circle(radius + offset, color=self._outer_color, arc_center=point),
+            )
 
         return generator
 
@@ -81,27 +87,27 @@ class PlateGroup(mn.VGroup):
         self,
         entities: list[PlateCircle],
         boundary_order: list[int],
-        boundary_color: color.Color = color.FOREGROUND,
+        # boundary_color: color.Color = color.FOREGROUND,
     ) -> None:
         self._entities: list[PlateCircle] = entities
         self._boundary: list[PlateCircle] = [self._entities[i] for i in boundary_order]
-        self._boundary_lines: list[mn.Line] = self._make_boundary_lines(boundary_color)
+        self._boundary_lines: list[sketch.Line] = self._make_boundary_lines()
         super().__init__(*[*self._entities, *self._boundary_lines])
 
-    def _make_boundary_lines(self, color: color.Color) -> list[mn.Line]:
+    def _make_boundary_lines(self) -> list[sketch.Line]:
         return [
-            plate_circle_tangent_line(self._boundary[i - 1], curr, color)
+            plate_circle_tangent_line(self._boundary[i - 1], curr)
             for i, curr in enumerate(self._boundary)
         ]
 
     def draw_inner_circles(self) -> mn.Animation:
         return mn.Succession(
-            *[mn.GrowFromCenter(x.inner_circle) for x in self._entities], lag_ratio=0.75
+            *[mn.GrowFromCenter(x.inside) for x in self._entities], lag_ratio=0.75
         )
 
     def draw_outer_circles(self) -> mn.Animation:
         return mn.Succession(
-            *[mn.GrowFromCenter(x.outer_circle) for x in self._entities], lag_ratio=0.75
+            *[mn.GrowFromCenter(x.outside) for x in self._entities], lag_ratio=0.75
         )
 
     def draw_boundary(self) -> mn.Animation:

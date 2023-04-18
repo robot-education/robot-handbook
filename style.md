@@ -128,10 +128,35 @@ The following admonitions should not be used:
 
 
 
-### Manim Bugs
-mn.Arc's start_angle is typed as int, not float
-Sequence[float], np.ndarray, and sometimes Sequence[float] | np.ndarray are used somewhat interchangably
-mn.Color seems to be unhappy with literal strings from time to time
-np.float64 is returned by coords (somewhat arbitrarily)
-GrowFromCenter, GrowFromPoint colors typed as str, not Color and missing | None
-AnimationBuilders from .animate are not valid animations?
+## Manim Bugs
+### Resolved Bugs
+`angle_between_vectors`'s return type is incorrectly typed as `np.ndarray`, not `float`.
+
+`mn.Arc`'s `start_angle` is typed as `int`, not `float` (since the type of `0` defaults to `int`)
+"animation" is spelled "animnation" in add_animation_override docs
+
+### Trivial Fixes
+`mobject.add_updater`'s call_updater argument throws when the updater does not take dt as an argument (as updater call logic for handling dt is missing)
+Update: This will be resolved in the next release of manim.
+
+### Bigger Issues
+`GrowFromCenter` should probably expose introducer (like Create and Uncreate do)
+
+AnimationBuilders from .animate are not valid animations.
+
+`get_x`, `get_y`, and `get_z` are the only functions to use/return `np.float64`
+
+`mn.Color` seems to be incompatible with raw `str`; this problem is worsened by `mn.Color` not being exposed.
+`GrowFromCenter` and `GrowFromPoint`'s colors are typed as `str`, not `Color` and are missing `| None`.
+Update: These issues are being addressed by the upcoming color refactor.
+
+`Sequence[float]`, `np.ndarray`, and sometimes `Sequence[float] | np.ndarray` are used somewhat interchangably.
+Since `np.ndarray` is not compatible with `Sequence[float]`, there are annoying behaviors like 
+the types of `line.put_start_and_end_on` not being compatible with, e.g. `line.get_start`.
+
+`remover` animations break updaters, even when used after normal animations in a `Succession`. However, this behavior goes
+away if `introducer` is set to `True` on the remover animation.
+
+### Features
+I would like `Add` and `Delete` type animations which add and delete objects from a scene and have a run-time of `0`. 
+This would be useful for, e.g., creating objects in class methods which do not have access to `Scene` directly.

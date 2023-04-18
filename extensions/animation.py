@@ -4,8 +4,7 @@ A sphinx extension designed to work with the build script to automatically inser
 Supports .mp4 videos compiled by the build script.
 """
 
-import copy
-from typing import Any, Dict, List, cast
+from typing import Dict, List, cast
 from pathlib import Path
 
 from sphinx import application
@@ -17,7 +16,7 @@ from docutils import nodes
 # from myst_parser.parsers import directives as myst_directives
 from myst_parser import mocking as myst_mocking
 
-from video_extension import local_nodes
+from extensions import video
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +53,7 @@ class Animation(sphinx_docutils.SphinxDirective):
             align="center",  # may also be left or right
         )
 
-        video_node = local_nodes.video(
+        video_node = video.video(
             # add entire directive for error handling
             rawsource=self.block_text,
             src=uri,
@@ -68,7 +67,7 @@ class Animation(sphinx_docutils.SphinxDirective):
         )
 
         # optional - use source nodes to support multiple sources
-        # source_node = local_nodes.source(
+        # source_node = video.source(
         #     rawsource=self.arguments[0], src=uri, type="video/mp4"
         # )
         # video_node += source_node
@@ -91,7 +90,7 @@ class Animation(sphinx_docutils.SphinxDirective):
             path = "media" / path
         else:
             logger.warning('Animations may omit the "media" folder in their path')
-        return docutils_directives.uri(path.as_posix())
+        return docutils_directives.uri(str(path))
 
     def _add_caption(self, figure_node: nodes.figure) -> nodes.Node:
         """
@@ -133,16 +132,9 @@ class Animation(sphinx_docutils.SphinxDirective):
 
 def setup(app: application.Sphinx) -> Dict[str, bool]:
     """Add video node and parameters to the Sphinx builder."""
-    local_nodes.register_video_nodes(app)
+    video.register_video_nodes(app)
 
     app.add_directive("animation", Animation)
-
-    # app.builder.supported_image_types = [
-    #     "image/svg+xml",
-    #     "image/png",
-    #     "image/gif",
-    #     "video/mp4",
-    # ]
 
     return {
         "parallel_read_safe": True,

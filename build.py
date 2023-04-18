@@ -1,18 +1,18 @@
 """
-A build script which can be used to compile animations in "website".
-Takes as arguments -p, for production, as well as -h for help.
-If -p is omitted, output is optimized for compile speed.
-A file may be specified, as well as an optional list of classes to compile within that file.
-If no file is specified, the entire directory is compiled.
+A build script which can be used to compile animations and build the website.
+
+Fuzzy matching is used to enable quickly specifying targets in the website folder.
 """
 import inspect
 import os
 import subprocess
 import argparse
 import sys
+import pathlib
 import importlib
+import re
 
-from typing import List
+from thefuzz import process, fuzz
 
 # prevent manim from printing
 sys.stdout = open(os.devnull, "w")
@@ -20,62 +20,81 @@ import manim as mn
 
 sys.stdout = sys.__stdout__
 
-source_path = "website"
+
+source_path = pathlib.Path("website")
+
 quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
 
+exclude_folders = ["__pycache__", "media", "_style"]
 
-def get_python_file_paths(path: str | None = None) -> List[str]:
-    if path is not None:
-        path = os.path.join(source_path, path)
-    else:
-        path = source_path
+split_regex = "A-Z_/\\\\"
 
-    file_paths = []
-    for dir_path, _, file_names in os.walk(path):
-        file_paths.extend(
-            [os.path.join(dir_path, file_name) for file_name in file_names]
-        )
 
+def get_all_file_paths(base: pathlib.Path) -> list[pathlib.Path]:
+    """Searches source_path for all potential files. Returns a mapping of file names to their paths."""
     return [
-        file_path
-        for file_path in file_paths
-        if os.path.splitext(file_path)[1] == ".py" and file_path != "{}/conf.py".format(source_path)
+        file_path for file_path in base.glob("**/*.py") if file_path.name != "conf.py"
     ]
 
 
-def get_path(file_name: str) -> str | None:
-    for dir_path, _, file_names in os.walk(source_path):
-        if file_name in file_names:
-            return os.path.join(dir_path, file_name)
-    return None
+def get_all_paths() -> list[pathlib.Path]:
+    """Searches source_path for all possible paths, including sub-paths, and returns them.
+
+    This function is used to collect paths for matching with the -p option.
+    The paths include paths to all files.
+    """
+    return [
+        pathlib.Path(*path.parts[1:])
+        for path in source_path.glob("**")
+        if path.name not in exclude_folders
+    ]
 
 
-def get_animation_names(file_path: str) -> List[str]:
-    file_path = file_path.replace("/", ".").removesuffix(".py")
-    module = importlib.import_module(file_path)
+def get_all_scenes(file_paths: list[pathlib.Path]) -> dict[str, pathlib.Path]:
+    """Searches source_path for all possible scenes.
+
+    Returns a mapping of scenes to their files.
+    Duplicate scenes and files are not explicitly handled.
+    """
+    return dict(
+        [
+            (scene_name, file_path)
+            for file_path in file_paths
+            for scene_name in get_scene_names(file_path)
+        ]
+    )
+
+
+def get_scene_names(file_path: pathlib.Path) -> list[str]:
+    """Extracts a list of scene names from the file specified by file_path."""
+    module_path = str(file_path).replace("/", ".").removesuffix(".py")
+    module = importlib.import_module(module_path)
     return [
         name
-        for name, cls in module.__dict__.items()
-        if inspect.isclass(cls) and issubclass(cls, mn.Scene)
+        for name, cls in inspect.getmembers(module)
+        if inspect.isclass(cls)
+        and issubclass(cls, mn.Scene)
+        and cls.__module__ == module_path
     ]
 
 
-def move_output(quality: str, file_path: str, animations: List[str]) -> None:
+def move_output(quality: str, file_path: pathlib.Path, scene_name: str) -> None:
     """Moves produced files from media to the appropriate location in website."""
     quality_folder = quality_folder_lookup[quality]
+
     path, sub_folder = os.path.split(file_path)
 
     # -p suppresses errors
     subprocess.run("mkdir -p {}/media".format(path), shell=True)
 
-    for animation in animations:
-        move_command = "mv media/videos/{sub_folder}/{quality_folder}/{animation}.mp4 {path}/media/.".format(
-            sub_folder=sub_folder.removesuffix(".py"),
-            animation=animation,
-            quality_folder=quality_folder,
-            path=path,
-        )
-        subprocess.run(move_command, shell=True)
+    # for scene in scenes:
+    move_command = "mv media/videos/{sub_folder}/{quality_folder}/{scene_name}.mp4 {path}/media/.".format(
+        sub_folder=sub_folder.removesuffix(".py"),
+        scene_name=scene_name,
+        quality_folder=quality_folder,
+        path=path,
+    )
+    subprocess.run(move_command, shell=True)
 
 
 def get_arg_parser() -> argparse.ArgumentParser:
@@ -87,21 +106,40 @@ def get_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="whether to build production versions of animations",
     )
+
     parser.add_argument(
+        "-m",
+        "--make",
+        action="store_true",
+        help="whether to make the website after building",
+    )
+
+    description = """
+    Inputs to the builder. All inputs are parsed using a fuzzy matcher which enables (often aggressive) abbreviations.
+    The fuzzer works by comparing tokens in the input with target tokens. 
+    Token splits are determined using capital letters, slashes, backslashes, and underscores.
+    So, "CoLi" or "coLi" will match "CoincidentLine" better than "coli" or "COLI".
+    """
+
+    group = parser.add_argument_group("inputs", description)
+
+    group.add_argument(
         "-f",
         "--file",
         nargs="*",
         default=None,
         help="python files to build",
     )
-    parser.add_argument(
+    group.add_argument(
         "-p",
         "--path",
         nargs="*",
         default=None,
-        help='paths relative to "/{}" which are recursively searched for files'.format(source_path),
+        help='paths relative to "/{}" which are recursively searched for files'.format(
+            source_path
+        ),
     )
-    parser.add_argument(
+    group.add_argument(
         "-s",
         "--scene",
         nargs="*",
@@ -110,47 +148,79 @@ def get_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def fuzzy_search(targets: list[str], values: list[str]) -> list[str]:
+    parsed_targets = dict([(target, split_tokens(target)) for target in targets])
+
+    matches = []
+    for value in values:
+        parsed_value = split_tokens(value)
+        _, score, target_name = process.extractOne(  # type: ignore
+            parsed_value, parsed_targets, scorer=fuzz.token_sort_ratio  # type: ignore
+        )
+
+        if score < 95:
+            print("Found {} for input {} (score: {})".format(target_name, value, score))
+        # print("Inputs:", parsed_targets)
+        # print("Query:", parsed_value)
+        matches.append(target_name)
+    return matches
+
+
+def split_tokens(input: str) -> str:
+    parsed = re.search("[^{}]*".format(split_regex), input)
+    matches: list[str] = []
+    if parsed is not None:
+        matches.append(parsed.group(0))
+
+    end = re.findall("[{}][^{}]*".format(split_regex, split_regex), input)
+    matches.extend(end)
+    return " ".join(matches)
+
+
 def main():
     args = get_arg_parser().parse_args()
 
     quality = "h" if args.production else "l"
 
-    file_paths = []
-    if args.file == None and args.path is None:
-        file_paths = get_python_file_paths()
+    target_paths = []
+    if args.path is not None:
+        all_paths = get_all_paths()
+        all_path_strs = [str(path) for path in all_paths]
+        results = fuzzy_search(all_path_strs, args.path)
+        file_path_lists = [
+            get_all_file_paths(source_path / pathlib.Path(path)) for path in results
+        ]
+        target_paths = [item for sublist in file_path_lists for item in sublist]
 
-    if args.path != None:
-        for path in args.path:
-            file_paths.extend(get_python_file_paths(path=path))
+    else:
+        target_paths = get_all_file_paths(source_path)
 
-    if args.file != None:
-        for file_name in args.file:
-            file_path = get_path(file_name)
-            if file_path is None:
-                raise ValueError(
-                    'Failed to find the specified file "{}" in "/{}". Aborting.'.format(file_name, file_path)
-                )
-            file_paths.append(file_path)
+    if args.file is not None:
+        # we use a dict so we can split names into sequences
+        target_names = [path.name for path in target_paths]
+        results = fuzzy_search(target_names, args.file)
+        target_paths = [path for path in target_paths if path.name in results]
 
-    for file_path in file_paths:
-        animation_names = get_animation_names(file_path)
+    scenes = get_all_scenes(target_paths)
+    if args.scene is not None:
+        results = fuzzy_search(list(scenes.keys()), args.scene)
+        scenes = dict([(k, v) for k, v in scenes.items() if k in results])
 
-        if args.scene is not None:
-            animation_names = [name for name in animation_names if name in args.scene]
-            if (animation_names == []):
-                continue
-
+    for scene_name, file_path in scenes.items():
         manim_command = (
-            "manim render -v ERROR -q{quality} {file_path} {animation_names}".format(
+            "manim render -v ERROR -q{quality} {file_path} {scene_names}".format(
                 quality=quality,
                 file_path=file_path,
-                animation_names=" ".join(animation_names),
+                scene_names=scene_name,  # " ".join(scene_names),
             )
         )
 
-        print("Rendering {}".format(file_path))
+        print("Rendering {} - {}".format(file_path, scene_name))
         subprocess.run(manim_command, shell=True)
-        move_output(quality, file_path, animation_names)
+        move_output(quality, file_path, scene_name)
+
+    if args.make:
+        subprocess.run("make html", shell=True)
 
 
 if __name__ == "__main__":

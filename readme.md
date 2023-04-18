@@ -1,7 +1,7 @@
 # Robot Concepts
-[![Build and Deploy](https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml/badge.svg?branch=main)](https://github.com/EganJ/robot-concepts/actions/workflows/gh-pages-deploy.yml)
+[![Build and Deploy](https://github.com/robot-education/robot-handbook/actions/workflows/gh-pages-deploy.yml/badge.svg?branch=main)](https://github.com/robot-education/robot-handbook/actions/workflows/gh-pages-deploy.yml)
 
-View the website by visiting [eganj.github.io/robot-concepts/](https://eganj.github.io/robot-concepts/).
+View the website by visiting [robothandbook.dev](https://robothandbook.dev).
 
 Robot Concepts is a collection of animations and other documentation intended to be a visual aid when explaining robotics
 concepts, primarily for an FRC audience. Animations created using [manim community](https://www.manim.community/).

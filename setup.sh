@@ -5,9 +5,7 @@ sudo apt-get update
 # manim system libraries
 sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev ffmpeg # texlive texlive-latex-extra
 
-# Create python virtual enviornment named .venv
-# python -m venv .venv
-# source .venv/bin/activate
+pip install --upgrade pip
 
 # install pip requirements
 pip install -r requirements.txt

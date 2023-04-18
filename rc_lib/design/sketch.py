@@ -1,130 +1,135 @@
 """Defines entities which look like Onshape sketch entities.
 """
+from __future__ import annotations
 
-from typing import Self
+from typing import Callable, Self, Any
+from typing_extensions import override
 from abc import ABC, abstractmethod
 import enum
 
 import manim as mn
 
 from rc_lib.math_utils import vector
-from rc_lib.style import color
-from rc_lib.style import animation
+from rc_lib.style import color, animation
 
 
-class Sketch(mn.VGroup, ABC):
+class SketchState(color.Color, enum.Enum):
+    NORMAL = color.Palette.BLUE.value
+    CONSTRAINED = color.Palette.BLACK.value
+
+
+class AlignType(enum.IntEnum):
+    HORIZONTAL = 0
+    VERTICAL = 1
+
+
+class Base(mn.VMobject, ABC):
     """An abstract base class for Sketch entities."""
 
-    def _create_override(self, **kwargs) -> mn.Animation:
+    state = SketchState.NORMAL
+
+    def _create_override(self) -> mn.Animation:
         raise NotImplementedError
 
-    def _uncreate_override(self, **kwargs) -> mn.Animation:
+    def _uncreate_override(self) -> mn.Animation:
+        raise NotImplementedError
+
+    # @abstractmethod
+    # def set_state(self, state: SketchState) -> Self:
+    #     self.state = state
+    #     return self
+
+    @abstractmethod
+    def get_group(self) -> mn.VGroup:
+        """Returns a group containing all mobjects owned by the entity."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def click_target(self) -> mn.VMobject:
         raise NotImplementedError
 
 
-class SketchArcBase(Sketch, ABC):
-    """
-    A class defining a sketch arc (or circle)  with a vertex at the center.
-
-    This class uses the mix-in pattern to support multiple inheritance.
-    """
-
-    def __init__(self, *, arc: mn.Arc, center_vertex: mn.Dot, **kwargs: mn.VMobject):
-        super().__init__(**kwargs)
-        self.add(arc, center_vertex)
-        self._arc = arc
-        self.center_vertex = center_vertex
-
-    def get_center(self) -> vector.Point2d:
-        """Returns the center of the arc (as opposed to the center of its bounding box)."""
-        return self.center_vertex.get_center()
-
-    def get_radius(self) -> float:
-        return self._arc.radius
-
-    def set_radius(self, radius: float) -> Self:
-        self._arc.scale(radius / self._arc.radius, about_point=self.get_center())
-        return self
-
-
-class LineEnd(enum.IntEnum):
-    """An enum defining the start and end of a line (or other edge)."""
-
-    START = 0
-    END = 1
-
-
-class SketchEdgeBase(Sketch, ABC):
-    """A class defining a Sketch entity which has an edge with two end vertices.
-
-    This class uses the mix-in pattern to support multiple inheritance.
-    """
-
-    def __init__(
-        self, *, edge: mn.VMobject, start_vertex: mn.Dot, end_vertex: mn.Dot, **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.add(edge, start_vertex, end_vertex)
-        self._edge = edge
-        self.start_vertex = start_vertex
-        self.end_vertex = end_vertex
-
-    def get_vertex(self, line_end: LineEnd) -> mn.Dot:
-        """A programmatic getter for start_vertex and end_vertex."""
-        return self.start_vertex if line_end == LineEnd.START else self.end_vertex
-
-    def get_point(self, line_end: LineEnd) -> vector.Point2d:
-        """A programmatic getter for start and end."""
-        return self.get_vertex(line_end).get_center()
-
-    def get_start(self) -> vector.Point2d:
-        """Returns the start point of the line."""
-        return self.get_point(LineEnd.START)
-
-    def get_end(self) -> vector.Point2d:
-        """Returns the end point of the line."""
-        return self.get_point(LineEnd.END)
-
-
-class SketchPoint(Sketch):
+class Point(mn.Dot, Base):
     """Defines a singlar Sketch vertex."""
 
-    def __init__(self, vertex: mn.Dot) -> None:
-        self.vertex = vertex
-        super().__init__(self.get_point)
+    def __init__(self, dot: mn.Dot) -> None:
+        super().__init__()
+        self.become(dot)
 
-    def get_point(self) -> vector.Vector2d:
+    def follow(self, point_function: Callable[[], vector.Point2d]) -> Self:
+        """Adds an updater function which causes this point to track the specified input."""
+
+        def updater(mobject: mn.Mobject):
+            mobject.move_to(point_function())
+
+        self.add_updater(updater, call_updater=True)
+        return self
+
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self)
+
+    @override
+    def click_target(self) -> mn.VMobject:
+        return self
+
+    def coincident_target(self, _: vector.Point2d) -> vector.Point2d:
         return self.get_center()
 
+    def concentric_target(self) -> vector.Point2d:
+        return self.get_center()
 
-class SketchCircle(SketchArcBase):
-    """Defines a Sketch circle with a vertex at its center."""
+    def midpoint_constraint(
+        self, points: tuple[Point, Point] | None = None, line: Line | None = None
+    ) -> mn.Animation:
+        if line is not None:
+            points = (line.start, line.end)
+        elif points is None:
+            raise ValueError("Expected a line or two points.")
 
-    def __init__(self, circle: mn.Circle, center_vertex: mn.Dot):
-        super().__init__(arc=circle, center_vertex=center_vertex)
-        self.circle = circle
+        return self.animate.move_to(
+            (points[0].get_center() + points[1].get_center()) / 2
+        )  # type: ignore
 
-    @mn.override_animation(mn.Create)
-    def _create_override(self, **kwargs) -> mn.Animation:
-        return mn.Succession(
-            mn.Create(self.center_vertex, run_time=0),
-            mn.GrowFromPoint(self._arc, self.get_center(), **kwargs),
+    def align_constraint(self, target: Point, type: AlignType) -> mn.Animation:
+        if type == AlignType.VERTICAL:
+            values = (target, self)
+        else:
+            values = (self, target)
+        target_point = vector.point_2d(
+            values[0].get_center()[0], values[1].get_center()[1]
         )
-
-    @mn.override_animation(mn.Uncreate)
-    def _uncreate_override(self, **kwargs) -> mn.Animation:
-        return mn.Succession(
-            animation.ShrinkToPoint(self._arc, self.get_center(), **kwargs),
-            mn.Uncreate(self.center_vertex, run_time=0),
-        )
+        return self.animate.move_to(target_point)  # type: ignore
 
 
-class SketchLine(SketchEdgeBase):
+class Line(mn.VGroup, Base):
     """Defines a Sketch line segment vertices at each end."""
 
-    def __init__(self, line: mn.Line, start_vertex: mn.Dot, end_vertex: mn.Dot) -> None:
-        super().__init__(edge=line, start_vertex=start_vertex, end_vertex=end_vertex)
+    def __init__(self, line: mn.Line) -> None:
         self.line = line
+        self.start = _make_point(point=self.line.get_start())
+        self.end = _make_point(point=self.line.get_end())
+        super().__init__(self.start, self.end)
+
+        def updater(mobject: mn.Mobject) -> None:
+            mobject.put_start_and_end_on(self.start.get_center(), self.end.get_center())
+
+        self.line.add_updater(updater)
+
+    @override
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.line, self.start, self.end)
+
+    @override
+    def get_start(self) -> vector.Point2d:
+        return self.start.get_center()
+
+    @override
+    def get_end(self) -> vector.Point2d:
+        return self.end.get_center()
+
+    @override
+    def get_midpoint(self) -> vector.Point2d:
+        return self.line.get_midpoint()
 
     def get_length(self) -> float:
         return vector.norm(self.get_end() - self.get_start())
@@ -132,148 +137,214 @@ class SketchLine(SketchEdgeBase):
     def get_direction(self) -> vector.Direction2d:
         return vector.normalize(self.get_end() - self.get_start())
 
-    def move_point(self, point: vector.Point2d, line_end: LineEnd) -> Self:
-        self.get_vertex(line_end).move_to(point)
-        self.line.put_start_and_end_on(self.get_start(), self.get_end())
-        return self
-
     def move_start(self, point: vector.Point2d) -> Self:
-        return self.move_point(point, LineEnd.START)
+        self.start.move_to(point)
+        return self
 
     def move_end(self, point: vector.Point2d) -> Self:
-        return self.move_point(point, LineEnd.END)
+        self.end.move_to(point)
+        return self
 
+    @override
+    def click_target(self) -> mn.VMobject:
+        return self.line
+
+    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
+        return self.line.get_projection(point)
+
+    def align_constraint(self, type: AlignType) -> mn.Animation:
+        curr_angle = self.line.get_angle()
+        if type == AlignType.VERTICAL:
+            if curr_angle >= 0 and curr_angle < mn.PI:
+                angle = (mn.PI / 2) - curr_angle
+            else:
+                angle = -(mn.PI / 2) - curr_angle
+        else:
+            if curr_angle >= -mn.PI / 2 and curr_angle < mn.PI / 2:
+                angle = -curr_angle
+            else:
+                angle = -mn.PI - curr_angle
+        return mn.Rotate(self, angle=angle, about_point=self.get_midpoint())  # type: ignore
+
+    def equal_constraint(self, target: Self) -> Any:
+        midpoint = target.get_midpoint()
+        offset = target.get_direction() * (self.get_length() / 2)
+        return target.animate.move_start(midpoint - offset).move_end(midpoint + offset)
+
+    def get_tangent_translation(self, target: ArcBase) -> vector.Vector2d:
+        projection: vector.Point2d = self.line.get_projection(target.get_center())  # type: ignore
+        return vector.direction(projection, target.get_center()) * (
+            vector.norm(target.get_center() - projection) - target.get_radius()
+        )
+
+    def is_start_closer_to_target(self, target: ArcBase) -> bool:
+        """Returns whether the start is closer than the end to target.
+
+        Used by tangent's rotate mode.
+        """
+        return vector.norm(self.get_start() - target.get_center()) < vector.norm(
+            self.get_end() - target.get_center()
+        )
+
+    @override
     @mn.override_animation(mn.Create)
-    def _create_override(self, **kwargs) -> mn.Animation:
+    def _create_override(self) -> mn.Animation:
         end = self.get_end()
+        self.move_end(self.get_start() + vector.ZERO_LENGTH_VECTOR)
         return mn.Succession(
-            mn.Create(self.start_vertex, run_time=0),
-            mn.AnimationGroup(
-                mn.Create(self.line),
-                mn.prepare_animation(
-                    self.end_vertex.move_to(self.get_start()).animate.move_to(end)
-                ),
-            ),
+            animation.Add(self.line),
+            self.animate(introducer=True).move_end(end),  # type: ignore
         )
 
+    @override
     @mn.override_animation(mn.Uncreate)
-    def _uncreate_override(self, **kwargs) -> mn.Animation:
+    def _uncreate_override(self) -> mn.Animation:
+        start = self.get_start() + vector.ZERO_LENGTH_VECTOR
         return mn.Succession(
-            mn.AnimationGroup(
-                mn.Uncreate(self.line),
-                mn.prepare_animation(
-                    self.end_vertex.animate(remover=True).move_to(self.get_start())
-                ),
-            ),
-            mn.Uncreate(self.start_vertex, run_time=0),
+            self.animate(remover=True).move_end(start),  # type: ignore
+            animation.Remove(self.line),
         )
 
 
-class SketchArc(SketchArcBase, SketchEdgeBase):
-    """Defines a Sketch arc with vertices at each end and a vertex in the center."""
-
-    def __init__(
-        self,
-        arc: mn.Arc,
-        start_vertex: mn.Dot,
-        end_vertex: mn.Dot,
-        center_vertex: mn.Dot,
-    ) -> None:
-        super().__init__(
-            arc=arc,
-            center_vertex=center_vertex,
-            edge=arc,
-            start_vertex=start_vertex,
-            end_vertex=end_vertex,
-        )
+class ArcBase(mn.VGroup, Base, ABC):
+    def __init__(self, arc: mn.Arc):
         self.arc = arc
+        self.middle = _make_point(point=self.arc.arc_center)
+        super().__init__(self.middle)
+
+    @override
+    def get_center(self) -> vector.Point2d:
+        return self.middle.get_center()
+
+    def get_radius(self) -> float:
+        return self.arc.radius
 
     def set_radius(self, radius: float) -> Self:
-        distance = radius - self.get_radius()
-        self.start_vertex.shift(
-            vector.direction(self.get_center(), self.get_start()) * distance
-        )
-        self.end_vertex.shift(
-            vector.direction(self.get_center(), self.get_end()) * distance
-        )
-        super().set_radius(radius)
+        self.arc.scale(radius / self.get_radius())
+        self.arc.radius = radius
         return self
 
+    @mn.override_animate(set_radius)
+    def _set_radius_override(self, radius: float, anim_args={}) -> mn.Animation:
+        # set_radius doesn't exist on arc, so we have to implement more manually
+        animation = mn.Transform(
+            self.arc,
+            target_mobject=self.arc.copy().scale(radius / self.get_radius()),
+            **anim_args,
+        )
+        self.arc.radius = radius
+        return animation
+
+    @override
+    def click_target(self) -> mn.VMobject:
+        return self.arc
+
+    def coincident_target(self, point: vector.Point2d) -> vector.Point2d:
+        return self.get_center() + (
+            vector.direction(self.get_center(), point) * self.get_radius()
+        )
+
+    def concentric_target(self) -> vector.Point2d:
+        return self.middle.get_center()
+
+    # def tangent_constraint(self, target: ArcBase) -> mn.Animation:
+    #     translation = self._get_circle_translation(target)
+    #     return self.middle.animate().shift(translation)
+
+    def get_tangent_translation(self, target: ArcBase) -> vector.Vector2d:
+        vec = target.get_center() - self.get_center()
+        return vector.normalize(vec) * (
+            vector.norm(vec) - self.get_radius() - target.get_radius()
+        )
+
+
+class Circle(ArcBase):
+    """Defines a Sketch circle with a vertex at its center."""
+
+    def __init__(self, circle: mn.Circle):
+        self.circle = circle
+        super().__init__(self.circle)
+
+        def updater(mobject: mn.Mobject) -> None:
+            mobject.move_to(self.middle.get_center())
+
+        self.arc.add_updater(updater)
+
+    @override
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.circle, self.middle)
+
     @mn.override_animation(mn.Create)
-    def _create_override(self, **kwargs) -> mn.Animation:
-        start_point = self.get_start()
-        end_point = self.get_end()
+    def _create_override(self) -> mn.Animation:
         return mn.Succession(
-            mn.Create(self.center_vertex, run_time=0),
-            mn.AnimationGroup(
-                mn.GrowFromPoint(self.arc, self.get_center()),
-                mn.prepare_animation(
-                    self.start_vertex.move_to(self.get_center()).animate.move_to(
-                        start_point
-                    )
-                ),
-                mn.prepare_animation(
-                    self.end_vertex.move_to(self.get_center()).animate.move_to(
-                        end_point
-                    )
-                ),
-            ),
+            animation.Add(self.middle),
+            mn.GrowFromCenter(self.arc),
         )
 
     @mn.override_animation(mn.Uncreate)
-    def _uncreate_override(self, **kwargs) -> mn.Animation:
+    def _uncreate_override(self) -> mn.Animation:
         return mn.Succession(
-            mn.AnimationGroup(
-                animation.ShrinkToPoint(self.arc, self.get_center()),
-                mn.prepare_animation(
-                    self.start_vertex.animate(remover=True).move_to(self.get_center())
-                ),
-                mn.prepare_animation(
-                    self.end_vertex.animate(remover=True).move_to(self.get_center())
-                ),
-            ),
-            mn.Uncreate(self.center_vertex, run_time=0),
+            mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
+            animation.Remove(self.middle),
         )
 
 
-class SketchFactory:
-    """A factory for Sketch objects."""
+class Arc(ArcBase):
+    """Defines a Sketch arc with vertices at each end and a vertex in the center."""
 
-    def __init__(self) -> None:
-        self._color = color.FOREGROUND
+    def __init__(self, arc: mn.Arc) -> None:
+        self.arc = arc
+        self.start = _make_point().follow(self.arc.get_start)
+        self.end = _make_point().follow(self.arc.get_end)
+        super().__init__(self.arc)
 
-    def set_color(self, color: color.Color) -> Self:
-        self._color = color
-        return self
+        def updater(mobject: mn.Mobject) -> None:
+            mobject.move_arc_center_to(self.middle.get_center())
+            self.start.update()
+            self.end.update()
 
-    def make_point(self, point: vector.Point2d) -> SketchPoint:
-        return SketchPoint(self._make_dot(point))
+        self.arc.add_updater(updater)
 
-    def make_line(
-        self, start_point: vector.Point2d, end_point: vector.Point2d
-    ) -> SketchLine:
-        return SketchLine(
-            mn.Line(start_point, end_point, color=self._color),
-            self._make_dot(start_point),
-            self._make_dot(end_point),
+    @override
+    def get_group(self) -> mn.VGroup:
+        return mn.VGroup(self.arc, self.start, self.end, self.middle)
+
+    @mn.override_animation(mn.Create)
+    def _create_override(self) -> mn.Animation:
+        return mn.Succession(
+            animation.Add(self.start, self.end, self.middle),
+            mn.GrowFromCenter(self.arc),
         )
 
-    def make_circle(self, center: vector.Point2d, radius: float) -> SketchCircle:
-        return SketchCircle(
-            mn.Circle(radius, color=self._color).move_to(center), self._make_dot(center)
+    @mn.override_animation(mn.Uncreate)
+    def _uncreate_override(self) -> mn.Animation:
+        return mn.Succession(
+            mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
+            animation.Remove(self.start, self.end, self.middle),
         )
 
-    def _make_dot(self, center: vector.Point2d) -> mn.Dot:
-        return mn.Dot(center, color=self._color)
 
-    def make_arc(
-        self, center: vector.Point2d, radius: float, start_angle: float, angle: float
-    ) -> SketchArc:
-        # start_angle is typed incorrectly as int
-        arc = mn.Arc(radius, start_angle=start_angle, angle=angle, color=self._color, arc_center=center)  # type: ignore
-        return SketchArc(
-            arc,
-            self._make_dot(arc.get_start()),
-            self._make_dot(arc.get_end()),
-            self._make_dot(center),
+def _make_point(point: vector.Point2d = mn.ORIGIN) -> Point:
+    return Point(mn.Dot(point, color=SketchState.NORMAL))
+
+
+def make_line(start_point: vector.Point2d, end_point: vector.Point2d) -> Line:
+    return Line(mn.Line(start_point, end_point, color=SketchState.NORMAL))
+
+
+def make_circle(center: vector.Point2d, radius: float) -> Circle:
+    return Circle(mn.Circle(radius, color=SketchState.NORMAL, arc_center=center))
+
+
+def make_arc(
+    center: vector.Point2d, radius: float, start_angle: float, angle: float
+) -> Arc:
+    return Arc(
+        mn.Arc(
+            radius,
+            start_angle=start_angle,  # type: ignore
+            angle=angle,
+            color=SketchState.NORMAL,
+            arc_center=center,
         )
+    )

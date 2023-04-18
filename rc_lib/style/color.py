@@ -21,6 +21,7 @@ class Palette(Color, enum.Enum):
     BLUE = mn.color.Colors.blue_d.value
     YELLOW = mn.color.Colors.yellow_e.value
     WHITE = mn.color.Colors.white.value
+    BLACK = mn.color.Colors.black.value
 
 
 FOREGROUND: Color = Palette.WHITE

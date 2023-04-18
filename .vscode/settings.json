@@ -24,6 +24,8 @@
         "Egan",
         "eganj",
         "finfo",
+        "fuzzer",
+        "fuzzywuzzy",
         "imgpath",
         "interp",
         "ipynb",
@@ -51,9 +53,11 @@
         "coincentric"
     ],
     "python.analysis.extraPaths": [
-        "rc_lib"
+        "rc_lib/**",
+        "website/**"
     ],
     "python.formatting.provider": "black",
     "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
     "python.defaultInterpreterPath": "/usr/local/bin/python"
 }
