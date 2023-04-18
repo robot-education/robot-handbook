@@ -27,7 +27,7 @@ import os
 # file_path = pathlib.Path(__file__)
 # os.chdir(file_path.parents[1].as_posix())
 
-sys.path.append(os.path.abspath("./_ext"))
+sys.path.append(os.path.abspath("/video_extension"))
 
 
 # -- Project information -----------------------------------------------------
@@ -49,7 +49,7 @@ extensions = [
     "sphinx_copybutton",
     "myst_parser",
     # custom animation extension
-    "animation",
+    "video_extension.animation",
 ]
 
 myst_enable_extensions = [
