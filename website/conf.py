@@ -10,22 +10,8 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-
-# import pathlib
-
-# gets path to video_extension. Does not rely on working directory, as this fails in gh actions?
-# path = pathlib.Path(__file__)
-# sys.path.append((path.parents[1] / "video_extension").as_posix())
-
-# sys.path.append(os.path.abspath("website/video_extension"))
-
 import sys
 import os
-
-# import pathlib
-
-# file_path = pathlib.Path(__file__)
-# os.chdir(file_path.parents[1].as_posix())
 
 sys.path.append(os.path.abspath("/video_extension"))
 
@@ -49,7 +35,7 @@ extensions = [
     "sphinx_copybutton",
     "myst_parser",
     # custom animation extension
-    "video_extension.animation",
+    "extensions.animation",
 ]
 
 myst_enable_extensions = [
