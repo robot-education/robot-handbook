@@ -13,7 +13,7 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath("/video_extension"))
+sys.path.append(os.path.abspath("/extensions"))
 
 
 # -- Project information -----------------------------------------------------

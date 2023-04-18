@@ -9,7 +9,7 @@ import enum
 
 import manim as mn
 
-from rc_lib.math_utils import vector, tangent
+from rc_lib.math_utils import vector
 from rc_lib.style import color, animation
 
 
