@@ -5,7 +5,8 @@ sudo apt-get update
 # manim system libraries
 sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev ffmpeg # texlive texlive-latex-extra
 
-pip install --upgrade pip
+# upgrading pip breaks gh actions?
+# pip install --upgrade pip
 
 # install pip requirements
 pip install -r requirements.txt
