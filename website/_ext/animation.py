@@ -16,7 +16,7 @@ from docutils import nodes
 # from myst_parser.parsers import directives as myst_directives
 from myst_parser import mocking as myst_mocking
 
-import local_nodes
+from website._ext import video
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class Animation(sphinx_docutils.SphinxDirective):
             align="center",  # may also be left or right
         )
 
-        video_node = local_nodes.video(
+        video_node = video.video(
             # add entire directive for error handling
             rawsource=self.block_text,
             src=uri,
@@ -67,7 +67,7 @@ class Animation(sphinx_docutils.SphinxDirective):
         )
 
         # optional - use source nodes to support multiple sources
-        # source_node = local_nodes.source(
+        # source_node = video.source(
         #     rawsource=self.arguments[0], src=uri, type="video/mp4"
         # )
         # video_node += source_node
@@ -132,7 +132,7 @@ class Animation(sphinx_docutils.SphinxDirective):
 
 def setup(app: application.Sphinx) -> Dict[str, bool]:
     """Add video node and parameters to the Sphinx builder."""
-    local_nodes.register_video_nodes(app)
+    video.register_video_nodes(app)
 
     app.add_directive("animation", Animation)
 

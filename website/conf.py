@@ -22,6 +22,11 @@
 import sys
 import os
 
+# import pathlib
+
+# file_path = pathlib.Path(__file__)
+# os.chdir(file_path.parents[1].as_posix())
+
 sys.path.append(os.path.abspath("./_ext"))
 
 
