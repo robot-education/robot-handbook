@@ -1,6 +1,4 @@
 """Animations which model basic plates."""
-from typing import Any
-
 import manim as mn
 from rc_lib.style import color, animation
 from rc_lib.math_utils import vector

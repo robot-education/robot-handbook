@@ -13,11 +13,6 @@ class Scene(mn.Scene, ABC):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # rebind construct so that the manim compiler is happy
-        # self._child_construct = self.construct
-        # self.construct = self._construct_sketch
-
         self._static_mobjects: list[sketch.Base] = []
 
     def introduce(self, *mobjects: sketch.Base):

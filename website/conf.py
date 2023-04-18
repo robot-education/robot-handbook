@@ -9,10 +9,13 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-import os
 import sys
 
-sys.path.append(os.path.abspath("video_extension"))
+import pathlib
+
+# gets path to video_extension. Does not rely on working directory, as this fails in gh actions
+path = pathlib.Path(__file__)
+sys.path.append((path.parents[1] / "video_extension").as_posix())
 
 # -- Project information -----------------------------------------------------
 
