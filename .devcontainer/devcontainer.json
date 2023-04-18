@@ -24,7 +24,21 @@
 	},
 	"forwardPorts": [
 		8000
+	],
+	"runArgs": [
+		"--net",
+		"host",
+		"-e",
+		"DISPLAY=${env:DISPLAY}",
+		"-v",
+		"/tmp/.X11-unix:/tmp/.X11-unix"
 	]
+	// "runArgs": [
+	// 	"--net=host"
+	// ],
+	// "remoteEnv": {
+	// 	"DISPLAY": ":0"
+	// }
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
