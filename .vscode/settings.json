@@ -8,6 +8,7 @@
     "editor.formatOnSave": true,
     "files.autoSave": "afterDelay",
     "files.autoSaveDelay": 1000,
+    "files.eol": "\n",
     "cSpell.allowCompoundWords": true,
     "cSpell.ignorePaths": [
         "build",
@@ -18,8 +19,15 @@
     ],
     "cSpell.words": [
         "atleast",
+        "autopictureinpicture",
+        "disablepictureinpicture",
         "Egan",
         "eganj",
+        "finfo",
+        "fuzzer",
+        "fuzzywuzzy",
+        "imgpath",
+        "interp",
         "ipynb",
         "Kempen",
         "kwargs",
@@ -28,17 +36,28 @@
         "mobjects",
         "Mobjects",
         "ndarray",
+        "nocontrols",
+        "onshape",
         "opengl",
+        "refid",
         "reservee",
         "submobjects",
         "unannotate",
         "Uncreate",
+        "Viridis",
         "vmobject",
         "vmobjects",
         "webm"
     ],
-    "python.analysis.extraPaths": [
-        "rc_lib"
+    "cSpell.flagWords": [
+        "coincentric"
     ],
-    "files.eol": "\n"
+    "python.analysis.extraPaths": [
+        "rc_lib/**",
+        "website/**"
+    ],
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.defaultInterpreterPath": "/usr/local/bin/python"
 }

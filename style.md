@@ -8,7 +8,7 @@ Avoid running animations with non-standard units of time. Prefer using one of th
 When setting the pace of an animation, consider that animations may play in a format which is not easily
 pausable, and that many users prefer a slower format. 
 
-Animations should always finish with a delay equal to `END_DELAY`.
+Animations should always finish with a delay equal to `style.animation.END_DELAY`.
 
 ## Colors
 Use the `Color` type and colors defined in `style`. Do not use colors from manim directly.
@@ -31,8 +31,7 @@ Animations should be displayed in the website by copying them from `animations` 
 Constraining a boundary line
 :::
 ```
-Tutorials with only a handful of animations my place all content in the same tutorial folder. Large tutorials may include
-a `media` folder.
+Tutorials must place all rendered video content in a folder named `video`.
 
 # Code
 ## Writing Animations
@@ -126,3 +125,38 @@ The following admonitions should not be used:
 - `attention`: `attention` is too similar to `warning` and `important`.
 - `caution`: `caution` is too similar to `warning`, `danger`, and `important`.
 - `error`: `error`'s use case is too niche to justify using it.
+
+
+
+## Manim Bugs
+### Resolved Bugs
+`angle_between_vectors`'s return type is incorrectly typed as `np.ndarray`, not `float`.
+
+`mn.Arc`'s `start_angle` is typed as `int`, not `float` (since the type of `0` defaults to `int`)
+"animation" is spelled "animnation" in add_animation_override docs
+
+### Trivial Fixes
+`mobject.add_updater`'s call_updater argument throws when the updater does not take dt as an argument (as updater call logic for handling dt is missing)
+Update: This will be resolved in the next release of manim.
+
+### Bigger Issues
+`GrowFromCenter` should probably expose introducer (like Create and Uncreate do)
+
+AnimationBuilders from .animate are not valid animations.
+
+`get_x`, `get_y`, and `get_z` are the only functions to use/return `np.float64`
+
+`mn.Color` seems to be incompatible with raw `str`; this problem is worsened by `mn.Color` not being exposed.
+`GrowFromCenter` and `GrowFromPoint`'s colors are typed as `str`, not `Color` and are missing `| None`.
+Update: These issues are being addressed by the upcoming color refactor.
+
+`Sequence[float]`, `np.ndarray`, and sometimes `Sequence[float] | np.ndarray` are used somewhat interchangably.
+Since `np.ndarray` is not compatible with `Sequence[float]`, there are annoying behaviors like 
+the types of `line.put_start_and_end_on` not being compatible with, e.g. `line.get_start`.
+
+`remover` animations break updaters, even when used after normal animations in a `Succession`. However, this behavior goes
+away if `introducer` is set to `True` on the remover animation.
+
+### Features
+I would like `Add` and `Delete` type animations which add and delete objects from a scene and have a run-time of `0`. 
+This would be useful for, e.g., creating objects in class methods which do not have access to `Scene` directly.

@@ -11,12 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.1
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.11.2"
 
       - name: Install and Build
         run: |
-          sudo bash setup.sh
+          bash setup.sh
+          python3 -m build --production
           make html
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
