@@ -24,7 +24,7 @@ sys.stdout = sys.__stdout__
 
 source_path = pathlib.Path("website")
 
-quality_folder_lookup = {"l": "480p15", "h": "1080p60"}
+quality_folder_lookup = {"l": "480p15", "m": "720p30", "h": "1080p60"}
 
 exclude_folders = ["__pycache__", "media", "_style"]
 
