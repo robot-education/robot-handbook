@@ -5,11 +5,11 @@ myst:
         vertical_title: "![vertical](/design/images/vertical.svg){.thumbnail} Vertical (v)"
         horizontal_title: "![horizontal](/design/images/horizontal.svg){.thumbnail} Horizontal (h)"
         parallel_title: "![parallel](/design/images/parallel.svg){.thumbnail} Parallel (b)"
-        perpendicular_title: "![perpendicular](/design/images/perpendicular.svg){.thumbnail} Perpendicular"
+        perpendicular_title: "![perpendicular](/design/images/perpendicular.svg){.thumbnail} Perpendicular (Shift + l)"
         equal_title: "![equal](/design/images/equal.svg){.thumbnail} Equal (e)"
-        midpoint_title: "![midpoint](/design/images/midpoint.svg){.thumbnail} Midpoint"
+        midpoint_title: "![midpoint](/design/images/midpoint.svg){.thumbnail} Midpoint (Shift + m)"
         tangent_title: "![tangent](/design/images/tangent.svg){.thumbnail} Tangent (t)"
-        concentric_title: "![concentric](/design/images/concentric.svg){.thumbnail} Concentric"
+        concentric_title: "![concentric](/design/images/concentric.svg){.thumbnail} Concentric (Shift + o)"
 ---
 
 # Sketch Constraints
