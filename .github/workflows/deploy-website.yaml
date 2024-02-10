@@ -1,4 +1,4 @@
-name: pages-deploy
+name: deploy-website
 on:
   push:
     branches:
@@ -27,7 +27,7 @@ jobs:
       - name: Archive built website
         uses: actions/upload-artifact@v4
         with:
-          name: website
+          name: github-pages
           path: ./build/html
 
   deploy:
