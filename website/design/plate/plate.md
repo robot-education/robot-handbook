@@ -7,6 +7,7 @@ Flat plates are common structural components on many robots.
 The basic process for modeling a plate is demonstrated in the following animation.
 
 :::{animation} IntakePlateScene.mp4
+:autoplay:
 Sketching a basic plate
 :::
 
