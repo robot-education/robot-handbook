@@ -24,6 +24,9 @@ jobs:
           python3 -m build --production
           make html
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Archive built website
         uses: actions/upload-artifact@v4
         with:
