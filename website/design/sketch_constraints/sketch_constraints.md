@@ -13,7 +13,7 @@ myst:
 ---
 
 # Sketch Constraints
-This tutorial provides a visual guide to the behavior of various constraints. Although the constraint icons and shortcuts are for Onshape, the selections and behaviors are generally applicable to all CAD software.
+This tutorial provides a visual guide to the behavior of various constraints. Although the constraint icons and keyboard shortcuts are for Onshape, the selection logic and their behaviors are generally applicable to all CAD software (with a handful of exceptions).
 
 ## {{coincident_title}}
 The coincident constraint is used to make points touch other entities. The available modes are:
@@ -41,7 +41,7 @@ Applying coincident {{coincident}} to lines
 :::
 
 ## {{vertical_title}}
-The vertical constraint is used to make lines or pairs of points vertical relative to the sketch plane. The available modes are:
+The vertical constraint is used to make either lines or pairs of points vertical relative to the sketch plane. The available modes are:
 * Line - the line becomes vertical.
 
 :::{animation} VerticalLineScene.mp4
@@ -57,7 +57,7 @@ Applying vertical {{vertical}} to two points
 :::
 
 ## {{horizontal_title}}
-The vertical constraint is used to make lines or pairs of points horizontal relative to the sketch plane. The available modes are:
+The horizontal constraint is used to make either lines or pairs of points horizontal relative to the sketch plane. The available modes are:
 * Line - the line becomes horizontal.
 
 :::{animation} HorizontalLineScene.mp4
@@ -83,7 +83,7 @@ Applying parallel {{parallel}} to two lines
 
 
 :::{note} Parallel {{parallel}} makes lines share the same direction, but it does not force them to be inline with each other. 
-    To make two lines parallel and inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
+    To make two lines inline, use [coincident {{coincident}} with two lines](#coincident-two-lines).
 :::
 
 ## {{perpendicular_title}}
@@ -112,7 +112,7 @@ Applying equal {{equal}} to lines
 Applying equal {{equal}} to circles and arcs
 :::
 
-:::{tip} Equal {{equal}} may be applied to multiple entities at once by preselecting multiple entities before clicking {{equal}}.
+:::{tip} Equal {{equal}} can be applied to multiple entities at once by preselecting them before clicking {{equal}}.
 :::
 
 ## {{midpoint_title}}
@@ -164,7 +164,7 @@ Applying concentric {{concentric}} to circles and arcs
 
 :::{animation} ConcentricPointScene.mp4
 :autoplay:
-Applying concentric {{concentric}} to points
+Applying concentric {{concentric}} to a points
 :::
 
 <!-- * Two points - the points become coincident. -->
