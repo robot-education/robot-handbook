@@ -3,6 +3,7 @@ A build script which can be used to compile animations and build the website.
 
 Fuzzy matching is used to enable quickly specifying targets in the website folder.
 """
+
 import inspect
 import os
 import subprocess
@@ -180,7 +181,7 @@ def split_tokens(input: str) -> str:
 def main():
     args = get_arg_parser().parse_args()
 
-    quality = "h" if args.production else "l"
+    quality = "m" if args.production else "l"
 
     target_paths = []
     if args.path is not None:
