@@ -56,8 +56,12 @@
         "rc_lib/**",
         "website/**"
     ],
-    "python.formatting.provider": "black",
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
-    "python.defaultInterpreterPath": "/usr/local/bin/python"
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "[python]": {
+        "diffEditor.ignoreTrimWhitespace": false,
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "editor.formatOnSaveMode": "file"
 }

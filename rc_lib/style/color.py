@@ -16,12 +16,12 @@ class Palette(Color, enum.Enum):
     arbitrary.
     """
 
-    RED = mn.color.Colors.red_c.value
-    GREEN = mn.color.Colors.green_d.value
-    BLUE = mn.color.Colors.blue_d.value
-    YELLOW = mn.color.Colors.yellow_e.value
-    WHITE = mn.color.Colors.white.value
-    BLACK = mn.color.Colors.black.value
+    RED = mn.RED
+    GREEN = mn.GREEN
+    BLUE = mn.BLUE
+    YELLOW = mn.YELLOW
+    WHITE = mn.WHITE
+    BLACK = mn.BLACK
 
 
 FOREGROUND: Color = Palette.WHITE

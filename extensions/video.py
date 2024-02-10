@@ -1,8 +1,7 @@
 """
 Local nodes which may be used to create videos.
+
 Useful links:
-
-
 rst directive writing documentation:
 https://docutils.sourceforge.io/docs/howto/rst-directives.html
 
@@ -144,7 +143,6 @@ class VideoTranslator(html_writers.HTMLTranslator, docutils.SphinxTranslator):
         self.body.append("</video>\n")
 
 
-# No args might not be valid here, I haven't checked
 def visit_node_unsupported(
     translator: docutils.SphinxTranslator, node: nodes.Node
 ) -> None:
@@ -165,5 +163,5 @@ def register_video_nodes(app: application.Sphinx) -> None:
     app.add_builder(VideoBuilder, override=True)
     app.set_translator("html", VideoTranslator)
 
-    app.add_node(video, **unsupported_dict)
-    app.add_node(source, **unsupported_dict)
+    app.add_node(video, **unsupported_dict)  # type: ignore
+    app.add_node(source, **unsupported_dict)  # type: ignore
