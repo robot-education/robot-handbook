@@ -30,7 +30,7 @@ def size(argument: str):
 
 class Animation(sphinx_docutils.SphinxDirective):
     """Animation directive.
-    Wrapper for the html <video> tag embeding all the supported options
+    Wrapper for the html <video> tag embeding all the supported options.
     """
 
     # enable content in the directive

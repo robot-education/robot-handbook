@@ -1,11 +1,13 @@
 """
     Mobject groups with available layout methods.
 """
-from typing import Callable, List, Any, Self, Tuple, cast
+
+from typing import Callable, List, Any, Self, cast
 
 import manim as mn
 from rc_lib.math_utils import vector, mobject_geometry
-from rc_lib.common_mobjects import containers
+from rc_lib.mobjects import containers
+from rc_lib.utils.type_utils import not_none
 
 
 def edge_from_center(
@@ -217,8 +219,9 @@ class LinearLayout(containers.OrderedVGroup):
 
     def animate_arrange(
         self,
-        anim_function: Callable[[mn.VMobject, vector.Point2d], mn.Animation]
-        | None = None,
+        anim_function: (
+            Callable[[mn.VMobject, vector.Point2d], mn.Animation] | None
+        ) = None,
         positions: List[vector.Point2d] | None = None,
     ) -> List[mn.Animation]:
         """
@@ -236,7 +239,7 @@ class LinearLayout(containers.OrderedVGroup):
         def _move_mob_to_pos(
             mobject: mn.VMobject, pos: vector.Vector2d
         ) -> mn.Animation:
-            return mn.Transform(mobject, mobject.move_to(pos))
+            return not_none(mn.Transform(mobject, mobject.move_to(pos)))
 
         if positions is None:
             positions = self.predict_arrangement()

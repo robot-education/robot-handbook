@@ -1,5 +1,6 @@
 import manim as mn
 from rc_lib.style import color, text
+from rc_lib.utils.type_utils import not_none
 
 
 class TitleSequence:
@@ -28,9 +29,9 @@ class TitleSequence:
         self._number += 1
         if self._number == 2:
             self._first = text
-            return mn.Write(self._first, run_time=0.75)
+            return not_none(mn.Write(self._first, run_time=0.75))
         else:
-            return mn.Transform(self._first, text, run_time=0.75)
+            return not_none(mn.Transform(self._first, text, run_time=0.75))
 
     def _make_text(self, title: str, color: color.Color) -> mn.Text:
         prefix = str(self._number) + ". " if self._add_numbers else ""

@@ -1,5 +1,6 @@
 """Defines entities which look like Onshape sketch entities.
 """
+
 from __future__ import annotations
 
 from typing import Callable, Self, Any
@@ -11,6 +12,7 @@ import manim as mn
 
 from rc_lib.math_utils import vector
 from rc_lib.style import color, animation
+from rc_lib.utils.type_utils import not_none
 
 
 class SketchState(color.Color, enum.Enum):
@@ -86,9 +88,7 @@ class Point(mn.Dot, Base):
         elif points is None:
             raise ValueError("Expected a line or two points.")
 
-        return self.animate.move_to(
-            (points[0].get_center() + points[1].get_center()) / 2
-        )  # type: ignore
+        return self.animate.move_to((points[0].get_center() + points[1].get_center()) / 2)  # type: ignore
 
     def align_constraint(self, target: Point, type: AlignType) -> mn.Animation:
         if type == AlignType.VERTICAL:
@@ -191,18 +191,22 @@ class Line(mn.VGroup, Base):
     def _create_override(self) -> mn.Animation:
         end = self.get_end()
         self.move_end(self.get_start() + vector.ZERO_LENGTH_VECTOR)
-        return mn.Succession(
-            animation.Add(self.line),
-            self.animate(introducer=True).move_end(end),  # type: ignore
+        return not_none(
+            mn.Succession(
+                animation.Add(self.line),
+                self.animate(introducer=True).move_end(end),
+            )
         )
 
     @override
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
         start = self.get_start() + vector.ZERO_LENGTH_VECTOR
-        return mn.Succession(
-            self.animate(remover=True).move_end(start),  # type: ignore
-            animation.Remove(self.line),
+        return not_none(
+            mn.Succession(
+                self.animate(remover=True).move_end(start),
+                animation.Remove(self.line),
+            )
         )
 
 
@@ -233,7 +237,7 @@ class ArcBase(mn.VGroup, Base, ABC):
             **anim_args,
         )
         self.arc.radius = radius
-        return animation
+        return not_none(animation)
 
     @override
     def click_target(self) -> mn.VMobject:
@@ -276,16 +280,20 @@ class Circle(ArcBase):
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
-        return mn.Succession(
-            animation.Add(self.middle),
-            mn.GrowFromCenter(self.arc),
+        return not_none(
+            mn.Succession(
+                animation.Add(self.middle),
+                mn.GrowFromCenter(self.arc),
+            )
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
-        return mn.Succession(
-            mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
-            animation.Remove(self.middle),
+        return not_none(
+            mn.Succession(
+                mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
+                animation.Remove(self.middle),
+            )
         )
 
 
@@ -311,16 +319,20 @@ class Arc(ArcBase):
 
     @mn.override_animation(mn.Create)
     def _create_override(self) -> mn.Animation:
-        return mn.Succession(
-            animation.Add(self.start, self.end, self.middle),
-            mn.GrowFromCenter(self.arc),
+        return not_none(
+            mn.Succession(
+                animation.Add(self.start, self.end, self.middle),
+                mn.GrowFromCenter(self.arc),
+            )
         )
 
     @mn.override_animation(mn.Uncreate)
     def _uncreate_override(self) -> mn.Animation:
-        return mn.Succession(
-            mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
-            animation.Remove(self.start, self.end, self.middle),
+        return not_none(
+            mn.Succession(
+                mn.GrowFromCenter(self.arc, reverse_rate_function=True, remover=True),
+                animation.Remove(self.start, self.end, self.middle),
+            )
         )
 
 

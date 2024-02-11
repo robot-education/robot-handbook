@@ -194,8 +194,5 @@ poetry.toml
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode
 
-
-# Don't commit the rendered media files. Still want to keep any source
-# media files, though- only get rid of the "media" folder, which is where
-# manim renders to.
+# Don't commit the rendered media files
 media

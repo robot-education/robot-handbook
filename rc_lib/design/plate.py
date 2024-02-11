@@ -4,6 +4,7 @@ from typing import Callable, Self
 from rc_lib.style import color
 from rc_lib.math_utils import tangent, vector
 from rc_lib.design import sketch
+from rc_lib.utils.type_utils import not_none
 
 
 class PlateCircle(sketch.Circle):
@@ -101,16 +102,22 @@ class PlateGroup(mn.VGroup):
         ]
 
     def draw_inner_circles(self) -> mn.Animation:
-        return mn.Succession(
-            *[mn.GrowFromCenter(x.inside) for x in self._entities], lag_ratio=0.75
+        return not_none(
+            mn.Succession(
+                *[mn.GrowFromCenter(x.inside) for x in self._entities], lag_ratio=0.75
+            )
         )
 
     def draw_outer_circles(self) -> mn.Animation:
-        return mn.Succession(
-            *[mn.GrowFromCenter(x.outside) for x in self._entities], lag_ratio=0.75
+        return not_none(
+            mn.Succession(
+                *[mn.GrowFromCenter(x.outside) for x in self._entities], lag_ratio=0.75
+            )
         )
 
     def draw_boundary(self) -> mn.Animation:
-        return mn.Succession(
-            *[mn.Create(line) for line in self._boundary_lines], lag_ratio=1
+        return not_none(
+            mn.Succession(
+                *[mn.Create(line) for line in self._boundary_lines], lag_ratio=1
+            )
         )
