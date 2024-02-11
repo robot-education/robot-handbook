@@ -1,4 +1,3 @@
-from typing import Any
 import manim as mn
 from rc_lib.design import sketch
 from rc_lib.style import color
@@ -11,7 +10,7 @@ Z_INDEX = 500
 class Click(mn.Transform):
     """Defines an animation which represents an object getting clicked."""
 
-    def __init__(self, mobject: sketch.Base):
+    def __init__(self, mobject: sketch.Base) -> None:
         base = mobject.click_target()
         target = base.copy().set_stroke(width=4 * 3.5).set_color(color.Palette.YELLOW)  # type: ignore
 
@@ -25,5 +24,9 @@ class Click(mn.Transform):
         )
 
 
-def make(animation: mn.Animation | Any, *mobjects: sketch.Base) -> mn.Animation:
+def make(animation: mn.Animation, *mobjects: sketch.Base) -> mn.Succession:
+    """Defines a step in an animation.
+
+    Each mobject is clicked in sequence, followed by the final animation playing.
+    """
     return mn.Succession(*[Click(mobject) for mobject in mobjects], animation)
