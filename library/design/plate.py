@@ -1,10 +1,10 @@
 import manim as mn
 from typing import Callable, Self
 
-from rc_lib.style import color
-from rc_lib.math_utils import tangent, vector
-from rc_lib.design import sketch
-from rc_lib.utils.type_utils import not_none
+from library.style import color
+from library.math import tangent, vector
+from library.design import sketch
+from library.utils.type_utils import not_none
 
 
 class PlateCircle(sketch.Circle):

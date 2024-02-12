@@ -1,6 +1,6 @@
 import manim as mn
-from rc_lib.style import color, text
-from rc_lib.utils.type_utils import not_none
+from library.style import color, text
+from library.utils.type_utils import not_none
 
 
 class TitleSequence:

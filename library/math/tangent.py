@@ -1,5 +1,5 @@
 import math
-from rc_lib.math_utils import vector
+from library.math import vector
 
 
 def circle_to_circle_tangent(

@@ -4,9 +4,9 @@ import math
 
 import manim as mn
 
-from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_scene, constraint, sketch_animation
-from rc_lib.utils.type_utils import not_none
+from library.math import vector
+from library.design import sketch, sketch_scene, constraint, sketch_animation
+from library.utils.type_utils import not_none
 
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:

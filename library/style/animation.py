@@ -2,8 +2,8 @@
 Style elements intrinsically linked with animation, such as timing.
 """
 import manim as mn
-from rc_lib.style import color
-from rc_lib.math_utils import vector
+from library.style import color
+from library.math import vector
 
 END_DELAY = 2.5
 
