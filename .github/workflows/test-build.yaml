@@ -6,16 +6,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout branch
+        uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install and Build
+      - name: Install and build
         run: |
           bash setup.sh
-          python3 -m build
+          python3.11 -m build
           make html
