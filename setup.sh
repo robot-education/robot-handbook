@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # install manim dependencies
+sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
 sudo apt-get install -y build-essential python3.12-dev libcairo2-dev libpango1.0-dev ffmpeg 
+# Optional manim dependencies
 # texlive texlive-latex-extra
 
 # Pillow dependencies
