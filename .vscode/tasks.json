@@ -3,9 +3,9 @@
     "tasks": [
         {
             "label": "build",
-            "detail": "Build the website.",
+            "detail": "Build the website",
             "type": "shell",
-            "command": "make html",
+            "command": "make clean && make html",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -23,7 +23,7 @@
         },
         {
             "label": "open",
-            "detail": "Open the website.",
+            "detail": "Open the website",
             "type": "shell",
             "command": "python -m http.server",
             "isBackground": true,
@@ -41,7 +41,7 @@
         },
         {
             "label": "clean",
-            "detail": "Delete generated files.",
+            "detail": "Delete generated files",
             "type": "shell",
             "command": "make clean",
             "isBackground": false,

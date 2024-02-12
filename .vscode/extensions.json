@@ -4,6 +4,7 @@
         "redhat.vscode-yaml",
         "yzhang.markdown-all-in-one",
         "ms-python.black-formatter",
-        "ms-python.python"
+        "ms-python.python",
+        "esbenp.prettier-vscode"
     ]
 }
