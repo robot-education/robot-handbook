@@ -2,7 +2,6 @@
     A collection of semantic aliases for type hinting used throughout the library.
 """
 from typing import cast, TypeAlias, Any
-from collections.abc import Sequence
 
 import manim as mn
 import numpy as np

@@ -2,8 +2,8 @@ from abc import ABC
 from typing import Any
 import manim as mn
 
-from rc_lib.design import sketch
-from rc_lib.style import animation
+from library.design import sketch
+from library.style import animation
 
 
 class Scene(mn.Scene, ABC):

@@ -1,10 +1,12 @@
 """Animations showcasing various Onshape sketch constraints."""
+
 import math
 
 import manim as mn
 
-from rc_lib.math_utils import vector
-from rc_lib.design import sketch, sketch_scene, constraint, sketch_animation
+from library.math import vector
+from library.design import sketch, sketch_scene, constraint, sketch_animation
+from library.utils.type_utils import not_none
 
 
 def coincident_common_mobjects() -> tuple[sketch.Circle, sketch.Line, sketch.Line]:
@@ -47,7 +49,9 @@ class CoincidentLineScene(sketch_scene.Scene):
 
         self.introduce(fixed_line, start_line)
 
-        animation = mn.Rotate(start_line, -angle, about_point=fixed_line.get_end())
+        animation = not_none(
+            mn.Rotate(start_line, -angle, about_point=fixed_line.get_end())
+        )
         self.run_group(sketch_animation.make(animation, start_line, fixed_line))
 
 
@@ -102,10 +106,12 @@ class ParallelScene(sketch_scene.Scene):
         start_point = end_point - direction * 10.5
         angle = math.radians(16.26)
         start_line = sketch.make_line(start_point, end_point).rotate(
-            -angle, about_point=line.get_midpoint()  # type: ignore
+            -angle, about_point=line.get_midpoint()
         )
 
-        animation = mn.Rotate(start_line, angle, about_point=line.get_midpoint())  # type: ignore
+        animation = not_none(
+            mn.Rotate(start_line, angle, about_point=line.get_midpoint())
+        )
         self.introduce(line, start_line)
         self.run_group(sketch_animation.make(animation, start_line, line))
 

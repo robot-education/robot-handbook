@@ -1,7 +1,7 @@
-from typing import Any
+from typing import cast
 import manim as mn
-from rc_lib.design import sketch
-from rc_lib.style import color
+from library.design import sketch
+from library.style import color
 
 
 # doesn't work as a class member...
@@ -25,5 +25,12 @@ class Click(mn.Transform):
         )
 
 
-def make(animation: mn.Animation | Any, *mobjects: sketch.Base) -> mn.Animation:
-    return mn.Succession(*[Click(mobject) for mobject in mobjects], animation)
+def make(animation: mn.Animation, *mobjects: sketch.Base) -> mn.Succession:
+    """Defines a step in an animation.
+
+    Each mobject is clicked in sequence, followed by the final animation playing.
+    """
+    return cast(
+        mn.Succession,
+        mn.Succession(*[Click(mobject) for mobject in mobjects], animation),
+    )

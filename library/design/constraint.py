@@ -2,14 +2,16 @@ from typing import Any
 
 import manim as mn
 
-from rc_lib.design import sketch, sketch_animation
-from rc_lib.math_utils import vector, tangent
+from library.design import sketch, sketch_animation
+from library.math import vector, tangent
+from library.utils.type_utils import not_none
 
 
 class ConstraintBase(mn.Succession):
     def __init__(self, animation: mn.Animation | Any, *mobjects: sketch.Base) -> None:
         super().__init__(
-            *[sketch_animation.Click(mobject) for mobject in mobjects], animation
+            *[not_none(sketch_animation.Click(mobject)) for mobject in mobjects],
+            animation
         )
 
 
