@@ -3,8 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Callable, Self, Any
-from typing_extensions import override
+from typing import Callable, Self, Any, override
 from abc import ABC, abstractmethod
 import enum
 
