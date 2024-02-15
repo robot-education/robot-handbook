@@ -1,7 +1,6 @@
 """Animations showcasing various Onshape sketch constraints."""
 
 import math
-
 import manim as mn
 
 from library.math import vector

@@ -24,7 +24,6 @@ dependencies = [
 [project.scripts]
 build = "library.build:main"
 
-
 [build-system]
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"

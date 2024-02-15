@@ -73,13 +73,13 @@ html_static_path = ["_style"]
 html_css_files = ["custom.css"]
 
 myst_substitutions = {
-    "coincident": "![coincident](/design/images/coincident.svg){.inline}",
-    "vertical": "![vertical](/design/images/vertical.svg){.inline}",
-    "horizontal": "![horizontal](/design/images/horizontal.svg){.inline}",
-    "parallel": "![parallel](/design/images/parallel.svg){.inline}",
-    "perpendicular": "![perpendicular](/design/images/perpendicular.svg){.inline}",
-    "equal": "![equal](/design/images/equal.svg){.inline}",
-    "midpoint": "![midpoint](/design/images/midpoint.svg){.inline}",
-    "tangent": "![tangent](/design/images/tangent.svg){.inline}",
-    "concentric": "![concentric](/design/images/concentric.svg){.inline}",
+    "coincident": "![coincident](/images/coincident.svg){.inline}",
+    "vertical": "![vertical](/images/vertical.svg){.inline}",
+    "horizontal": "![horizontal](/images/horizontal.svg){.inline}",
+    "parallel": "![parallel](/images/parallel.svg){.inline}",
+    "perpendicular": "![perpendicular](/images/perpendicular.svg){.inline}",
+    "equal": "![equal](/images/equal.svg){.inline}",
+    "midpoint": "![midpoint](/images/midpoint.svg){.inline}",
+    "tangent": "![tangent](/images/tangent.svg){.inline}",
+    "concentric": "![concentric](/images/concentric.svg){.inline}",
 }
