@@ -19,8 +19,10 @@ Sketch:
 - h - Horizontal
 - e - Equal
 - t - Tangent
+<!-- - Hold Shift - disable autoconstraining -->
 
 Assembly:
 
 - j - Show/hide mate connectors
 - k - Show/hide mate features
+<!-- - Hold Shift - lock to face -->

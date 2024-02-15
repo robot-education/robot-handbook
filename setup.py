@@ -2,4 +2,4 @@
 
 import setuptools
 
-setuptools.setup(name="library", version="0.1", packages=["library", "extensions"])
+setuptools.setup(packages=["library", "extensions", "website"])

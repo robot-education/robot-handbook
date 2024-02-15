@@ -1,0 +1,30 @@
+[project]
+name = "robot-handbook"
+version = "v0.1.0"
+authors = [{ name = "Alex Kempen", email = "alex.bookreader@gmail.com" }]
+
+requires-python = ">= 3.12"
+dependencies = [
+    # website
+    "Sphinx",
+    "sphinx-copybutton",
+    "sphinx-rtd-theme",
+    "sphinx-autobuild",
+    "myst-parser",
+
+    # animation libraries
+    "manim>=0.18",
+    "setuptools",
+    "numpy",
+
+    # build script
+    "thefuzz[speedup]",
+]
+
+[project.scripts]
+build = "library.build:main"
+
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
