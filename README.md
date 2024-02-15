@@ -1,6 +1,6 @@
 # Robot Concepts
 
-[![Build and Deploy](https://github.com/robot-education/robot-handbook/actions/workflows/gh-pages-deploy.yml/badge.svg?branch=main)](https://github.com/robot-education/robot-handbook/actions/workflows/gh-pages-deploy.yml)
+[![Build and Deploy](https://github.com/robot-education/robot-handbook/actions/workflows/deploy-website.yaml/badge.svg?branch=main)](https://github.com/robot-education/robot-handbook/actions/workflows/deploy-website.yaml)
 
 View the website by visiting [robothandbook.dev](https://robothandbook.dev).
 

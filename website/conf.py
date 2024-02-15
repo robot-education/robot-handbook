@@ -18,9 +18,9 @@ sys.path.append(os.path.abspath("/extensions"))
 
 # -- Project information -----------------------------------------------------
 
-project = "Robot Concepts"
-copyright = "2023, Alex Kempen and Egan Johnson"
-author = "Alex Kempen and Egan Johnson"
+project = "Robot Education"
+copyright = "2023, Alex Kempen"
+author = "Alex Kempen"
 
 # The full version, including alpha/beta/rc tags
 release = "1.0.0"
