@@ -1,5 +1,8 @@
 # Keyboard Shortcuts
 
+:::{note} This page is specific to Onshape. It is unlikely to apply to other CAD software.
+:::
+
 Here is a list of the most common/important Onshape shortcuts.
 
 General:
@@ -19,10 +22,10 @@ Sketch:
 - h - Horizontal
 - e - Equal
 - t - Tangent
-<!-- - Hold Shift - disable autoconstraining -->
+<!-- - Shift (hold) - disable autoconstraining -->
 
 Assembly:
 
 - j - Show/hide mate connectors
 - k - Show/hide mate features
-<!-- - Hold Shift - lock to face -->
+<!-- - Shift (hold) - lock to selected face -->
