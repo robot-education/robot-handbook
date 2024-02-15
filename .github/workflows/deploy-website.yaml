@@ -21,7 +21,7 @@ jobs:
       - name: Install and Build
         run: |
           bash setup.sh
-          python3 -m build --production
+          build --production
           make html
 
       - name: Setup Pages
