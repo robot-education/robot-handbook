@@ -194,5 +194,6 @@ poetry.toml
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,visualstudiocode
 
-# Don't commit the rendered media files
-media
+# Don't commit rendered media files
+/media
+generated

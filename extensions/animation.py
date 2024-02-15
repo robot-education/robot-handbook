@@ -87,9 +87,9 @@ class Animation(sphinx_docutils.SphinxDirective):
     def _parse_uri(self) -> str:
         path = Path(self.arguments[0])
         if len(path.parts) == 1:
-            path = "media" / path
+            path = "generated" / path
         else:
-            logger.warning('Animations may omit the "media" folder in their path')
+            logger.warning('Animations may omit the "generated" folder in their path')
         return docutils_directives.uri(str(path))
 
     def _add_caption(self, figure_node: nodes.figure) -> nodes.Node:

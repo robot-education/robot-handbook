@@ -86,10 +86,10 @@ def move_output(quality: str, file_path: pathlib.Path, scene_name: str) -> None:
     path, sub_folder = os.path.split(file_path)
 
     # -p suppresses errors
-    subprocess.run("mkdir -p {}/media".format(path), shell=True)
+    subprocess.run("mkdir -p {}/generated".format(path), shell=True)
 
     # for scene in scenes:
-    move_command = "mv media/videos/{sub_folder}/{quality_folder}/{scene_name}.mp4 {path}/media/.".format(
+    move_command = "mv media/videos/{sub_folder}/{quality_folder}/{scene_name}.mp4 {path}/generated/.".format(
         sub_folder=sub_folder.removesuffix(".py"),
         scene_name=scene_name,
         quality_folder=quality_folder,
