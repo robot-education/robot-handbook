@@ -11,19 +11,23 @@ Feature dialogs refers to menus that open whenever a feature is edited in Onshap
 
 ## Working With Selection Parameters
 
-Many Onshape features have multiple places where selections can be made. For example, the Mirror feature requires both selecting features/parts to extrude as well as a plane to mirror about. In these cases, you must first specify exactly where you'd like your selections to go by first clicking the appropriate Selection parameter.
+Many Onshape features have multiple places where selections can be made. In these cases, you must manually specify where you'd like your selections to go by manually activating the correct selection parameter.
 
-<!-- Gif of managing parameter focus to fill out an assembly mirror -->
+For example, the Mirror feature requires both selecting features/parts to extrude as well as a plane to mirror about. Thus, in order to use Mirror, you have to manually activate **Mirror plane** by clicking on it after you've selected your **Parts to mirror**.
 
-Onshape will automatically filter selections in the Graphics window to the type of the current active Selection parameter. So, it isn't possible to select a mirror plane while the **Parts to mirror** Selection parameter is active, and vice-versa for parts while the **Mirror plane** Selection parameter is active.
+<!-- Gif of managing parameter focus to fill out a part studio mirror -->
+
+Note Onshape will automatically filter selections in the Graphics window to the type of the current active selection parameter. So, it isn't possible to select a mirror plane while the **Parts to mirror** selection parameter is active, and vice-versa for parts while the **Mirror plane** selection parameter is active.
 
 :::{warning}
-If you're trying to make a selection you need but Onshape is refusing to highlight it, double check that the right Selection parameter is active!
+If you're trying to make a selection but Onshape won't let you, double check that the right selection parameter is active!
 :::
 
 ## Selecting An Entire Sketch
 
-When you click a sketch in the feature tree, Onshape will automatically create a query which will always use all elements from that sketch.
+It's possible to quickly select all elements in a sketch by clicking the sketch entry in the feature tree.
+
+<!-- Gif of selecting a sketch in a feature tree -->
 
 This can be faster than manually selecting every sketch element one-by-one, and is more robust to future changes to the sketch (since changes to the sketch will be automatically reflected in the feature).
 
@@ -32,11 +36,11 @@ This can be faster than manually selecting every sketch element one-by-one, and 
 
 ## Troubleshooting Features
 
-When Features are in an invalid state, they will turn red in the Feature tree. When a feature is in this state, an error message will be made available.
+When Features are in an invalid state, they will turn red in the Feature tree. When a feature is in this state, an error message can be viewed by hovering over the feature name in both the feature dialog and the feature tree.
 
 <!-- Screenshots of hovering over the error message in the tooltip/feature dialog -->
 
-Some features will also display banner messages, mark specific parameters in red, and show various error geometry while they are open.
+Some features will also display error messages as banners, mark invalid parameters in red, and/or show various error geometry while they are open.
 
 For example, the Hole tool will show the holes it is attempting to cut when one or more Sketch points are selected and the Merge scope is empty.
 
@@ -48,12 +52,12 @@ Several Onshape features use editing logic which automatically triggers to make 
 
 <!-- Insert gif of hole tool merge scope getting filled in automatically -->
 
-This behavior is generally helpful, but it can be detrimental in the case of the Extrude feature, which likes to automatically set itself to **Add** when a selection is made which is adjacent to another part.
+This behavior is generally helpful, but it can be detrimental in the case of the Extrude feature, which likes to automatically set itself to **Add** when a selection is made which is next to another part.
 
 <!-- Insert gif of Extrude setting itself to Add -->
 
-If you do not want Onshape to join your extrude with another part, you should keep an eye out for this behavior. If it does happen, you can fix it by toggling your extrude back to **New**.
+If you do not want Onshape to merge your extrude with an existing part, you should keep an eye out for this behavior. If it does happen, you can fix it by manually toggling your extrude back to **New**.
 
 :::{warning}
-If you're expecting to have multiple parts but you only have one, double check that Onshape hasn't automatically changed your extrude to **Add**!
+If you're expecting to have multiple parts but you only have one, make sure Onshape hasn't automatically changed your extrude to **Add**!
 :::
